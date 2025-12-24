@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\Client;
+use App\Models\ClientAccount;
 use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -16,8 +16,9 @@ return new class extends Migration
         Schema::create('client_memberships', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(User::class, 'user_id');
-            $table->foreignIdFor(Client::class, 'client_id');
+            $table->foreignIdFor(ClientAccount::class, 'client_account_id');
             $table->enum('status', ['pending','accepted','rejected'])->default('pending');
+            $table->unique(['user_id', 'client_account_id'],'client_membership_user_client_account_unique');
             $table->timestamps();
         });
     }
