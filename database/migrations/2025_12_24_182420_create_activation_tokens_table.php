@@ -12,11 +12,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('client_accounts', function (Blueprint $table) {
+        Schema::create('activation_tokens', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('address')->nullable();
-            $table->string('phone')->nullable();
+            $table->foreignIdFor(User::class);
+            $table->string('token');
+            $table->timestamp('expires_at');
             $table->timestamps();
         });
     }
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('client_accounts');
+        Schema::dropIfExists('activation_tokens');
     }
 };

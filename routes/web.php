@@ -1,37 +1,43 @@
 <?php
 
-use App\Livewire\MyTest\Welcome;
-use App\Livewire\Settings\Appearance;
-use App\Livewire\Settings\Password;
-use App\Livewire\Settings\Profile;
-use App\Livewire\Settings\TwoFactor;
+use App\Http\Controllers\SignupActivate;
+use App\Http\Middleware\IsVerified;
 use Illuminate\Support\Facades\Route;
-use Laravel\Fortify\Features;
+use App\Livewire\Login;
+use App\Livewire\SignedUp;
+use App\Livewire\Signup;
+use App\Livewire\UserHome;
+use App\Livewire\VerifyAccount;
+use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+Route::middleware(['auth',IsVerified::class])->group(function() {
+    Route::get('/home', UserHome::class)->name('user.home'); 
+});
 
-Route::middleware(['auth'])->group(function () {
-    Route::redirect('settings', 'settings/profile');
+/**
+* Logout a user
+*/
+Route::get('/logout', function() {
+    Auth::logout();
+   return redirect('/login');
+})->middleware('auth')->name('logout');
 
-    Route::get('settings/profile', Profile::class)->name('profile.edit');
-    Route::get('settings/password', Password::class)->name('user-password.edit');
-    Route::get('settings/appearance', Appearance::class)->name('appearance.edit');
+/**
+* Activation Route
+*/
+Route::get('/activate/{token}', [SignupActivate::class, 'activate'])->name('activate');
 
-    Route::get('settings/two-factor', TwoFactor::class)
-        ->middleware(
-            when(
-                Features::canManageTwoFactorAuthentication()
-                    && Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword'),
-                ['password.confirm'],
-                [],
-            ),
-        )
-        ->name('two-factor.show');
+/**
+* Guest Routes
+*/
+Route::get('/signed-up', SignedUp::class)->name('signed-up');
+Route::get('/email/verify', VerifyAccount::class)->name('verification.notice');
+Route::middleware('guest')->group(function() {
+    Route::get('/signup', Signup::class)->name('signup');
+    Route::get('/login', Login::class)->name('login');
 });
 
