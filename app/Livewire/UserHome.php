@@ -3,13 +3,20 @@
 namespace App\Livewire;
 
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
+use Illuminate\Support\Facades\Auth;
 
-#[Title('Manage Clients | Optima FM')]
+#[Layout('components.layouts.dashboard')]
+#[Title('My Organizations | Optima FM')]
 class UserHome extends Component
 {
     public function render()
     {
-        return view('livewire.user-home');
+        $memberships = Auth::user()->clientMemberships()->with('clientAccount')->get();
+
+        return view('livewire.user-home', [
+            'memberships' => $memberships
+        ]);
     }
 }

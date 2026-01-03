@@ -8,6 +8,7 @@ use App\Models\ClientMembership;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 final class PublicUserSignup
 {
@@ -41,6 +42,16 @@ final class PublicUserSignup
                     'user_id' => $user->id,
                     'status' => ClientMembership::STATUS_ACCEPTED,
                 ]);
+
+                // Set the current team id to the new client's id so the role is created for this team
+                setPermissionsTeamId($client->id);
+                
+                // Create the admin role for this client
+                $role = Role::create(['name' => 'admin', 'client_account_id' => $client->id]);
+                
+                // Assign the role to the user
+                $user->assignRole($role);
+
                 $user->verification_sent_at = now();
                 $user->save();  
                 event(new ClientRegistered($user));

@@ -7,9 +7,7 @@ use Illuminate\Http\Request;
 
 class CurrentClientResolver
 {
-    /**
-    * Create a new class instance.
-    */
+ 
     public function resolve(Request $request): ?ClientAccount
     {
         $user = $request->user();
