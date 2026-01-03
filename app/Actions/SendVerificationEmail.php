@@ -30,15 +30,16 @@ class SendVerificationEmail
          * Check if user has pending verifications that are under 5 mins before
          * sending a new one
          */
-        $last_token = $user->activationToken()->latest()->first();
-        if($last_token && $last_token->created_at->diffInMinutes(now()) < 5) {
-            $left = floor(5 - $last_token->created_at->diffInMinutes(now()));
+        $last_token = $user->verification_sent_at;
+        if($last_token && $last_token->diffInMinutes(now()) < 5) {
+            $left = floor(5 - $last_token->diffInMinutes(now()));
             $time = $left <= 1 ? " a few seconds" : $left . " minutes";
             $message = "Please try again after " . $time;
             return $error->push(['message' => $message, 'type' => 'warning']);
         }
         
-        $user->activationToken()->delete();
+        $user->verification_sent_at = now();
+        $user->save();
         
         event(new ResendVerification($user));
         return $error;

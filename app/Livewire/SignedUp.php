@@ -16,6 +16,9 @@ class SignedUp extends Component
     public function sendVerificationEmail()
     {
         $user = Auth::user();
+        if(!$user) {
+            return redirect('/login');
+        }
         $sendVerification = (new SendVerificationEmail())->execute($user);
 
         if($sendVerification->isNotEmpty()) {

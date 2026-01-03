@@ -8,9 +8,6 @@ use App\Models\ClientMembership;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use App\Mail\ActivationEmail;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
 
 final class PublicUserSignup
 {
@@ -29,6 +26,7 @@ final class PublicUserSignup
                     'password' => Hash::make($password),
                 ]);
                 
+                
                 /**
                 * Create the Client
                 */
@@ -43,7 +41,8 @@ final class PublicUserSignup
                     'user_id' => $user->id,
                     'status' => ClientMembership::STATUS_ACCEPTED,
                 ]);
-                
+                $user->verification_sent_at = now();
+                $user->save();  
                 event(new ClientRegistered($user));
                 return $user;
             });

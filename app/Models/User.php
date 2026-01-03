@@ -49,6 +49,7 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'verification_sent_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
@@ -63,10 +64,5 @@ class User extends Authenticatable
             ->take(2)
             ->map(fn ($word) => Str::substr($word, 0, 1))
             ->implode('');
-    }
-
-    public function activationToken(): HasOne
-    {
-        return $this->hasOne(ActivationToken::class);
     }
 }

@@ -16,7 +16,10 @@
         
         <!-- Logo -->
         <div class="w-full max-w-lg relative z-10 mb-8 flex justify-center">
+            <a href="{{ url('/') }}">
             <img src="{{ asset('images/logo-white.png') }}" class="w-40" alt="Logo" />
+            </a>
+
         </div>
 
         <!-- Background Decor -->

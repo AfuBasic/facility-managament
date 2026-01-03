@@ -1,4 +1,5 @@
 <div
+    x-cloak
     x-data="{
         show: false,
         message: '',

@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Livewire\Login;
 use App\Livewire\SignedUp;
 use App\Livewire\Signup;
+use App\Livewire\SignupActivation;
 use App\Livewire\UserHome;
 use App\Livewire\VerifyAccount;
 use Illuminate\Support\Facades\Auth;
@@ -29,7 +30,7 @@ Route::get('/logout', function() {
 /**
 * Activation Route
 */
-Route::get('/activate/{token}', [SignupActivate::class, 'activate'])->name('activate');
+Route::get('/activate/{user}', SignupActivation::class)->middleware('signed')->name('activate');
 
 /**
 * Guest Routes
