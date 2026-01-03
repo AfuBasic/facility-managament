@@ -7,6 +7,7 @@ use App\Http\Middleware\SetClientContext;
 use App\Livewire\Client\Assets;
 use App\Livewire\Client\Dashboard;
 use App\Livewire\Client\Facilities;
+use App\Livewire\Client\Roles;
 use App\Livewire\Client\SlaPolicy;
 use App\Livewire\Client\Users;
 use App\Livewire\Client\Vendors;
@@ -14,6 +15,7 @@ use App\Livewire\Client\WorkOrders;
 use App\Livewire\ForgotPassword;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Login;
+use App\Livewire\ResetPassword;
 use App\Livewire\SignedUp;
 use App\Livewire\Signup;
 use App\Livewire\SignupActivation;
@@ -45,6 +47,7 @@ Route::middleware(['auth', IsVerified::class])->group(function() {
              Route::get('/sla-policy', SlaPolicy::class)->name('sla-policy');
              Route::get('/vendors', Vendors::class)->name('vendors');
              Route::get('/users', Users::class)->name('users');
+             Route::get('/roles', Roles::class)->name('roles');
     });
 });
 
@@ -62,6 +65,6 @@ Route::middleware('guest')->group(function() {
     Route::get('/signup', Signup::class)->name('signup');
     Route::get('/login', Login::class)->name('login');
     Route::get('/forgot-password', ForgotPassword::class )->name('forgot-password');
-    Route::get('/reset-password/{token}', \App\Livewire\ResetPassword::class)->name('password.reset');
+    Route::get('/reset-password/{token}', ResetPassword::class)->name('password.reset');
 });
 
