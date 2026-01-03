@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\SignupActivate;
 use App\Http\Middleware\IsVerified;
+use App\Livewire\ForgotPassword;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Login;
 use App\Livewire\SignedUp;
@@ -40,5 +41,7 @@ Route::get('/email/verify', VerifyAccount::class)->name('verification.notice');
 Route::middleware('guest')->group(function() {
     Route::get('/signup', Signup::class)->name('signup');
     Route::get('/login', Login::class)->name('login');
+    Route::get('/forgot-password', ForgotPassword::class )->name('forgot-password');
+    Route::get('/reset-password/{token}', \App\Livewire\ResetPassword::class)->name('password.reset');
 });
 

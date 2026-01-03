@@ -26,6 +26,7 @@ class Login extends Component
         }
 
         $this->addError('email', 'The provided credentials do not match our records.');
+        $this->dispatch('toast', message: 'The provided credentials do not match our records.', type: 'error');
     }
 
     public function render()

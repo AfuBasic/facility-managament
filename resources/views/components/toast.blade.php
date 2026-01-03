@@ -34,13 +34,20 @@
         class="pointer-events-auto cursor-pointer"
     >
         <div
-            class="flex items-center gap-3 rounded-xl px-4 py-3 shadow-xl backdrop-blur border
-                   bg-white/90 text-gray-900 min-w-[320px]"
+            class="flex items-start gap-3 rounded-xl px-4 py-3 shadow-xl backdrop-blur
+                   min-w-[320px] border"
             :class="{
-                'border-emerald-200': type === 'success',
-                'border-red-200': type === 'error',
-                'border-amber-200': type === 'warning',
-                'border-sky-200': type === 'info',
+                /* SUCCESS */
+                'bg-emerald-50/90 border-emerald-300 text-emerald-900': type === 'success',
+
+                /* ERROR (very clear) */
+                'bg-red-50/95 border-red-400 text-red-900': type === 'error',
+
+                /* WARNING */
+                'bg-amber-50/95 border-amber-400 text-amber-900': type === 'warning',
+
+                /* INFO */
+                'bg-sky-50/95 border-sky-400 text-sky-900': type === 'info',
             }"
         >
 
@@ -66,15 +73,33 @@
                               d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                 </template>
+
+                <template x-if="type === 'info'">
+                    <svg class="h-5 w-5 text-sky-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </template>
             </div>
 
-            <!-- Content -->
+            <!-- Message -->
             <div class="flex-1 text-sm leading-snug">
-                <p x-text="message"></p>
+                <p
+                    x-text="message"
+                    :class="{ 'font-medium': type === 'error' }"
+                ></p>
             </div>
 
-            <!-- Close hint -->
-            <div class="text-xs text-gray-400 select-none">
+            <!-- Close -->
+            <div
+                class="text-xs select-none"
+                :class="{
+                    'text-red-400': type === 'error',
+                    'text-emerald-400': type === 'success',
+                    'text-amber-400': type === 'warning',
+                    'text-sky-400': type === 'info',
+                }"
+            >
                 ✕
             </div>
         </div>
