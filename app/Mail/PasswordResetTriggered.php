@@ -9,7 +9,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class PasswordResetTriggered extends Mailable
+class PasswordResetTriggered extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
@@ -37,7 +37,7 @@ class PasswordResetTriggered extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.users.password-reset',
+            view: 'emails.users.password-reset',
             with: [
                 'url' => $this->url,
                 'user' => $this->user,

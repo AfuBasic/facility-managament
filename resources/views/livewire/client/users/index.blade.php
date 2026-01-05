@@ -46,7 +46,7 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-slate-200">
                     @forelse($memberships as $membership)
-                    <tr>
+                    <tr wire:key="membership-{{ $membership->id }}">
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
                                 <div class="h-10 w-10 rounded-full bg-teal-100 flex items-center justify-center text-teal-700 font-bold text-sm">
@@ -77,14 +77,14 @@
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <div class="flex items-center justify-end gap-3">
                                 @if($membership->status === 'expired' || $membership->status === 'password_reset')
-                                    <button wire:click="resend({{ $membership->id }})" class="text-teal-600 hover:text-teal-900">Resend Invite</button>
+                                    <button wire:click="resend({{ $membership->id }})" wire:loading.attr="disabled" wire:target="resend({{ $membership->id }})" class="text-teal-600 hover:text-teal-900 disabled:opacity-50">Resend Invite</button>
                                 @endif
                                 
                                 @if($membership->status === 'accepted')
-                                    <button wire:click="resetAccount({{ $membership->id }})" wire:confirm="This will reset the user's password and require them to setup their account again. Continue?" class="text-indigo-600 hover:text-indigo-900">Reset Account</button>
+                                    <button wire:click="resetAccount({{ $membership->id }})" wire:loading.attr="disabled" wire:target="resetAccount({{ $membership->id }})" wire:confirm="This will reset the user's password and require them to setup their account again. Continue?" class="text-indigo-600 hover:text-indigo-900 disabled:opacity-50">Reset Account</button>
                                 @endif
 
-                                <button wire:click="delete({{ $membership->id }})" wire:confirm="Are you sure you want to remove this user?" class="text-red-600 hover:text-red-900">Remove</button>
+                                <button wire:click="delete({{ $membership->id }})" wire:loading.attr="disabled" wire:target="delete({{ $membership->id }})" wire:confirm="Are you sure you want to remove this user?" class="text-red-600 hover:text-red-900 disabled:opacity-50">Remove</button>
                             </div>
                         </td>
                     </tr>
@@ -108,13 +108,13 @@
         <div class="space-y-4">
             <div>
                 <label class="block text-sm font-medium text-slate-700 mb-1">Email Address</label>
-                <input type="email" wire:model="email" class="w-full rounded-lg border-slate-200 focus:border-teal-500 focus:ring-teal-500">
+                <input type="email" wire:model="email" class="p-2 border w-full rounded-lg border-slate-200 focus:border-teal-500 focus:ring-teal-500">
                 @error('email') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
             </div>
             
             <div>
                 <label class="block text-sm font-medium text-slate-700 mb-1">Role</label>
-                <select wire:model="role" class="w-full rounded-lg border-slate-200 focus:border-teal-500 focus:ring-teal-500">
+                <select wire:model="role" class="p-2 border w-full rounded-lg border-slate-200 focus:border-teal-500 focus:ring-teal-500">
                     <option value="">Select a role</option>
                     @foreach($roles as $role)
                         <option value="{{ $role->name }}">{{ ucwords($role->name) }}</option>
@@ -126,7 +126,10 @@
 
         <x-slot:footer>
             <x-ui.button variant="secondary" @click="show = false">Cancel</x-ui.button>
-            <x-ui.button wire:click="invite" :disabled="$roles->isEmpty()">Send Invitation</x-ui.button>
+            <x-ui.button wire:click="invite" :disabled="$roles->isEmpty()" wire:loading.attr="disabled">
+                <span wire:loading.remove wire:target="invite">Send Invitation</span>
+                <span wire:loading wire:target="invite">Sending...</span>
+            </x-ui.button>
         </x-slot:footer>
     </x-ui.modal>
 </div>

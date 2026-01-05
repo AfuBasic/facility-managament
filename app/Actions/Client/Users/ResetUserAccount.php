@@ -29,7 +29,7 @@ class ResetUserAccount
             ['membership' => $membership->id]
         );
 
-        // 4. Send Email
-        Mail::to($membership->user->email)->send(new PasswordResetTriggered($url, $membership->user));
+        // 4. Dispatch Event
+        \App\Events\AccountResetTriggered::dispatch($membership->user, $url);
     }
 }

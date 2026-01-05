@@ -8,7 +8,7 @@ class UpdateRole
 {
     public function execute(Role $role, string $name, array $permissions): Role
     {
-        $role->update(['name' => $name]);
+        $role->update(['name' => strtolower($name)]);
         $role->syncPermissions($permissions);
 
         return $role;

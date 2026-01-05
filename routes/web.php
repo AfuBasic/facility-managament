@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AcceptInvitationController;
 use App\Http\Controllers\ClientSessionController;
 use App\Http\Controllers\SignupActivate;
 use App\Http\Middleware\IsVerified;
@@ -61,11 +62,15 @@ Route::get('/activate/{user}', SignupActivation::class)->middleware('signed')->n
 */
 Route::get('/signed-up', SignedUp::class)->name('signed-up');
 Route::get('/email/verify', VerifyAccount::class)->name('verification.notice');
-Route::middleware('guest')->group(function() {
-    Route::get('/signup', Signup::class)->name('signup');
+Route::group(['middleware' => ['guest']], function () {
     Route::get('/login', Login::class)->name('login');
-    Route::get('/forgot-password', ForgotPassword::class )->name('forgot-password');
+    Route::get('/signup', Signup::class)->name('signup');
+    Route::get('/forgot-password', ForgotPassword::class)->name('password.request');
     Route::get('/reset-password/{token}', ResetPassword::class)->name('password.reset');
+    
+    // Invitation Routes
+    Route::get('/invitations/{membership}/accept', [AcceptInvitationController::class, 'show'])->name('invitations.accept');
+    Route::post('/invitations/{membership}/accept', [AcceptInvitationController::class, 'store']);
 });
 
 /**

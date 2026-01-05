@@ -25,6 +25,6 @@ class ResendInvitation
             ['membership' => $membership->id]
         );
 
-        Mail::to($membership->user->email)->send(new UserInvitation($url, $membership->user));
+        \App\Events\InvitationResent::dispatch($membership->user, $url, $membership->clientAccount);
     }
 }

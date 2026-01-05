@@ -9,7 +9,6 @@ use App\Actions\Client\Users\ResetUserAccount;
 use App\Models\ClientAccount;
 use App\Models\ClientMembership;
 use App\Models\User;
-use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -24,10 +23,19 @@ class Users extends Component
     public $email = '';
     public $role = '';
     public $showInviteModal = false;
-
+    public ClientAccount | null $clientAccount;
+    
+    public function hydrate()
+    {
+        if ($this->clientAccount) {
+            setPermissionsTeamId($this->clientAccount->id);
+        }
+    }
+    
     public function mount()
     {
-        Gate::authorize('view users');
+        $this->clientAccount = app(ClientAccount::class);
+        $this->authorize('view users');
     }
 
     public function invite(InviteUser $inviteUser)
@@ -36,8 +44,16 @@ class Users extends Component
             'email' => 'required|email',
             'role' => 'required|exists:roles,name'
         ]);
+
+        $existingUser = User::where('email', $this->email)->first();
+        if ($existingUser && ClientMembership::where('user_id', $existingUser->id)
+            ->where('client_account_id', $this->clientAccount->id)
+            ->exists()) {
+            $this->addError('email', 'This user is already a member of this organization.');
+            return;
+        }
         
-        $inviteUser->execute($this->email, $this->role, app(ClientAccount::class)->id);
+        $inviteUser->execute($this->email, $this->role, $this->clientAccount->id);
 
         $this->showInviteModal = false;
         $this->reset(['email', 'role']);
@@ -47,7 +63,7 @@ class Users extends Component
     public function resend($membershipId, ResendInvitation $resendInvitation)
     {
         $membership = ClientMembership::findOrFail($membershipId);
-        $this->authorize('update', $membership->user);
+        $this->authorize('edit users');
         
         $resendInvitation->execute($membership);
         
@@ -57,7 +73,7 @@ class Users extends Component
     public function resetAccount($membershipId, ResetUserAccount $resetAccount)
     {
         $membership = ClientMembership::findOrFail($membershipId);
-        $this->authorize('update', $membership->user);
+        $this->authorize('edit users');
         
         $resetAccount->execute($membership);
         
@@ -67,7 +83,7 @@ class Users extends Component
     public function delete($membershipId)
     {
          $membership = ClientMembership::findOrFail($membershipId);
-         $this->authorize('delete', $membership->user);
+         $this->authorize('delete users');
          
          $membership->delete();
          
@@ -76,7 +92,7 @@ class Users extends Component
 
     public function render()
     {
-        $client = app(ClientAccount::class);
+        $client = $this->clientAccount;
         
         $memberships = ClientMembership::where('client_account_id', $client->id)
             ->with(['user', 'user.roles'])

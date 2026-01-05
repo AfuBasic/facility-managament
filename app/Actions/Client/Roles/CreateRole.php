@@ -9,7 +9,7 @@ class CreateRole
     public function execute(string $name, array $permissions, string $clientAccountId): Role
     {
         $role = Role::create([
-            'name' => $name,
+            'name' => strtolower($name),
             'guard_name' => 'web',
             'client_account_id' => $clientAccountId
         ]);

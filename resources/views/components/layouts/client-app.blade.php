@@ -3,6 +3,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="{{ asset('images/icons/icon_64.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('images/icons/icon_128.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('images/icons/icon_256.png') }}">
     <title>{{ $title ?? 'Optima FM' }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles

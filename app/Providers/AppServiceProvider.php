@@ -26,12 +26,7 @@ class AppServiceProvider extends ServiceProvider
             return route('user.home');
         });
 
-        Gate::before(function ($user, $ability) {
-            if (! app()->bound(ClientAccount::class)) {
-                return null;
-            }
-            $clientAccount = app(ClientAccount::class);
-            // Spatie scopes to the current team automatically via setPermissionsTeamId called in middleware
+        Gate::before(function ($user) {
             return $user->hasRole('admin') ?: null;
         });
     }

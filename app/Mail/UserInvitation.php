@@ -9,7 +9,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class UserInvitation extends Mailable
+class UserInvitation extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
@@ -18,7 +18,8 @@ class UserInvitation extends Mailable
      */
     public function __construct(
         public string $url,
-        public $user
+        public $user,
+        public \App\Models\ClientAccount $clientAccount
     ) {}
 
     /**
@@ -37,10 +38,11 @@ class UserInvitation extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.users.invitation',
+            view: 'emails.users.invitation',
             with: [
                 'url' => $this->url,
                 'user' => $this->user,
+                'clientAccount' => $this->clientAccount,
             ],
         );
     }
