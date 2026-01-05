@@ -2,6 +2,9 @@
 
 namespace App\Livewire\Client;
 
+use App\Actions\Client\CreateRole;
+use App\Actions\Client\DeleteRole;
+use App\Actions\Client\UpdateRole;
 use App\Models\ClientAccount;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Rule;
@@ -61,24 +64,18 @@ class Roles extends Component
         $this->showModal = true;
     }
 
-    public function save()
-    {
+    public function save(
+        CreateRole $createRole,
+        UpdateRole $updateRole
+    ) {
         $this->validate();
 
         if ($this->isEditing) {
             $role = Role::where('client_account_id', $this->clientAccountId)->findOrFail($this->editingRoleId);
-            $role->update(['name' => $this->name]);
+            $updateRole->execute($role, $this->name, $this->selectedPermissions);
         } else {
-            // Create role scoped to this client/team
-            $role = Role::create([
-                'name' => $this->name,
-                'guard_name' => 'web',
-                'client_account_id' => app(ClientAccount::class)->id
-            ]);
+            $createRole->execute($this->name, $this->selectedPermissions, $this->clientAccountId);
         }
-
-        // Sync permissions
-        $role->syncPermissions($this->selectedPermissions);
 
         $this->showModal = false;
         $this->loadRoles();
@@ -86,10 +83,10 @@ class Roles extends Component
         $this->dispatch('toast', message: 'Role saved successfully!', type: 'success');
     }
 
-    public function delete($id)
+    public function delete($id, DeleteRole $deleteRole)
     {
         $role = Role::where('client_account_id', $this->clientAccountId)->findOrFail($id);
-        $role->delete();
+        $deleteRole->execute($role);
         
         $this->loadRoles();
         $this->dispatch('toast', message: 'Role deleted successfully.', type: 'success');
