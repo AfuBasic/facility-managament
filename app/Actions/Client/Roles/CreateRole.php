@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Actions\Client;
+namespace App\Actions\Client\Roles;
 
-use App\Models\ClientAccount;
 use Spatie\Permission\Models\Role;
 
 class CreateRole

@@ -43,7 +43,7 @@
             
             <div class="flex flex-wrap gap-1.5 mt-4 max-h-24 overflow-y-auto custom-scrollbar">
                 @foreach($role->permissions->take(8) as $permission)
-                <x-ui.badge>{{ $permission->name }}</x-ui.badge>
+                <x-ui.badge>{{ ucwords($permission->name) }}</x-ui.badge>
                 @endforeach
                 @if($role->permissions->count() > 8)
                 <x-ui.badge variant="neutral">+{{ $role->permissions->count() - 8 }} more</x-ui.badge>
@@ -74,33 +74,37 @@
         <!-- Name -->
         <div class="mb-6">
             <label class="block text-sm font-medium text-slate-700 mb-1">Role Name</label>
-            <input type="text" wire:model="name" class="w-full rounded-lg border-slate-200 focus:border-teal-500 focus:ring-teal-500 transition-colors" placeholder="e.g. Maintenance Manager">
+            <input type="text" wire:model="name" class="w-full transition-colors rounded-lg border border-slate-200 p-2 focus:border-teal-500 focus:ring-teal-500" placeholder="e.g. Maintenance Manager">
             @error('name') <span class="text-sm text-red-500 mt-1">{{ $message }}</span> @enderror
         </div>
         
         <!-- Permissions Grid -->
         <div>
-            <label class="block text-sm font-medium text-slate-700 mb-3">Permissions</label>
+            <div class="flex items-center justify-between mb-4">
+                <label class="block text-sm font-medium text-slate-700">Permissions</label>
+                <button type="button" wire:click="toggleSelectAll" class="text-sm font-medium text-teal-600 hover:text-teal-700 hover:underline transition-colors focus:outline-none">
+                    {{ count($selectedPermissions) === \Spatie\Permission\Models\Permission::count() ? 'Deselect All' : 'Select All' }}
+                </button>
+            </div>
+            
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach($groupedPermissions as $group => $perms)
-                <div class="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                    <h4 class="text-sm font-semibold text-slate-900 mb-3 uppercase tracking-wide border-b border-slate-200 pb-2">{{ $group }}</h4>
-                    <div class="space-y-2">
+                <div class="bg-slate-50 rounded-xl p-4 border border-slate-100 hover:border-teal-100 transition-colors">
+                    <div class="flex items-center justify-between border-b border-slate-200 pb-2 mb-3">
+                        <h4 class="text-sm font-semibold text-slate-900 uppercase tracking-wide">{{ $group }}</h4>
+                        <button type="button" wire:click="toggleGroup('{{ $group }}')" class="text-xs font-medium text-slate-400 hover:text-teal-600 transition-colors focus:outline-none">
+                            Check All
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-3">
                         @foreach($perms as $perm)
-                        <div class="flex items-start">
-                            <div class="flex h-5 items-center">
-                                <input id="perm-{{ $perm->id }}" 
-                                wire:model="selectedPermissions" 
-                                value="{{ $perm->name }}" 
-                                type="checkbox" 
-                                class="h-4 w-4 rounded border-slate-300 text-teal-600 focus:ring-teal-600">
-                            </div>
-                            <div class="ml-3 text-sm">
-                                <label for="perm-{{ $perm->id }}" class="font-medium text-slate-600 cursor-pointer select-none">
-                                    {{ str_replace($group . ' ', '', str_replace('view', 'View', str_replace('create', 'Create', str_replace('edit', 'Edit', str_replace('delete', 'Delete', ucfirst($perm->name)))))) }}
-                                </label>
-                            </div>
-                        </div>
+                        <x-ui.checkbox 
+                            wire:key="perm-{{ $perm->id }}"
+                            wire:model="selectedPermissions" 
+                            value="{{ $perm->name }}"
+                            label="{{ str_replace($group . ' ', '', str_replace('view', 'View', str_replace('create', 'Create', str_replace('edit', 'Edit', str_replace('delete', 'Delete', ucfirst($perm->name)))))) }}"
+                        />
                         @endforeach
                     </div>
                 </div>

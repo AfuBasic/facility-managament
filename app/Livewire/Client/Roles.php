@@ -2,9 +2,9 @@
 
 namespace App\Livewire\Client;
 
-use App\Actions\Client\CreateRole;
-use App\Actions\Client\DeleteRole;
-use App\Actions\Client\UpdateRole;
+use App\Actions\Client\Roles\CreateRole;
+use App\Actions\Client\Roles\DeleteRole;
+use App\Actions\Client\Roles\UpdateRole;
 use App\Models\ClientAccount;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Rule;
@@ -90,6 +90,44 @@ class Roles extends Component
         
         $this->loadRoles();
         $this->dispatch('toast', message: 'Role deleted successfully.', type: 'success');
+    }
+
+    public function toggleSelectAll()
+    {
+        // If all are selected, deselect all. Otherwise, select all.
+        $allPermissions = Permission::all()->pluck('name')->toArray();
+        
+        if (count($this->selectedPermissions) === count($allPermissions)) {
+            $this->selectedPermissions = [];
+        } else {
+            $this->selectedPermissions = $allPermissions;
+        }
+    }
+
+    public function toggleGroup($groupName)
+    {
+        // Get all permissions for this group
+        // We need to replicate the grouping logic or filter existing permissions
+        // Replicating logic: simple string matching based on the convention "action module"
+        
+        $groupPermissions = Permission::all()->filter(function($perm) use ($groupName) {
+            $parts = explode(' ', $perm->name);
+            $module = count($parts) > 1 ? ucfirst($parts[1]) : 'Other';
+            return $module === $groupName;
+        })->pluck('name')->toArray();
+        
+        $intersect = array_intersect($this->selectedPermissions, $groupPermissions);
+        
+        if (count($intersect) === count($groupPermissions)) {
+            // All selected, so deselect this group
+            $this->selectedPermissions = array_diff($this->selectedPermissions, $groupPermissions);
+        } else {
+            // Not all selected, so select all in group (merge)
+            $this->selectedPermissions = array_unique(array_merge($this->selectedPermissions, $groupPermissions));
+        }
+        
+        // Re-index array to be safe
+        $this->selectedPermissions = array_values($this->selectedPermissions);
     }
 
     public function render()
