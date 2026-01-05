@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Client;
 
+use App\Models\ClientAccount;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -12,6 +13,6 @@ class Dashboard extends Component
 {
     public function render()
     {
-        return view('livewire.client.dashboard');
+        return view('livewire.client.dashboard.index');
     }
 }

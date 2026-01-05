@@ -47,10 +47,10 @@ final class PublicUserSignup
                 setPermissionsTeamId($client->id);
                 
                 // Create the admin role for this client
-                $role = Role::create(['name' => 'admin', 'client_account_id' => $client->id]);
+                $role = Role::create(['name' => 'admin', 'guard_name' => 'web','client_account_id' => $client->id]);
                 
                 // Assign the role to the user
-                $user->assignRole($role);
+                $user->assignRole($role, $client->id);
 
                 $user->verification_sent_at = now();
                 $user->save();  

@@ -17,6 +17,7 @@
         <li>
             <div class="text-xs font-semibold leading-6 text-slate-500 uppercase tracking-widest mb-4 px-2">Management</div>
             <ul role="list" class="-mx-2 space-y-2">
+                @can('view facilities')
                 <li>
                     <a href="{{ route('app.facilities') }}" wire:navigate class="group flex gap-x-3 rounded-xl p-2.5 text-sm leading-6 font-semibold transition-all duration-300 {{ request()->routeIs('app.facilities') ? 'bg-gradient-to-r from-teal-500/10 to-transparent text-teal-400 border-l-4 border-teal-500 shadow-[0_0_20px_rgba(45,212,191,0.1)]' : 'text-slate-400 hover:text-white hover:bg-slate-800/50 border-l-4 border-transparent' }}">
                         <svg class="h-6 w-6 shrink-0 {{ request()->routeIs('app.facilities') ? 'text-teal-400' : 'text-slate-500 group-hover:text-teal-400 transition-colors' }}" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -25,6 +26,8 @@
                         Facilities
                     </a>
                 </li>
+                @endcan
+                @can('view assets')
                  <li>
                     <a href="{{ route('app.assets') }}" wire:navigate class="group flex gap-x-3 rounded-xl p-2.5 text-sm leading-6 font-semibold transition-all duration-300 {{ request()->routeIs('app.assets') ? 'bg-gradient-to-r from-teal-500/10 to-transparent text-teal-400 border-l-4 border-teal-500 shadow-[0_0_20px_rgba(45,212,191,0.1)]' : 'text-slate-400 hover:text-white hover:bg-slate-800/50 border-l-4 border-transparent' }}">
                         <svg class="h-6 w-6 shrink-0 {{ request()->routeIs('app.assets') ? 'text-teal-400' : 'text-slate-500 group-hover:text-teal-400 transition-colors' }}" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -33,6 +36,8 @@
                         Assets
                     </a>
                 </li>
+                @endcan
+                @can('view work orders')
                  <li>
                     <a href="{{ route('app.work-orders') }}" wire:navigate class="group flex gap-x-3 rounded-xl p-2.5 text-sm leading-6 font-semibold transition-all duration-300 {{ request()->routeIs('app.work-orders') ? 'bg-gradient-to-r from-teal-500/10 to-transparent text-teal-400 border-l-4 border-teal-500 shadow-[0_0_20px_rgba(45,212,191,0.1)]' : 'text-slate-400 hover:text-white hover:bg-slate-800/50 border-l-4 border-transparent' }}">
                         <svg class="h-6 w-6 shrink-0 {{ request()->routeIs('app.work-orders') ? 'text-teal-400' : 'text-slate-500 group-hover:text-teal-400 transition-colors' }}" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -41,12 +46,14 @@
                         Work Orders
                     </a>
                 </li>
+                @endcan
             </ul>
         </li>
 
         <li>
             <div class="text-xs font-semibold leading-6 text-slate-500 uppercase tracking-widest mb-4 px-2">Compliance & People</div>
             <ul role="list" class="-mx-2 space-y-2">
+                 @can('view sla policy')
                  <li>
                     <a href="{{ route('app.sla-policy') }}" wire:navigate class="group flex gap-x-3 rounded-xl p-2.5 text-sm leading-6 font-semibold transition-all duration-300 {{ request()->routeIs('app.sla-policy') ? 'bg-gradient-to-r from-teal-500/10 to-transparent text-teal-400 border-l-4 border-teal-500 shadow-[0_0_20px_rgba(45,212,191,0.1)]' : 'text-slate-400 hover:text-white hover:bg-slate-800/50 border-l-4 border-transparent' }}">
                         <svg class="h-6 w-6 shrink-0 {{ request()->routeIs('app.sla-policy') ? 'text-teal-400' : 'text-slate-500 group-hover:text-teal-400 transition-colors' }}" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -55,6 +62,8 @@
                         SLA Policy
                     </a>
                 </li>
+                @endcan
+                @can('view vendors')
                  <li>
                     <a href="{{ route('app.vendors') }}" wire:navigate class="group flex gap-x-3 rounded-xl p-2.5 text-sm leading-6 font-semibold transition-all duration-300 {{ request()->routeIs('app.vendors') ? 'bg-gradient-to-r from-teal-500/10 to-transparent text-teal-400 border-l-4 border-teal-500 shadow-[0_0_20px_rgba(45,212,191,0.1)]' : 'text-slate-400 hover:text-white hover:bg-slate-800/50 border-l-4 border-transparent' }}">
                         <svg class="h-6 w-6 shrink-0 {{ request()->routeIs('app.vendors') ? 'text-teal-400' : 'text-slate-500 group-hover:text-teal-400 transition-colors' }}" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -63,6 +72,8 @@
                         Vendors
                     </a>
                 </li>
+                @endcan
+                @can('view users')
                 <li>
                     <a href="{{ route('app.users') }}" wire:navigate class="group flex gap-x-3 rounded-xl p-2.5 text-sm leading-6 font-semibold transition-all duration-300 {{ request()->routeIs('app.users') ? 'bg-gradient-to-r from-teal-500/10 to-transparent text-teal-400 border-l-4 border-teal-500 shadow-[0_0_20px_rgba(45,212,191,0.1)]' : 'text-slate-400 hover:text-white hover:bg-slate-800/50 border-l-4 border-transparent' }}">
                         <svg class="h-6 w-6 shrink-0 {{ request()->routeIs('app.users') ? 'text-teal-400' : 'text-slate-500 group-hover:text-teal-400 transition-colors' }}" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -71,6 +82,8 @@
                         Users
                     </a>
                 </li>
+                @endcan
+                @can('view roles')
                 <li>
                     <a href="{{ route('app.roles') }}" wire:navigate class="group flex gap-x-3 rounded-xl p-2.5 text-sm leading-6 font-semibold transition-all duration-300 {{ request()->routeIs('app.roles') ? 'bg-gradient-to-r from-teal-500/10 to-transparent text-teal-400 border-l-4 border-teal-500 shadow-[0_0_20px_rgba(45,212,191,0.1)]' : 'text-slate-400 hover:text-white hover:bg-slate-800/50 border-l-4 border-transparent' }}">
                         <svg class="h-6 w-6 shrink-0 {{ request()->routeIs('app.roles') ? 'text-teal-400' : 'text-slate-500 group-hover:text-teal-400 transition-colors' }}" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -79,6 +92,7 @@
                         Roles
                     </a>
                 </li>
+                @endcan
             </ul>
         </li>
     </ul>
