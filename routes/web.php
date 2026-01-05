@@ -68,3 +68,10 @@ Route::middleware('guest')->group(function() {
     Route::get('/reset-password/{token}', ResetPassword::class)->name('password.reset');
 });
 
+/**
+ * Logout Route
+ */
+Route::get('/logout', function () {
+    Auth::logout();
+    return redirect()->route('login');
+})->name('logout');
