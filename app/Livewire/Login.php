@@ -25,8 +25,8 @@ class Login extends Component
             return redirect()->intended(route('user.home'));
         }
 
-        $this->addError('email', 'The provided credentials do not match our records.');
-        $this->dispatch('toast', message: 'The provided credentials do not match our records.', type: 'error');
+        $this->addError('email', 'Invalid Login Credentials.');
+        $this->dispatch('toast', message: 'Invalid Login Credentials.', type: 'error');
     }
 
     public function render()
