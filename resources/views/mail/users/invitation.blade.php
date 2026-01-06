@@ -27,11 +27,12 @@
                 <h1 style="color: #0F172A; margin-top: 0; font-size: 24px;">You've Been Invited!</h1>
                 
                 <p class="text">Hello {{ $user->name }},</p>
-                <p class="text">You have been invited to join the <strong>{{ $clientAccount->name }}</strong> team on <strong></strong>Optima FM</strong>. We'd love to have you on board to help manage our facilities efficiently.</p>
+                <p class="text">You have been invited to join the <strong>{{ $clientAccount->name }}</strong> team on <strong></strong>Optima FM</strong> as <strong>{{ $role }}</strong>. They'd love to have you on board to help manage their facilities efficiently.</p>
                 
                 <a href="{{ $url }}" class="btn-primary">Accept Invitation</a>
                 
                 <p class="text" style="font-size: 14px; color: #64748B;">This link is valid for 1 hour.</p>
+                <p class="text" style="font-size: 14px; color: #64748B;">You can also find the invitation on your invitation section if you already have an account with Optima FM.</p>
 
                 <p class="text" style="margin-top: 32px; font-size: 14px;">If the button doesn't work, copy and paste this link into your browser:</p>
                 <a href="{{ $url }}" class="link-text">{{ $url }}</a>

@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Models\ClientAccount;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -19,7 +20,8 @@ class UserInvitation extends Mailable implements ShouldQueue
     public function __construct(
         public string $url,
         public $user,
-        public \App\Models\ClientAccount $clientAccount
+        public ClientAccount $clientAccount,
+        public string $role
     ) {}
 
     /**
@@ -38,11 +40,12 @@ class UserInvitation extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(
-            view: 'emails.users.invitation',
+            view: 'mail.users.invitation',
             with: [
                 'url' => $this->url,
                 'user' => $this->user,
                 'clientAccount' => $this->clientAccount,
+                'role' => $this->role,
             ],
         );
     }

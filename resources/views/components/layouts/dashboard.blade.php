@@ -44,6 +44,10 @@
                     Dashboard
                 </x-nav-link>
 
+                <x-nav-link href="{{ route('user.invitations') }}" icon="envelope" :active="request()->routeIs('user.invitations')">
+                    Invitations
+                </x-nav-link>
+
                 <x-nav-link href="{{ route('user.settings') }}" icon="cog-6-tooth" :active="request()->routeIs('user.settings')">
                     Settings
                 </x-nav-link>
@@ -92,6 +96,8 @@
             </main>
         </div>
     </div>
+    
+    <x-ui.confirm-modal />
     
     @livewireScripts
 </body>

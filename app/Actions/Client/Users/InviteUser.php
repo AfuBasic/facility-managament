@@ -4,8 +4,10 @@ namespace App\Actions\Client\Users;
 
 use App\Events\UserInvited;
 use App\Mail\UserInvitation;
+use App\Models\ClientAccount;
 use App\Models\ClientMembership;
 use App\Models\User;
+use App\Services\InvitationTracker;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
@@ -16,6 +18,10 @@ class InviteUser
     public function execute(string $email, string $roleName, string $clientAccountId): void
     {
         DB::transaction(function() use ($email, $roleName, $clientAccountId) {
+            // Check if user already exists
+            $existingUser = User::where('email', $email)->first();
+            $isNewUser = !$existingUser;
+            
             //  Find or Create User
             $user = User::firstOrCreate(
                 ['email' => $email],
@@ -46,10 +52,19 @@ class InviteUser
                     now()->addHour(),
                     ['membership' => $membership->id]
                 );
+                
+                // Track invitation
+                app(InvitationTracker::class)->recordInvitation(
+                    email: $email,
+                    roleName: $roleName,
+                    clientAccountId: (int) $clientAccountId,
+                    invitedByUserId: auth()->id(),
+                    isNewUser: $isNewUser
+                );
                     
                 // Dispatch Event
-                $clientAccount = \App\Models\ClientAccount::find($clientAccountId);
-                UserInvited::dispatch($user, $url, $clientAccount);
+                $clientAccount = ClientAccount::find($clientAccountId);
+                UserInvited::dispatch($user, $url, $clientAccount, $roleName);
         });
     }
 }

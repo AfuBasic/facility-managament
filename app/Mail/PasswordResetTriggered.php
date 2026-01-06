@@ -37,7 +37,7 @@ class PasswordResetTriggered extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(
-            view: 'emails.users.password-reset',
+            view: 'mail.users.password-reset',
             with: [
                 'url' => $this->url,
                 'user' => $this->user,

@@ -45,6 +45,7 @@
                 </div>
             @endforeach
         </div>
+
     @else
         <!-- Empty State -->
         <div class="text-center py-20 bg-white rounded-3xl border border-dashed border-slate-300">

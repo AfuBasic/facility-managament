@@ -21,6 +21,7 @@ use App\Livewire\SignedUp;
 use App\Livewire\Signup;
 use App\Livewire\SignupActivation;
 use App\Livewire\UserHome;
+use App\Livewire\UserInvitations;
 use App\Livewire\UserSettings;
 use App\Livewire\VerifyAccount;
 use Illuminate\Support\Facades\Auth;
@@ -31,6 +32,7 @@ Route::get('/', function () {
 
 Route::middleware(['auth', IsVerified::class])->group(function() {
     Route::get('/home', UserHome::class)->name('user.home'); 
+    Route::get('/user/invitations', UserInvitations::class)->name('user.invitations');
     Route::get('/user/settings', UserSettings::class)->name('user.settings');
     
     // Switch Client Route
@@ -69,10 +71,10 @@ Route::group(['middleware' => ['guest']], function () {
     Route::get('/reset-password/{token}', ResetPassword::class)->name('password.reset');
     
     // Invitation Routes
-    Route::get('/invitations/{membership}/accept', [AcceptInvitationController::class, 'show'])->name('invitations.accept');
-    Route::post('/invitations/{membership}/accept', [AcceptInvitationController::class, 'store']);
 });
 
+Route::get('/invitations/{membership}/accept', [AcceptInvitationController::class, 'show'])->name('invitations.accept');
+Route::post('/invitations/{membership}/accept', [AcceptInvitationController::class, 'store']);
 /**
  * Logout Route
  */

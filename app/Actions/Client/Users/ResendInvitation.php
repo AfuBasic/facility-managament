@@ -3,6 +3,7 @@
 namespace App\Actions\Client\Users;
 
 use App\Models\ClientMembership;
+use App\Services\InvitationTracker;
 use Illuminate\Support\Facades\URL;
 
 class ResendInvitation
@@ -21,6 +22,12 @@ class ResendInvitation
             'invitations.accept',
             now()->addHour(),
             ['membership' => $membership->id]
+        );
+
+        // Track resend
+        app(InvitationTracker::class)->recordResend(
+            email: $membership->user->email,
+            clientAccountId: $membership->client_account_id
         );
 
         \App\Events\InvitationResent::dispatch($membership->user, $url, $membership->clientAccount);

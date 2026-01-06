@@ -109,10 +109,18 @@
                             @can('edit users')
                             <!-- Reset Account Button -->
                             <button 
-                                wire:click="resetAccount({{ $membership->id }})" 
                                 wire:loading.attr="disabled" 
                                 wire:target="resetAccount({{ $membership->id }})" 
-                                wire:confirm="This will reset the user's password and require them to setup their account again. Continue?" 
+                                @click="window.dispatchEvent(new CustomEvent('confirm-action', {
+                                    detail: {
+                                        title: 'Reset Account',
+                                        message: 'This will reset the user\'s password and require them to setup their account again. Continue?',
+                                        confirmText: 'Reset Account',
+                                        cancelText: 'Cancel',
+                                        variant: 'warning',
+                                        action: () => $wire.resetAccount({{ $membership->id }})
+                                    }
+                                }))"
                                 class="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded transition-colors disabled:opacity-50"
                                 title="Reset Account"
                             >
@@ -126,10 +134,18 @@
                             @can('delete users')
                             <!-- Delete Button -->
                             <button 
-                                wire:click="delete({{ $membership->id }})" 
                                 wire:loading.attr="disabled" 
                                 wire:target="delete({{ $membership->id }})" 
-                                wire:confirm="Are you sure you want to remove this user?" 
+                                @click="window.dispatchEvent(new CustomEvent('confirm-action', {
+                                    detail: {
+                                        title: 'Remove User',
+                                        message: 'Are you sure you want to remove this user? This action cannot be undone.',
+                                        confirmText: 'Remove User',
+                                        cancelText: 'Cancel',
+                                        variant: 'danger',
+                                        action: () => $wire.delete({{ $membership->id }})
+                                    }
+                                }))"
                                 class="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
                                 title="Remove User"
                             >

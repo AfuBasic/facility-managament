@@ -25,6 +25,14 @@ class AcceptInvitationController extends Controller
         if ($membership->status === ClientMembership::STATUS_EXPIRED) {
              return view('auth.invitation-expired');
         }
+        
+        if(auth()->user()) {
+            return redirect()->route('user.invitations');
+        }
+        if($membership->user->email_verified_at) {
+            return redirect()->route('login')->with('url.intended', route('user.invitations'));
+        }
+
 
         return view('auth.accept-invitation', ['membership' => $membership]);
     }

@@ -127,6 +127,9 @@
     </div>
 
     <x-toast />
+    
+    <x-ui.confirm-modal />
+    
     @livewireScripts
 </body>
 </html>
