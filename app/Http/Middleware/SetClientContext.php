@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\ClientAccount;
 use App\Services\CurrentClientResolver;
 use Closure;
 use Illuminate\Http\Request;
@@ -30,8 +31,11 @@ class SetClientContext
         }
 
         // Bind the current client to the container
-        app()->instance('currentClient', $client);
-
+        app()->instance(ClientAccount::class, $client);
+        
+        // precise permission team
+        setPermissionsTeamId($client->id);
+        
         return $next($request);
     }
 }

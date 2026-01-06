@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\ClientMembership;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -15,8 +16,13 @@ class UserHome extends Component
     {
         $memberships = Auth::user()->clientMemberships()->with('clientAccount')->get();
 
+        $pendingInvitationsCount = ClientMembership::where('user_id', auth()->id())
+            ->where('status', ClientMembership::STATUS_PENDING)
+            ->count();
+
         return view('livewire.user-home', [
-            'memberships' => $memberships
+            'memberships' => $memberships,
+            'pendingInvitationsCount' => $pendingInvitationsCount
         ]);
     }
 }

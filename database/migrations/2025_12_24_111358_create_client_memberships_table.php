@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(User::class, 'user_id');
             $table->foreignIdFor(ClientAccount::class, 'client_account_id');
-            $table->enum('status', ['pending','accepted','rejected'])->default('pending');
+            $table->enum('status', ['pending','accepted','rejected','password_reset','expired'])->default('pending');
             $table->unique(['user_id', 'client_account_id'],'client_membership_user_client_account_unique');
             $table->timestamps();
         });
