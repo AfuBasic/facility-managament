@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\ClientMembership;
+use App\Models\InvitationLog;
 use App\Services\InvitationTracker;
 use Illuminate\Support\Facades\URL;
 use Livewire\Attributes\Layout;
@@ -13,6 +14,8 @@ use Livewire\Component;
 #[Title('My Invitations | Optima FM')]
 class UserInvitations extends Component
 {
+    public $activeTab = 'pending';
+
     public function render()
     {
         $invitations = ClientMembership::where('user_id', auth()->id())
@@ -21,9 +24,20 @@ class UserInvitations extends Component
             ->latest()
             ->get();
 
+        $invitationHistory = InvitationLog::where('email', auth()->user()->email)
+            ->with(['clientAccount', 'invitedBy'])
+            ->latest('invited_at')
+            ->get();
+
         return view('livewire.user-invitations.index', [
-            'invitations' => $invitations
+            'invitations' => $invitations,
+            'invitationHistory' => $invitationHistory
         ]);
+    }
+
+    public function setTab($tab)
+    {
+        $this->activeTab = $tab;
     }
 
     public function accept($membershipId)

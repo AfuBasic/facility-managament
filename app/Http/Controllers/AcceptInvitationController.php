@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 
 use App\Models\ClientMembership;
+use App\Services\InvitationTracker;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -53,7 +54,11 @@ class AcceptInvitationController extends Controller
         ]);
 
         $membership->update(['status' => ClientMembership::STATUS_ACCEPTED]);
-
+        app(InvitationTracker::class)->recordAcceptance(
+            $membership->user->email,
+            $membership->client_account_id,
+            $membership->user->id
+        );
         // Login
         Auth::login($membership->user);
 
