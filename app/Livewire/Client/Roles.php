@@ -34,7 +34,7 @@ class Roles extends Component
 
     public function mount()
     {
-        Gate::authorize('view roles');
+        $this->authorize('view roles');
 
         //Check if permissions have been seeded, if not, seed them
         $permissions = Permission::all();
@@ -78,9 +78,11 @@ class Roles extends Component
         $this->validate();
 
         if ($this->isEditing) {
+            $this->authorize('edit roles');
             $role = Role::where('client_account_id', $this->clientAccountId)->findOrFail($this->editingRoleId);
             $updateRole->execute($role, $this->name, $this->selectedPermissions);
         } else {
+            $this->authorize('create roles');
             $createRole->execute($this->name, $this->selectedPermissions, $this->clientAccountId);
         }
 
@@ -92,6 +94,7 @@ class Roles extends Component
 
     public function delete($id, DeleteRole $deleteRole)
     {
+        $this->authorize('delete roles');
         $role = Role::where('client_account_id', $this->clientAccountId)->findOrFail($id);
         $deleteRole->execute($role);
         
