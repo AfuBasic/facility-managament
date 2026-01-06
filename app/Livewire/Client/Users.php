@@ -93,9 +93,7 @@ class Users extends Component
         $this->editingMembershipId = $membershipId;
         
         // Get the current role for this user in this client context
-        $currentRole = $membership->user->roles()
-            ->where('client_account_id', $this->clientAccount->id)
-            ->first();
+        $currentRole = $membership->user->roles()->first();
         
         $this->selectedRole = $currentRole ? $currentRole->name : '';
         $this->showEditRoleModal = true;
