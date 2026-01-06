@@ -32,6 +32,14 @@ class Roles extends Component
     public $showModal = false;
     public $editingRoleId;
 
+
+    
+    public function hydrate()
+    {
+        if ($this->clientAccountId) {
+            setPermissionsTeamId($this->clientAccountId);
+        }
+    }
     public function mount()
     {
         $this->authorize('view roles');
