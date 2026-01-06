@@ -39,9 +39,9 @@ class AcceptInvitationController extends Controller
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
-        $membership->user->update([
+        $membership->user()->update([
             'password' => Hash::make($request->password),
-            'email_verified_at' => now(), // Auto verify email
+            'email_verified_at' => now(), 
         ]);
 
         $membership->update(['status' => ClientMembership::STATUS_ACCEPTED]);

@@ -4,6 +4,7 @@ namespace App\Livewire\Client;
 
 use App\Actions\Client\Roles\CreateRole;
 use App\Actions\Client\Roles\DeleteRole;
+use App\Actions\Client\Roles\SeedPermissions;
 use App\Actions\Client\Roles\UpdateRole;
 use App\Models\ClientAccount;
 use Livewire\Attributes\Layout;
@@ -34,6 +35,12 @@ class Roles extends Component
     public function mount()
     {
         Gate::authorize('view roles');
+
+        //Check if permissions have been seeded, if not, seed them
+        $permissions = Permission::all();
+        if($permissions->isEmpty()) {
+            (new SeedPermissions())->execute();
+        }
         $this->clientAccountId = app(ClientAccount::class)->id;
         $this->loadRoles();
     }

@@ -6,6 +6,7 @@ use Livewire\WithPagination;
 use App\Actions\Client\Users\InviteUser;
 use App\Actions\Client\Users\ResendInvitation;
 use App\Actions\Client\Users\ResetUserAccount;
+use App\Actions\Client\Users\UpdateUserRole;
 use App\Models\ClientAccount;
 use App\Models\ClientMembership;
 use App\Models\User;
@@ -23,6 +24,9 @@ class Users extends Component
     public $email = '';
     public $role = '';
     public $showInviteModal = false;
+    public $showEditRoleModal = false;
+    public $editingMembershipId = null;
+    public $selectedRole = '';
     public ClientAccount | null $clientAccount;
     
     public function hydrate()
@@ -40,6 +44,7 @@ class Users extends Component
 
     public function invite(InviteUser $inviteUser)
     {
+        $this->authorize('create users');
         $this->validate([
             'email' => 'required|email',
             'role' => 'required|exists:roles,name'
@@ -78,6 +83,39 @@ class Users extends Component
         $resetAccount->execute($membership);
         
         $this->dispatch('toast', message: 'Account reset and invitation sent.', type: 'success');
+    }
+
+    public function editRole($membershipId)
+    {
+        $this->authorize('edit users');
+        
+        $membership = ClientMembership::with('user.roles')->findOrFail($membershipId);
+        $this->editingMembershipId = $membershipId;
+        
+        // Get the current role for this user in this client context
+        $currentRole = $membership->user->roles()
+            ->where('client_account_id', $this->clientAccount->id)
+            ->first();
+        
+        $this->selectedRole = $currentRole ? $currentRole->name : '';
+        $this->showEditRoleModal = true;
+    }
+
+    public function updateRole(UpdateUserRole $updateUserRole)
+    {
+        $this->authorize('edit users');
+        
+        $this->validate([
+            'selectedRole' => 'required|exists:roles,name'
+        ]);
+        
+        $membership = ClientMembership::findOrFail($this->editingMembershipId);
+        
+        $updateUserRole->execute($membership, $this->selectedRole);
+        
+        $this->showEditRoleModal = false;
+        $this->reset(['editingMembershipId', 'selectedRole']);
+        $this->dispatch('toast', message: 'User role updated successfully.', type: 'success');
     }
 
     public function delete($membershipId)

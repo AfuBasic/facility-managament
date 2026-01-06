@@ -2,16 +2,14 @@
 
 namespace App\Actions\Client\Users;
 
-use App\Mail\UserInvitation;
 use App\Models\ClientMembership;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 
 class ResendInvitation
 {
     public function execute(ClientMembership $membership): void
     {
-        // Guard: Don't resend if already pending (Strict adherence to user request)
+        // Guard: Don't resend if already pending 
         if ($membership->status === ClientMembership::STATUS_PENDING) {
              return; 
         }
