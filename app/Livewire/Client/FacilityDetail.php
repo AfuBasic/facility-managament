@@ -56,7 +56,7 @@ class FacilityDetail extends Component
             ->where('client_account_id', $this->clientAccount->id)
             ->findOrFail($facility->id);
         
-        $this->authorize('view facilities');
+        $this->authorize('manage facilities');
     }
 
     public function setTab($tab)
@@ -67,7 +67,7 @@ class FacilityDetail extends Component
     // Space Management Methods
     public function createSpace()
     {
-        $this->authorize('manage facility');
+        $this->authorize('manage facilities');
         $this->resetSpaceForm();
         $this->showSpaceModal = true;
     }
