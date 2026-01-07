@@ -8,6 +8,7 @@ use App\Http\Middleware\SetClientContext;
 use App\Livewire\Client\Assets;
 use App\Livewire\Client\Dashboard;
 use App\Livewire\Client\Facilities;
+use App\Livewire\Client\FacilityDetail;
 use App\Livewire\Client\Roles;
 use App\Livewire\Client\SlaPolicy;
 use App\Livewire\Client\Users;
@@ -45,6 +46,7 @@ Route::middleware(['auth', IsVerified::class])->group(function() {
         ->group(function () {
              Route::get('/dashboard', Dashboard::class)->name('dashboard');
              Route::get('/facilities', Facilities::class)->name('facilities');
+             Route::get('/facilities/{facility}', FacilityDetail::class)->name('facilities.show');
              Route::get('/assets', Assets::class)->name('assets');
              Route::get('/work-orders', WorkOrders::class)->name('work-orders');
              Route::get('/sla-policy', SlaPolicy::class)->name('sla-policy');
