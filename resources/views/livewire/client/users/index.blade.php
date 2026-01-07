@@ -14,6 +14,24 @@
 </x-slot:actions>
 @endcan
 </x-ui.page-header>
+
+<!-- Search Bar -->
+<div class="mb-6">
+    <div class="relative">
+        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+            <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+            </svg>
+        </div>
+        <input 
+            type="text" 
+            wire:model.live.debounce.300ms="search" 
+            class="block border w-full rounded-lg border-slate-300 pl-10 pr-3 py-2.5 text-slate-900 placeholder:text-slate-400 focus:border-teal-500 focus:ring-teal-500 sm:text-sm transition-colors"
+            placeholder="Search by name or email..."
+        >
+    </div>
+</div>
+
 @if($roles->isEmpty())
 <div class="rounded-lg bg-amber-50 p-4 border border-amber-200 mb-6">
     <div class="flex">
@@ -167,10 +185,14 @@
             </tbody>
         </table>
     </div>
-    <div class="px-6 py-4 border-t border-slate-200">
-        {{ $memberships->links() }}
-    </div>
 </x-ui.card>
+
+<!-- Pagination -->
+@if($memberships->hasPages())
+<div class="mt-6">
+    {{ $memberships->links() }}
+</div>
+@endif
 
 <!-- Invite User Modal -->
 <x-ui.modal show="showInviteModal" title="Invite New User">

@@ -7,9 +7,12 @@ use App\Actions\Client\Users\InviteUser;
 use App\Actions\Client\Users\ResendInvitation;
 use App\Actions\Client\Users\ResetUserAccount;
 use App\Actions\Client\Users\UpdateUserRole;
+use App\Livewire\Concerns\WithNotifications;
 use App\Models\ClientAccount;
 use App\Models\ClientMembership;
 use App\Models\User;
+use App\Repositories\MembershipRepository;
+use App\Repositories\RoleRepository;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -19,7 +22,7 @@ use Spatie\Permission\Models\Role;
 #[Title('Users | Optima FM')]
 class Users extends Component
 {
-    use WithPagination;
+    use WithPagination, WithNotifications;
 
     public $email = '';
     public $role = '';
@@ -27,6 +30,7 @@ class Users extends Component
     public $showEditRoleModal = false;
     public $editingMembershipId = null;
     public $selectedRole = '';
+    public $search = '';
     public ClientAccount | null $clientAccount;
     
     public function hydrate()
@@ -45,44 +49,41 @@ class Users extends Component
     public function invite(InviteUser $inviteUser)
     {
         $this->authorize('create users');
+        
         $this->validate([
             'email' => 'required|email',
             'role' => 'required|exists:roles,name'
         ]);
 
-        $existingUser = User::where('email', $this->email)->first();
-        if ($existingUser && ClientMembership::where('user_id', $existingUser->id)
-            ->where('client_account_id', $this->clientAccount->id)
-            ->exists()) {
+        if ($this->isExistingMember()) {
             $this->addError('email', 'This user is already a member of this organization.');
             return;
         }
         
         $inviteUser->execute($this->email, $this->role, $this->clientAccount->id);
 
-        $this->showInviteModal = false;
-        $this->reset(['email', 'role']);
-        $this->dispatch('toast', message: 'Invitation sent successfully!', type: 'success');
+        $this->closeModal('showInviteModal', ['email', 'role']);
+        $this->success('Invitation sent successfully!');
     }
 
     public function resend($membershipId, ResendInvitation $resendInvitation)
     {
-        $membership = ClientMembership::findOrFail($membershipId);
         $this->authorize('edit users');
         
+        $membership = $this->membershipRepo()->findById($membershipId);
         $resendInvitation->execute($membership);
         
-        $this->dispatch('toast', message: 'Invitation resent successfully.', type: 'success');
+        $this->success('Invitation resent successfully.');
     }
 
     public function resetAccount($membershipId, ResetUserAccount $resetAccount)
     {
-        $membership = ClientMembership::findOrFail($membershipId);
         $this->authorize('edit users');
         
+        $membership = $this->membershipRepo()->findById($membershipId);
         $resetAccount->execute($membership);
         
-        $this->dispatch('toast', message: 'Account reset and invitation sent.', type: 'success');
+        $this->success('Account reset and invitation sent.');
     }
 
     public function editRole($membershipId)
@@ -91,11 +92,7 @@ class Users extends Component
         
         $membership = ClientMembership::with('user.roles')->findOrFail($membershipId);
         $this->editingMembershipId = $membershipId;
-        
-        // Get the current role for this user in this client context
-        $currentRole = $membership->user->roles()->first();
-        
-        $this->selectedRole = $currentRole ? $currentRole->name : '';
+        $this->selectedRole = $membership->user->roles()->first()?->name ?? '';
         $this->showEditRoleModal = true;
     }
 
@@ -103,48 +100,79 @@ class Users extends Component
     {
         $this->authorize('edit users');
         
-        $this->validate([
-            'selectedRole' => 'required|exists:roles,name'
-        ]);
-        
-        $membership = ClientMembership::findOrFail($this->editingMembershipId);
-        
+        $this->validate(['selectedRole' => 'required|exists:roles,name']);
+
+        $membership = $this->membershipRepo()->findById($this->editingMembershipId);
         $updateUserRole->execute($membership, $this->selectedRole);
-        
-        $this->showEditRoleModal = false;
-        $this->reset(['editingMembershipId', 'selectedRole']);
-        $this->dispatch('toast', message: 'User role updated successfully.', type: 'success');
+
+        $this->closeModal('showEditRoleModal');
+        $this->success('User role updated successfully.');
     }
 
     public function delete($membershipId)
     {
-         $membership = ClientMembership::findOrFail($membershipId);
-         $this->authorize('delete users');
-         
-         $membership->delete();
-         
-         $this->dispatch('toast', message: 'User access removed.', type: 'success');
+        $this->authorize('delete users');
+        
+        $membership = $this->membershipRepo()->findById($membershipId);
+        $membership->delete();
+        
+        $this->success('User access removed.');
+    }
+
+    public function updatingSearch()
+    {
+        $this->resetPage();
     }
 
     public function render()
     {
-        $client = $this->clientAccount;
-        
-        $memberships = ClientMembership::where('client_account_id', $client->id)
-            ->with(['user', 'user.roles'])
-            ->whereHas('user.roles', function($q) {
-                $q->where('name', '!=', 'admin');
-            })
-            ->latest()
-            ->paginate(10);
-            
-        $roles = Role::where('client_account_id', $client->id)
-            ->where('name', '!=', 'admin')
-            ->get();
-
         return view('livewire.client.users.index', [
-            'memberships' => $memberships,
-            'roles' => $roles
+            'memberships' => $this->membershipRepo()->getPaginatedForClient(
+                $this->clientAccount->id,
+                $this->search
+            ),
+            'roles' => $this->roleRepo()->getAllForClient($this->clientAccount->id)
         ]);
+    }
+
+    /**
+     * Get MembershipRepository instance
+     */
+    private function membershipRepo(): MembershipRepository
+    {
+        return app(MembershipRepository::class);
+    }
+
+    /**
+     * Get RoleRepository instance
+     */
+    private function roleRepo(): RoleRepository
+    {
+        return app(RoleRepository::class);
+    }
+
+    /**
+     * Check if the email belongs to an existing member
+     */
+    private function isExistingMember(): bool
+    {
+        $existingUser = User::where('email', $this->email)->first();
+        
+        return $existingUser && $this->membershipRepo()->isUserMember(
+            $existingUser->id,
+            $this->clientAccount->id
+        );
+    }
+
+    /**
+     * Close a modal and optionally reset properties
+     */
+    private function closeModal(string $modalProperty, array $resetProperties = []): void
+    {
+        $this->$modalProperty = false;
+        
+        if (!empty($resetProperties)) {
+            $this->reset($resetProperties);
+        }
     }
 }
