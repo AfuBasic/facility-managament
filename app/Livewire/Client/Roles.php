@@ -33,15 +33,6 @@ class Roles extends Component
         'name' => 'required|string|max:255',
         'selectedPermissions' => 'required|array|min:1',
     ];
-
-    public function hydrate()
-    {
-        if ($this->clientAccountId) {
-            setPermissionsTeamId($this->clientAccountId);
-        }
-    }
-
-
     
     public function hydrate()
     {
