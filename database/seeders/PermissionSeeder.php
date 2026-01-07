@@ -22,6 +22,7 @@ class PermissionSeeder extends Seeder
             'create facilities',
             'edit facilities',
             'delete facilities',
+            'manage facility',
 
             // Assets
             'view assets',

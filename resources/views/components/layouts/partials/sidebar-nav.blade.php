@@ -27,16 +27,6 @@
                     </a>
                 </li>
                 @endcan
-                @can('view assets')
-                 <li>
-                    <a href="{{ route('app.assets') }}" wire:navigate class="group flex gap-x-3 rounded-xl p-2.5 text-sm leading-6 font-semibold transition-all duration-300 {{ request()->routeIs('app.assets') ? 'bg-gradient-to-r from-teal-500/10 to-transparent text-teal-400 border-l-4 border-teal-500 shadow-[0_0_20px_rgba(45,212,191,0.1)]' : 'text-slate-400 hover:text-white hover:bg-slate-800/50 border-l-4 border-transparent' }}">
-                        <svg class="h-6 w-6 shrink-0 {{ request()->routeIs('app.assets') ? 'text-teal-400' : 'text-slate-500 group-hover:text-teal-400 transition-colors' }}" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                           <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
-                        </svg>
-                        Assets
-                    </a>
-                </li>
-                @endcan
                 @can('view work orders')
                  <li>
                     <a href="{{ route('app.work-orders') }}" wire:navigate class="group flex gap-x-3 rounded-xl p-2.5 text-sm leading-6 font-semibold transition-all duration-300 {{ request()->routeIs('app.work-orders') ? 'bg-gradient-to-r from-teal-500/10 to-transparent text-teal-400 border-l-4 border-teal-500 shadow-[0_0_20px_rgba(45,212,191,0.1)]' : 'text-slate-400 hover:text-white hover:bg-slate-800/50 border-l-4 border-transparent' }}">
