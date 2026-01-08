@@ -44,6 +44,17 @@ class Users extends Component
     {
         $this->clientAccount = app(ClientAccount::class);
         $this->authorize('view users');
+        
+        // Auto-open invite modal if invite parameter is present
+        if (request()->query('invite') === 'true') {
+            $this->openInviteModal();
+        }
+    }
+
+    public function openInviteModal()
+    {
+        $this->authorize('create users');
+        $this->showInviteModal = true;
     }
 
     public function invite(InviteUser $inviteUser)

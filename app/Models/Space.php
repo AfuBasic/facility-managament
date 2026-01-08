@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToClient;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,9 +10,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Space extends Model
 {
     use HasFactory;
+    use BelongsToClient;
     
     protected $fillable = [
         'facility_id',
+        'client_account_id',
         'name',
         'type',
         'floor',

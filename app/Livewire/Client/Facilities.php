@@ -30,16 +30,12 @@ class Facilities extends Component
     // Form fields
     public $name = '';
     public $address = '';
-    public $contact_person_name = '';
-    public $contact_person_phone = '';
 
     public ClientAccount $clientAccount;
 
     protected $rules = [
         'name' => 'required|string|max:255',
         'address' => 'nullable|string|max:500',
-        'contact_person_name' => 'nullable|string|max:255',
-        'contact_person_phone' => 'nullable|string|max:20',
     ];
 
     public function hydrate()
@@ -64,7 +60,7 @@ class Facilities extends Component
     {
         $this->authorize('create facilities');
         
-        $this->reset(['name', 'address', 'contact_person_name', 'contact_person_phone', 'isEditing', 'editingFacilityId']);
+        $this->reset(['name', 'address', 'isEditing', 'editingFacilityId']);
         $this->showModal = true;
     }
 
@@ -82,8 +78,6 @@ class Facilities extends Component
         $this->editingFacilityId = $facility->id;
         $this->name = $facility->name;
         $this->address = $facility->address ?? '';
-        $this->contact_person_name = $facility->contact_person_name ?? '';
-        $this->contact_person_phone = $facility->contact_person_phone ?? '';
         $this->isEditing = true;
         $this->showModal = true;
     }
@@ -98,9 +92,7 @@ class Facilities extends Component
             $updateFacility->execute(
                 $facility,
                 $this->name,
-                $this->address,
-                $this->contact_person_name,
-                $this->contact_person_phone
+                $this->address
             );
             $this->success('Facility updated successfully!');
         } else {
@@ -108,8 +100,6 @@ class Facilities extends Component
             $createFacility->execute(
                 $this->name,
                 $this->address,
-                $this->contact_person_name,
-                $this->contact_person_phone,
                 $this->clientAccount->id
             );
             $this->success('Facility created successfully!');
@@ -153,6 +143,6 @@ class Facilities extends Component
     public function closeModal(): void
     {
         $this->showModal = false;
-        $this->reset(['name', 'address', 'contact_person_name', 'contact_person_phone', 'isEditing', 'editingFacilityId']);
+        $this->reset(['name', 'address', 'isEditing', 'editingFacilityId']);
     }
 }

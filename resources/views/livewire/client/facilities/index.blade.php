@@ -226,36 +226,6 @@
                                 @error('address') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
                             </div>
 
-                            {{-- Contact Person Name --}}
-                            <div>
-                                <label for="contact_person_name" class="block text-sm font-medium text-slate-300 mb-2">
-                                    Contact Person Name
-                                </label>
-                                <input 
-                                    wire:model="contact_person_name" 
-                                    type="text" 
-                                    id="contact_person_name"
-                                    class="w-full rounded-md border border-slate-600 bg-slate-900/50 px-4 py-2.5 text-sm text-white placeholder-slate-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all"
-                                    placeholder="Enter contact person name"
-                                />
-                                @error('contact_person_name') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
-                            </div>
-
-                            {{-- Contact Person Phone --}}
-                            <div>
-                                <label for="contact_person_phone" class="block text-sm font-medium text-slate-300 mb-2">
-                                    Contact Person Phone
-                                </label>
-                                <input 
-                                    wire:model="contact_person_phone" 
-                                    type="tel" 
-                                    id="contact_person_phone"
-                                    class="w-full rounded-md border border-slate-600 bg-slate-900/50 px-4 py-2.5 text-sm text-white placeholder-slate-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all"
-                                    placeholder="Enter contact person phone"
-                                />
-                                @error('contact_person_phone') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
-                            </div>
-
                             {{-- Actions --}}
                             <div class="flex items-center gap-3 pt-4">
                                 <button 

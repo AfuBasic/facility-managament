@@ -27,7 +27,7 @@
                 <h1 style="color: #0F172A; margin-top: 0; font-size: 24px;">You've Been Invited!</h1>
                 
                 <p class="text">Hello {{ $user->name }},</p>
-                <p class="text">You have been invited to join the <strong>{{ $clientAccount->name }}</strong> team on <strong></strong>Optima FM</strong> as <strong>{{ $role }}</strong>. They'd love to have you on board to help manage their facilities efficiently.</p>
+                <p class="text">You have been invited to join the <strong>{{ $clientAccount->name }}</strong> team on <strong></strong>Optima FM</strong> as <strong>{{ ucwords($role_name) }}</strong>. They'd love to have you on board to help manage their facilities efficiently.</p>
                 
                 <a href="{{ $url }}" class="btn-primary">Accept Invitation</a>
                 

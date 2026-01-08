@@ -1,24 +1,63 @@
 <?php
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToClient;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Builder;
+use App\Models\User;
+use App\Models\ClientAccount;
+use App\Models\Space;
+use App\Models\FacilityUser;
 
 class Facility extends Model
 {
-    use HasFactory;
+    use HasFactory, BelongsToClient;
     
     protected $fillable = [
         'name',
         'address',
-        'contact_person_name',
-        'contact_person_phone',
         'client_account_id',
     ];
+
+    /**
+     * Get the contact person (first assigned user) for this facility
+     */
+    public function getContactPerson(): ?User
+    {
+        return $this->users->first();
+    }
+
+    /**
+     * Get contact person name from first assigned user
+     */
+    public function getContactPersonNameAttribute(): string
+    {
+        $contactPerson = $this->getContactPerson();
+        
+        if (!$contactPerson) {
+            return 'Unassigned';
+        }
+        
+        return $contactPerson->name ?? 'New User';
+    }
+
+    /**
+     * Get contact person phone/email from first assigned user
+     */
+    public function getContactPersonPhoneAttribute(): ?string
+    {
+        $contactPerson = $this->getContactPerson();
+        
+        if (!$contactPerson) {
+            return null;
+        }
+        
+        return $contactPerson->phone ?? $contactPerson->email ?? null;
+    }
 
     /**
      * Get the client account that owns the facility
@@ -29,24 +68,38 @@ class Facility extends Model
     }
 
     /**
-     * Get the users assigned to this facility
+     * Get the users (managers) assigned to this facility (active only)
      */
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'facility_user')
-            ->withPivot('assigned_at', 'removed_at')
+        return $this->belongsToMany(User::class, 'facility_users')
+            ->using(FacilityUser::class)
+            ->withPivot('designation', 'assigned_at', 'removed_at', 'client_account_id')
             ->withTimestamps()
-            ->whereNull('facility_user.removed_at');
+            ->whereNull('facility_users.removed_at');
     }
 
     /**
-     * Get all users including removed ones
+     * Get all users (managers) including dormant ones
      */
     public function allUsers(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'facility_user')
-            ->withPivot('assigned_at', 'removed_at')
+        return $this->belongsToMany(User::class, 'facility_users')
+            ->using(FacilityUser::class)
+            ->withPivot('designation', 'assigned_at', 'removed_at', 'client_account_id')
             ->withTimestamps();
+    }
+
+    /**
+     * Get dormant users (managers) who have been unassigned
+     */
+    public function dormantUsers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'facility_users')
+            ->using(FacilityUser::class)
+            ->withPivot('designation', 'assigned_at', 'removed_at', 'client_account_id')
+            ->withTimestamps()
+            ->whereNotNull('facility_users.removed_at');
     }
 
     /**

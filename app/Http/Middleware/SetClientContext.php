@@ -33,6 +33,9 @@ class SetClientContext
         // Bind the current client to the container
         app()->instance(ClientAccount::class, $client);
         
+        // Store in session as backup for model traits
+        session(['current_client_account_id' => $client->id]);
+        
         // precise permission team
         setPermissionsTeamId($client->id);
         

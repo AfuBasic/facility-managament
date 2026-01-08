@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\ClientAccount;
+use App\Models\Facility;
+use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -11,10 +14,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('facility_user', function (Blueprint $table) {
+        Schema::create('facility_users', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('facility_id')->constrained()->onDelete('cascade');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignIdFor(ClientAccount::class);
+            $table->string('designation');
+            $table->foreignIdFor(Facility::class)->constrained()->onDelete('cascade');
+            $table->foreignIdFor(User::class)->constrained()->onDelete('cascade');
             $table->timestamp('assigned_at')->useCurrent();
             $table->timestamp('removed_at')->nullable();
             $table->timestamps();

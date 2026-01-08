@@ -16,12 +16,12 @@ class FacilityRepository
         ?string $search = null,
         int $perPage = 10
     ): LengthAwarePaginator {
-        return Facility::forClient($clientAccountId)
+        return Facility::with('users')
+            ->forClient($clientAccountId)
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('address', 'like', "%{$search}%")
-                      ->orWhere('contact_person_name', 'like', "%{$search}%");
+                      ->orWhere('address', 'like', "%{$search}%");
                 });
             })
             ->withCount('users')
@@ -38,13 +38,13 @@ class FacilityRepository
         ?string $search = null,
         int $perPage = 10
     ): LengthAwarePaginator {
-        return Facility::forClient($clientAccountId)
+        return Facility::with('users')
+            ->forClient($clientAccountId)
             ->assignedToUser($userId)
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('address', 'like', "%{$search}%")
-                      ->orWhere('contact_person_name', 'like', "%{$search}%");
+                      ->orWhere('address', 'like', "%{$search}%");
                 });
             })
             ->withCount('users')
@@ -67,7 +67,8 @@ class FacilityRepository
      */
     public function getAllForClient(int $clientAccountId): Collection
     {
-        return Facility::forClient($clientAccountId)
+        return Facility::with('users')
+            ->forClient($clientAccountId)
             ->orderBy('name')
             ->get();
     }

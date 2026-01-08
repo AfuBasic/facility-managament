@@ -17,8 +17,6 @@ return new class extends Migration
             $table->foreignIdFor(ClientAccount::class);
             $table->string('name');
             $table->string('address');
-            $table->string('contact_person_name')->nullable();
-            $table->string('contact_person_phone')->nullable();
             $table->timestamps();
         });
     }

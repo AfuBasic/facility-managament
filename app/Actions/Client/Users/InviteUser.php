@@ -8,6 +8,7 @@ use App\Models\ClientAccount;
 use App\Models\ClientMembership;
 use App\Models\User;
 use App\Services\InvitationTracker;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
@@ -58,7 +59,7 @@ class InviteUser
                     email: $email,
                     roleName: $roleName,
                     clientAccountId: (int) $clientAccountId,
-                    invitedByUserId: auth()->id(),
+                    invitedByUserId: Auth::id(),
                     isNewUser: $isNewUser
                 );
                     

@@ -45,7 +45,7 @@ class UserInvitation extends Mailable implements ShouldQueue
                 'url' => $this->url,
                 'user' => $this->user,
                 'clientAccount' => $this->clientAccount,
-                'role' => $this->role,
+                'role_name' => $this->role,
             ],
         );
     }
