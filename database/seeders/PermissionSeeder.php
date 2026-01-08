@@ -30,6 +30,18 @@ class PermissionSeeder extends Seeder
             'edit spaces',
             'delete spaces',
 
+            //Consumables
+            'view consumables',
+            'create consumables',
+            'edit consumables',
+            'delete consumables',
+
+            //Facility Managers
+            'view facility_managers',
+            'assign facility_managers',
+            'unassign facility_managers',
+            'delete facility_managers',
+
             // Assets
             'view assets',
             'create assets',

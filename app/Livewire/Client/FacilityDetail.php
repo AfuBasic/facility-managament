@@ -3,6 +3,7 @@
 namespace App\Livewire\Client;
 
 use App\Livewire\Concerns\WithNotifications;
+use App\Mail\ManagerAssignedToFacility;
 use App\Models\ClientAccount;
 use App\Models\ClientMembership;
 use App\Models\Facility;
@@ -10,9 +11,11 @@ use App\Models\FacilityUser;
 use App\Models\Space;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
+use Spatie\Permission\Models\Permission;
 
 #[Layout('components.layouts.client-app')]
 #[Title('Facility Details | Optima FM')]
@@ -66,12 +69,11 @@ class FacilityDetail extends Component
     
     public function mount($facility)
     {
+        
         $this->clientAccount = app(ClientAccount::class);
         $this->facility = Facility::query()
         ->where('client_account_id', $this->clientAccount->id)
         ->findOrFail($facility->id);
-        
-        $this->authorize('manage facilities');
         
         // Get available tabs based on permissions
         $availableTabs = $this->getAvailableTabs();
@@ -112,7 +114,7 @@ class FacilityDetail extends Component
             $tabs[] = 'consumables';
         }
         
-        if (Auth::user()->can('view users')) {
+        if (Auth::user()->can('view facility_managers')) {
             $tabs[] = 'managers';
         }
         
@@ -245,14 +247,14 @@ class FacilityDetail extends Component
     
     public function openManagerModal()
     {
-        $this->authorize('create users');
+        $this->authorize('assign facility_managers');
         $this->resetManagerForm();
         $this->showManagerModal = true;
     }
     
     public function editManager($userId)
     {
-        $this->authorize('edit users');
+        $this->authorize('assign facility_managers');
         
         $manager = $this->facility->allUsers()->where('user_id', $userId)->first();
         
@@ -276,7 +278,7 @@ class FacilityDetail extends Component
         ]);
         
         if ($this->isEditingManager) {
-            $this->authorize('edit users');
+            $this->authorize('assign facility_managers');
             
             // Update designation
             $this->facility->users()->updateExistingPivot($this->selectedUserId, [
@@ -285,7 +287,7 @@ class FacilityDetail extends Component
             
             $this->success('Manager designation updated successfully!');
         } else {
-            $this->authorize('create users');
+            $this->authorize('assign facility_managers');
             
             // Attach new manager
             $this->facility->users()->attach($this->selectedUserId, [
@@ -293,6 +295,17 @@ class FacilityDetail extends Component
                 'client_account_id' => $this->clientAccount->id,
                 'assigned_at' => now(),
             ]);
+            
+            // Send email notification to the assigned manager
+            $manager = User::find($this->selectedUserId);
+            Mail::to($manager->email)->send(
+                new ManagerAssignedToFacility(
+                    $manager,
+                    $this->facility,
+                    $this->clientAccount,
+                    $this->managerDesignation
+                )
+            );
             
             $this->success('Manager assigned successfully!');
         }
@@ -303,7 +316,7 @@ class FacilityDetail extends Component
     
     public function unassignManager($userId)
     {
-        $this->authorize('delete users');
+        $this->authorize('unassign facility_managers');
         
         // Soft delete: set removed_at
         $this->facility->users()->updateExistingPivot($userId, [
@@ -316,7 +329,7 @@ class FacilityDetail extends Component
     
     public function reactivateManager($userId)
     {
-        $this->authorize('edit users');
+        $this->authorize('assign facility_managers');
         
         // Clear removed_at
         $this->facility->allUsers()->updateExistingPivot($userId, [
@@ -329,7 +342,7 @@ class FacilityDetail extends Component
     
     public function deleteManager($userId)
     {
-        $this->authorize('delete users');
+        $this->authorize('delete facility_managers');
         
         // Hard delete: detach from pivot table
         $this->facility->allUsers()->detach($userId);

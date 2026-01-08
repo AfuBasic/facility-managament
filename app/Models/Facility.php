@@ -2,6 +2,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\BelongsToClient;
+use App\Models\Concerns\HasHashid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,7 +16,7 @@ use App\Models\FacilityUser;
 
 class Facility extends Model
 {
-    use HasFactory, BelongsToClient;
+    use HasFactory, BelongsToClient, HasHashid;
     
     protected $fillable = [
         'name',

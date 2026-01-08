@@ -145,7 +145,7 @@
                     wire:key="perm-{{ $perm->id }}"
                     wire:model="selectedPermissions" 
                     value="{{ $perm->name }}"
-                    label="{{ str_replace($group . ' ', '', str_replace('view', 'View', str_replace('create', 'Create', str_replace('edit', 'Edit', str_replace('delete', 'Delete', ucfirst($perm->name)))))) }}"
+                    label="{{ str_replace($group . ' ', '', str_replace('view', 'View', str_replace('create', 'Create', str_replace('edit', 'Edit', str_replace('delete', 'Delete', ucwords($perm->name)))))) }}"
                     />
                     @endforeach
                 </div>

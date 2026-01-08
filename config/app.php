@@ -107,6 +107,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Hashid Salt
+    |--------------------------------------------------------------------------
+    |
+    | This salt is used to encode/decode IDs in URLs for better security
+    | and aesthetics. Change this to a random string in your .env file.
+    |
+    */
+
+    'hashid_salt' => env('HASHID_SALT', 'default-salt-please-change'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Maintenance Mode Driver
     |--------------------------------------------------------------------------
     |

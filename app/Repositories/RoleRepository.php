@@ -44,7 +44,7 @@ class RoleRepository
         return Permission::all()
             ->groupBy(function($perm) {
                 $parts = explode(' ', $perm->name);
-                return count($parts) > 1 ? ucfirst($parts[1]) : 'Other';
+                return count($parts) > 1 ? str_replace('_', ' ', ucfirst($parts[1])) : 'Other';
             });
     }
 

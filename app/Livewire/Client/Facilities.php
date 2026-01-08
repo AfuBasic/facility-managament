@@ -8,6 +8,7 @@ use App\Actions\Client\Facilities\UpdateFacility;
 use App\Livewire\Concerns\WithNotifications;
 use App\Models\ClientAccount;
 use App\Repositories\FacilityRepository;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -125,10 +126,25 @@ class Facilities extends Component
 
     public function render()
     {
-        $facilities = $this->facilityRepo()->getPaginatedForClient(
-            $this->clientAccount->id,
-            $this->search
-        );
+        $user = Auth::user();
+        $facilityRepo = $this->facilityRepo();
+        
+        // Check if user is admin
+        $isAdmin = $user->hasRole('admin');
+        
+        // Admins see all facilities, others only see facilities they manage
+        if ($isAdmin) {
+            $facilities = $facilityRepo->getPaginatedForClient(
+                $this->clientAccount->id,
+                $this->search
+            );
+        } else {
+            $facilities = $facilityRepo->getPaginatedForUser(
+                $user->id,
+                $this->clientAccount->id,
+                $this->search
+            );
+        }
 
         return view('livewire.client.facilities.index', [
             'facilities' => $facilities

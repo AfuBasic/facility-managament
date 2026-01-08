@@ -72,7 +72,7 @@
                 @include('livewire.client.facility-detail.tabs.assets')
             @elseif($activeTab === 'consumables' && auth()->user()->can('view consumables'))
                 @include('livewire.client.facility-detail.tabs.consumables')
-            @elseif($activeTab === 'managers' && auth()->user()->can('view users'))
+            @elseif($activeTab === 'managers' && auth()->user()->can('view facility_managers'))
                 @include('livewire.client.facility-detail.tabs.managers')
             @else
                 <div class="text-center py-12">
