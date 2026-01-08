@@ -3,6 +3,7 @@
 namespace App\Livewire\Client\FacilityDetail;
 
 use App\Livewire\Concerns\WithNotifications;
+use App\Models\ClientAccount;
 use App\Models\Facility;
 use App\Models\Space;
 use Livewire\Component;
@@ -13,6 +14,7 @@ class FacilitySpaces extends Component
     
     public Facility $facility;
     
+    public ClientAccount $clientAccount;
     // Space form fields
     public $showSpaceModal = false;
     public $isEditingSpace = false;
@@ -35,6 +37,16 @@ class FacilitySpaces extends Component
         'spaceStatus' => 'required|in:active,inactive,maintenance',
     ];
     
+    public function hydrate()
+    {
+        if($this->clientAccount) {
+            setPermissionsTeamId($this->clientAccount->id);
+        }
+    }
+
+    public function mount(){
+        $this->clientAccount = app(ClientAccount::class);
+    }
     public function createSpace()
     {
         $this->authorize('create spaces');

@@ -9,6 +9,7 @@ use App\Models\ClientMembership;
 use App\Models\Facility;
 use App\Models\FacilityUser;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
 
@@ -28,6 +29,13 @@ class FacilityManagers extends Component
     public $managerSearch = '';
     public $dormantManagerSearch = '';
     
+    public function hydrate()
+    {
+        if($this->clientAccount) {
+            setPermissionsTeamId($this->clientAccount->id);
+        }
+    }
+
     public function getAvailableUsersProperty()
     {
         // Get IDs of users already assigned to this facility (active only)
@@ -74,6 +82,7 @@ class FacilityManagers extends Component
     
     public function openManagerModal()
     {
+
         $this->authorize('assign facility_managers');
         $this->resetManagerForm();
         $this->showManagerModal = true;
