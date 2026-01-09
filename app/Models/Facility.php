@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 use App\Models\User;
 use App\Models\ClientAccount;
 use App\Models\Space;
+use App\Models\Store;
 use App\Models\FacilityUser;
 
 class Facility extends Model
@@ -109,6 +110,14 @@ class Facility extends Model
     public function spaces(): HasMany
     {
         return $this->hasMany(Space::class);
+    }
+
+    /**
+     * Get the stores in this facility
+     */
+    public function stores(): HasMany
+    {
+        return $this->hasMany(Store::class);
     }
 
     /**

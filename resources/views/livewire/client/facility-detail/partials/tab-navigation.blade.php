@@ -10,21 +10,12 @@
             </button>
         @endcan
         
-        @can('view assets')
+        @can('view stores')
             <button 
-                wire:click="setTab('assets')" 
-                class="py-3 sm:py-4 px-2 sm:px-1 border-b-2 font-medium text-sm whitespace-nowrap transition-colors {{ $activeTab === 'assets' ? 'border-teal-500 text-teal-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300' }}"
+                wire:click="setTab('stores')" 
+                class="py-3 sm:py-4 px-2 sm:px-1 border-b-2 font-medium text-sm whitespace-nowrap transition-colors {{ $activeTab === 'stores' ? 'border-teal-500 text-teal-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300' }}"
             >
-                Assets
-            </button>
-        @endcan
-        
-        @can('view consumables')
-            <button 
-                wire:click="setTab('consumables')" 
-                class="py-3 sm:py-4 px-2 sm:px-1 border-b-2 font-medium text-sm whitespace-nowrap transition-colors {{ $activeTab === 'consumables' ? 'border-teal-500 text-teal-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300' }}"
-            >
-                Consumables
+                Stores
             </button>
         @endcan
         

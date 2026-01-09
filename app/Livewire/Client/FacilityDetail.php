@@ -62,12 +62,8 @@ class FacilityDetail extends Component
             $tabs[] = 'spaces';
         }
         
-        if (Auth::user()->can('view assets')) {
-            $tabs[] = 'assets';
-        }
-        
-        if (Auth::user()->can('view consumables')) {
-            $tabs[] = 'consumables';
+        if (Auth::user()->can('view stores')) {
+            $tabs[] = 'stores';
         }
         
         if (Auth::user()->can('view facility_managers')) {
