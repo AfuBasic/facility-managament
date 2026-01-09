@@ -19,7 +19,7 @@ class FacilityDetail extends Component
     
     public function hydrate()
     {
-        if($this->clientAccount) {
+        if ($this->clientAccount) {
             setPermissionsTeamId($this->clientAccount->id);
         }
     }

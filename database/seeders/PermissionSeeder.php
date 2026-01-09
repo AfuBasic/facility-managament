@@ -37,6 +37,12 @@ class PermissionSeeder extends Seeder
             'delete stores',
             'manage stores',
 
+            //Contacts
+            'view contacts',
+            'create contacts',
+            'edit contacts',
+            'delete contacts',
+
             //Consumables
             'view consumables',
             'create consumables',
@@ -56,16 +62,10 @@ class PermissionSeeder extends Seeder
             'delete assets',
 
             // Work Orders
-            'view work orders',
-            'create work orders',
-            'edit work orders',
-            'delete work orders',
-
-            // Vendors
-            'view vendors',
-            'create vendors',
-            'edit vendors',
-            'delete vendors',
+            'view workorders',
+            'create workorders',
+            'edit workorders',
+            'delete workorders',
 
             // Users
             'view users',

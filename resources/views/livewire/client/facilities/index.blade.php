@@ -178,14 +178,14 @@
                 <div class="fixed inset-0 bg-slate-950/75 backdrop-blur-sm transition-opacity -z-10" wire:click="closeModal"></div>
 
                 {{-- Modal panel --}}
-                <div class="relative inline-block align-bottom bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-slate-700 px-6 pt-5 pb-6 text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-8 z-10">
+                <div class="relative inline-block align-bottom bg-white rounded-2xl border border-slate-200 px-6 pt-5 pb-6 text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-8">
                     <div class="space-y-6">
                         {{-- Header --}}
                         <div class="flex items-center justify-between">
-                            <h3 class="text-xl font-semibold text-white">
+                            <h3 class="text-xl font-semibold text-slate-900">
                                 {{ $isEditing ? 'Edit Facility' : 'Create New Facility' }}
                             </h3>
-                            <button wire:click="closeModal" class="text-slate-400 hover:text-white transition-colors">
+                            <button wire:click="closeModal" class="text-slate-400 hover:text-slate-600 transition-colors">
                                 <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                                 </svg>
@@ -196,46 +196,46 @@
                         <form wire:submit="save" class="space-y-5">
                             {{-- Name --}}
                             <div>
-                                <label for="name" class="block text-sm font-medium text-slate-300 mb-2">
-                                    Facility Name <span class="text-red-400">*</span>
+                                <label for="name" class="block text-sm font-medium text-slate-700 mb-2">
+                                    Facility Name <span class="text-red-500">*</span>
                                 </label>
                                 <input 
                                     wire:model="name" 
                                     type="text" 
                                     id="name"
-                                    class="w-full rounded-md border border-slate-600 bg-slate-900/50 px-4 py-2.5 text-sm text-white placeholder-slate-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all"
+                                    class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
                                     placeholder="Enter facility name"
                                 />
-                                @error('name') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
+                                @error('name') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
                             </div>
 
                             {{-- Address --}}
                             <div>
-                                <label for="address" class="block text-sm font-medium text-slate-300 mb-2">
+                                <label for="address" class="block text-sm font-medium text-slate-700 mb-2">
                                     Address
                                 </label>
                                 <textarea 
                                     wire:model="address" 
                                     id="address"
                                     rows="2"
-                                    class="w-full rounded-md border border-slate-600 bg-slate-900/50 px-4 py-2.5 text-sm text-white placeholder-slate-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all resize-none"
+                                    class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 resize-none"
                                     placeholder="Enter facility address"
                                 ></textarea>
-                                @error('address') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
+                                @error('address') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
                             </div>
 
                             {{-- Actions --}}
                             <div class="flex items-center gap-3 pt-4">
                                 <button 
                                     type="submit"
-                                    class="flex-1 inline-flex justify-center items-center gap-2 rounded-xl bg-gradient-to-r from-teal-600 to-teal-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-teal-500/30 hover:shadow-teal-500/50 hover:scale-105 transition-all duration-200"
+                                    class="flex-1 inline-flex justify-center items-center gap-2 rounded-xl bg-gradient-to-r from-teal-600 to-teal-500 px-4 py-2.5 text-sm font-semibold text-white hover:from-teal-700 hover:to-teal-600 transition-all"
                                 >
                                     {{ $isEditing ? 'Update Facility' : 'Create Facility' }}
                                 </button>
                                 <button 
                                     type="button"
                                     wire:click="closeModal"
-                                    class="px-4 py-2.5 text-sm font-medium text-slate-400 hover:text-white transition-colors"
+                                    class="px-4 py-2.5 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
                                 >
                                     Cancel
                                 </button>

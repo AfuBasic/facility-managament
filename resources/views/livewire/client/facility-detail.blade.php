@@ -67,9 +67,9 @@
         {{-- Tab Content --}}
         <div class="p-6">
             @if($activeTab === 'spaces' && auth()->user()->can('view spaces'))
-                <livewire:client.facility-detail.facility-spaces :facility="$facility" :key="'spaces-'.$facility->id" />
+                <livewire:client.facility-detail.facility-spaces :facility="$facility" :clientAccount="$clientAccount" :key="'spaces-'.$facility->id" />
             @elseif($activeTab === 'stores' && auth()->user()->can('view stores'))
-                <livewire:client.facility-detail.facility-stores :facility="$facility" :key="'stores-'.$facility->id" />
+                <livewire:client.facility-detail.facility-stores :facility="$facility" :clientAccount="$clientAccount" :key="'stores-'.$facility->id" />
             @elseif($activeTab === 'managers' && auth()->user()->can('view facility_managers'))
                 <livewire:client.facility-detail.facility-managers :facility="$facility" :clientAccount="$clientAccount" :key="'managers-'.$facility->id" />
             @else
