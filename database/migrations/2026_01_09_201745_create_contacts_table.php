@@ -28,7 +28,7 @@ return new class extends Migration
             $table->date('birthday')->nullable();
             $table->text('address')->nullable();
             $table->text('notes')->nullable();
-            $table->foreignIdFor(Contact::class)->nullable()->constrained()->onDelete('set null');
+            $table->foreignIdFor(Contact::class,'contact_person_id')->nullable()->constrained()->onDelete('set null');
             $table->timestamps();
             
             $table->index(['contact_type_id', 'contact_group_id']);

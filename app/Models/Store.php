@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\ClientAccount;
 use App\Models\Facility;
 use App\Models\User;
+use App\Models\Concerns\HasHashid;
 
 class Store extends Model
 {
-    use HasFactory;
+    use HasFactory, HasHashid;
     
     protected $fillable = [
         'client_account_id',

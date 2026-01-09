@@ -39,13 +39,16 @@ class FacilitySpaces extends Component
     
     public function hydrate()
     {
-        if($this->clientAccount) {
+        if ($this->clientAccount) {
             setPermissionsTeamId($this->clientAccount->id);
         }
     }
 
     public function mount(){
-        $this->clientAccount = app(ClientAccount::class);
+        if (!$this->clientAccount) {
+            $this->clientAccount = app(ClientAccount::class);
+        }
+        setPermissionsTeamId($this->clientAccount->id);
     }
     public function createSpace()
     {

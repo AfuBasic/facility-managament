@@ -119,13 +119,13 @@
             <div class="flex min-h-screen items-end justify-center px-4 pt-4 pb-20 text-center sm:block sm:p-0">
                 <div class="fixed inset-0 bg-slate-950/75 backdrop-blur-sm transition-opacity -z-10" wire:click="closeSpaceModal"></div>
 
-                <div class="relative inline-block align-bottom bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-slate-700 px-6 pt-5 pb-6 text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full sm:p-8 z-10">
+                <div class="relative inline-block align-bottom bg-white rounded-2xl border border-slate-200 px-6 pt-5 pb-6 text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full sm:p-8">
                     <div class="space-y-6">
                         <div class="flex items-center justify-between">
-                            <h3 class="text-xl font-semibold text-white">
+                            <h3 class="text-xl font-semibold text-slate-900">
                                 {{ $isEditingSpace ? 'Edit Space' : 'Create New Space' }}
                             </h3>
-                            <button wire:click="closeSpaceModal" class="text-slate-400 hover:text-white transition-colors">
+                            <button wire:click="closeSpaceModal" class="text-slate-400 hover:text-slate-900 transition-colors">
                                 <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                                 </svg>
@@ -135,90 +135,90 @@
                         <form wire:submit="saveSpace" class="space-y-5">
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label for="spaceName" class="block text-sm font-medium text-slate-300 mb-2">
-                                        Space Name <span class="text-red-400">*</span>
+                                    <label for="spaceName" class="block text-sm font-medium text-slate-700 mb-2">
+                                        Space Name <span class="text-red-500">*</span>
                                     </label>
                                     <input 
                                         wire:model="spaceName" 
                                         type="text" 
                                         id="spaceName"
-                                        class="w-full rounded-md border border-slate-600 bg-slate-900/50 px-4 py-2.5 text-sm text-white placeholder-slate-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all"
+                                        class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900  focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all"
                                         placeholder="e.g., Conference Room A"
                                     />
-                                    @error('spaceName') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
+                                    @error('spaceName') <p class="mt-1 text-sm text-red-500">{{ $message }}</p> @enderror
                                 </div>
 
                                 <div>
-                                    <label for="spaceType" class="block text-sm font-medium text-slate-300 mb-2">
+                                    <label for="spaceType" class="block text-sm font-medium text-slate-700 mb-2">
                                         Type
                                     </label>
                                     <input 
                                         wire:model="spaceType" 
                                         type="text" 
                                         id="spaceType"
-                                        class="w-full rounded-md border border-slate-600 bg-slate-900/50 px-4 py-2.5 text-sm text-white placeholder-slate-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all"
+                                        class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900  focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all"
                                         placeholder="e.g., Office, Storage"
                                     />
-                                    @error('spaceType') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
+                                    @error('spaceType') <p class="mt-1 text-sm text-red-500">{{ $message }}</p> @enderror
                                 </div>
                             </div>
 
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label for="spaceFloor" class="block text-sm font-medium text-slate-300 mb-2">
+                                    <label for="spaceFloor" class="block text-sm font-medium text-slate-700 mb-2">
                                         Floor
                                     </label>
                                     <input 
                                         wire:model="spaceFloor" 
                                         type="text" 
                                         id="spaceFloor"
-                                        class="w-full rounded-md border border-slate-600 bg-slate-900/50 px-4 py-2.5 text-sm text-white placeholder-slate-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all"
+                                        class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900  focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all"
                                         placeholder="e.g., 2nd"
                                     />
-                                    @error('spaceFloor') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
+                                    @error('spaceFloor') <p class="mt-1 text-sm text-red-500">{{ $message }}</p> @enderror
                                 </div>
                                 <div>
-                                <label for="spaceStatus" class="block text-sm font-medium text-slate-300 mb-2">
-                                    Status <span class="text-red-400">*</span>
+                                <label for="spaceStatus" class="block text-sm font-medium text-slate-700 mb-2">
+                                    Status <span class="text-red-500">*</span>
                                 </label>
                                 <select 
                                     wire:model="spaceStatus" 
                                     id="spaceStatus"
-                                    class="w-full rounded-md border border-slate-600 bg-slate-900/50 px-4 py-2.5 text-sm text-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all"
+                                    class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all"
                                 >
                                     <option value="active">Active</option>
                                     <option value="inactive">Inactive</option>
                                     <option value="maintenance">Maintenance</option>
                                 </select>
-                                @error('spaceStatus') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
+                                @error('spaceStatus') <p class="mt-1 text-sm text-red-500">{{ $message }}</p> @enderror
                             </div>
                             </div>
 
                             <div>
-                                <label for="spaceDescription" class="block text-sm font-medium text-slate-300 mb-2">
+                                <label for="spaceDescription" class="block text-sm font-medium text-slate-700 mb-2">
                                     Description
                                 </label>
                                 <textarea 
                                     wire:model="spaceDescription" 
                                     id="spaceDescription"
                                     rows="3"
-                                    class="w-full rounded-md border border-slate-600 bg-slate-900/50 px-4 py-2.5 text-sm text-white placeholder-slate-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all resize-none"
+                                    class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900  focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all resize-none"
                                     placeholder="Enter space description..."
                                 ></textarea>
-                                @error('spaceDescription') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
+                                @error('spaceDescription') <p class="mt-1 text-sm text-red-500">{{ $message }}</p> @enderror
                             </div>
 
                             <div class="flex items-center gap-3 pt-4">
                                 <button 
                                     type="submit"
-                                    class="flex-1 inline-flex justify-center items-center gap-2 rounded-xl bg-gradient-to-r from-teal-600 to-teal-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-teal-500/30 hover:shadow-teal-500/50 hover:scale-105 transition-all duration-200"
+                                    class="flex-1 inline-flex justify-center items-center gap-2 rounded-xl bg-gradient-to-r from-teal-600 to-teal-500 px-4 py-2.5 text-sm font-semibold text-slate-900   transition-all duration-200"
                                 >
                                     {{ $isEditingSpace ? 'Update Space' : 'Create Space' }}
                                 </button>
                                 <button 
                                     type="button"
                                     wire:click="closeSpaceModal"
-                                    class="px-4 py-2.5 text-sm font-medium text-slate-400 hover:text-white transition-colors"
+                                    class="px-4 py-2.5 text-sm font-medium text-slate-400 hover:text-slate-900 transition-colors"
                                 >
                                     Cancel
                                 </button>

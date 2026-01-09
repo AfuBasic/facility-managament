@@ -75,18 +75,18 @@
 <style>
     /* Tom Select custom styling to match modal inputs */
     .ts-wrapper .ts-control {
-        background-color: rgba(15, 23, 42, 0.5) !important;
-        border: 1px solid rgb(71, 85, 105) !important;
-        border-radius: 0.375rem !important;
+        background-color: white !important;
+        border: 1px solid rgb(203, 213, 225) !important;
+        border-radius: 0.5rem !important;
         padding: 0.625rem 1rem !important;
         font-size: 0.875rem !important;
         line-height: 1.25rem !important;
-        color: white !important;
+        color: rgb(15, 23, 42) !important;
         min-height: auto !important;
     }
     
     .ts-wrapper.single .ts-control {
-        background-color: rgba(15, 23, 42, 0.5) !important;
+        background-color: white !important;
     }
     
     .ts-wrapper .ts-control:focus,
@@ -98,13 +98,13 @@
     
     .ts-wrapper .ts-control .item {
         background-color: transparent !important;
-        color: white !important;
+        color: rgb(15, 23, 42) !important;
         border: none !important;
         padding: 0 !important;
     }
     
     .ts-wrapper .ts-control input {
-        color: white !important;
+        color: rgb(15, 23, 42) !important;
     }
     
     .ts-wrapper .ts-control input::placeholder {
@@ -112,9 +112,9 @@
     }
     
     .ts-dropdown {
-        background-color: rgb(15, 23, 42) !important;
-        border: 1px solid rgb(71, 85, 105) !important;
-        border-radius: 0.375rem !important;
+        background-color: white !important;
+        border: 1px solid rgb(203, 213, 225) !important;
+        border-radius: 0.5rem !important;
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
         margin-top: 0.25rem !important;
     }
@@ -122,30 +122,30 @@
     .ts-dropdown .option {
         padding: 0.625rem 1rem !important;
         font-size: 0.875rem !important;
-        color: white !important;
+        color: rgb(15, 23, 42) !important;
         cursor: pointer !important;
     }
     
     .ts-dropdown .option:hover,
     .ts-dropdown .option.active {
-        background-color: rgb(30, 41, 59) !important;
-        color: white !important;
+        background-color: rgb(240, 253, 250) !important;
+        color: rgb(20, 184, 166) !important;
     }
     
     .ts-dropdown .option.selected {
-        background-color: rgba(20, 184, 166, 0.2) !important;
-        color: rgb(94, 234, 212) !important;
+        background-color: rgb(204, 251, 241) !important;
+        color: rgb(19, 78, 74) !important;
     }
     
     .ts-dropdown .no-results {
         padding: 0.625rem 1rem !important;
         font-size: 0.875rem !important;
-        color: rgb(148, 163, 184) !important;
+        color: rgb(100, 116, 139) !important;
     }
     
     /* Remove default Tom Select caret/arrow */
     .ts-wrapper.single .ts-control:after {
-        border-color: rgb(148, 163, 184) transparent transparent !important;
+        border-color: rgb(100, 116, 139) transparent transparent !important;
     }
     
     /* Ensure proper sizing */

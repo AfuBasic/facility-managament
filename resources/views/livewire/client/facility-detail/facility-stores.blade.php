@@ -32,8 +32,22 @@
                     @endif
 
                     <div class="flex items-center gap-2 pt-4 border-t border-slate-200">
+                        @can('view stores')
+                            <a 
+                                href="{{ route('app.stores.detail', $store->hashid) }}" 
+                                wire:navigate
+                                class="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-teal-600 to-teal-500 px-4 py-2 text-sm font-semibold text-white hover:from-teal-700 hover:to-teal-600 transition-all"
+                            >
+                                <x-heroicon-o-arrow-right class="h-4 w-4" />
+                                Manage Store
+                            </a>
+                        @endcan
                         @can('edit stores')
-                            <button wire:click="editStore({{ $store->id }})" class="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-white border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-all">
+                            <button 
+                                wire:click="editStore({{ $store->id }})" 
+                                class="inline-flex items-center justify-center rounded-lg bg-slate-50 p-2 text-slate-600 hover:bg-slate-100 transition-all"
+                                title="Edit Store"
+                            >
                                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
                                 </svg>
@@ -87,15 +101,15 @@
     @if($showStoreModal)
         <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
             <div class="flex min-h-screen items-end justify-center px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-                <div class="fixed inset-0 bg-slate-950/75 backdrop-blur-sm transition-opacity -z-10" wire:click="closeStoreModal"></div>
+                <div class="fixed inset-0 bg-slate-950/75 backdrop-blur-sm transition-opacity" wire:click="closeStoreModal"></div>
 
-                <div class="relative inline-block align-bottom bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-slate-700 px-6 pt-5 pb-6 text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full sm:p-8 z-10">
+                <div class="relative inline-block align-bottom bg-white rounded-2xl border border-slate-200 px-6 pt-5 pb-6 text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full sm:p-8">
                     <div class="space-y-6">
                         <div class="flex items-center justify-between">
-                            <h3 class="text-xl font-semibold text-white">
+                            <h3 class="text-xl font-semibold text-slate-900">
                                 {{ $isEditingStore ? 'Edit Store' : 'Create New Store' }}
                             </h3>
-                            <button wire:click="closeStoreModal" class="text-slate-400 hover:text-white transition-colors">
+                            <button wire:click="closeStoreModal" class="text-slate-400 hover:text-slate-600 transition-colors">
                                 <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                                 </svg>
@@ -105,32 +119,32 @@
                         <form wire:submit="saveStore" class="space-y-5">
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label for="storeName" class="block text-sm font-medium text-slate-300 mb-2">
-                                        Store Name <span class="text-red-400">*</span>
+                                    <label for="storeName" class="block text-sm font-medium text-slate-700 mb-2">
+                                        Store Name <span class="text-red-500">*</span>
                                     </label>
                                     <input 
                                         wire:model="storeName" 
                                         type="text" 
                                         id="storeName"
-                                        class="w-full rounded-md border border-slate-600 bg-slate-900/50 px-4 py-2.5 text-sm text-white placeholder-slate-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all"
+                                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
                                         placeholder="e.g., Main Store"
                                     />
-                                    @error('storeName') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
+                                    @error('storeName') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
                                 </div>
 
                                 <div>
-                                    <label for="storeStatus" class="block text-sm font-medium text-slate-300 mb-2">
-                                        Status <span class="text-red-400">*</span>
+                                    <label for="storeStatus" class="block text-sm font-medium text-slate-700 mb-2">
+                                        Status <span class="text-red-500">*</span>
                                     </label>
                                     <select 
                                         wire:model="storeStatus" 
                                         id="storeStatus"
-                                        class="w-full rounded-md border border-slate-600 bg-slate-900/50 px-4 py-2.5 text-sm text-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all"
+                                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
                                     >
                                         <option value="active">Active</option>
                                         <option value="inactive">Inactive</option>
                                     </select>
-                                    @error('storeStatus') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
+                                    @error('storeStatus') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
                                 </div>
                             </div>
 
@@ -153,30 +167,30 @@
                             </div>
 
                             <div>
-                                <label for="storeDescription" class="block text-sm font-medium text-slate-300 mb-2">
+                                <label for="storeDescription" class="block text-sm font-medium text-slate-700 mb-2">
                                     Description
                                 </label>
                                 <textarea 
                                     wire:model="storeDescription" 
                                     id="storeDescription"
                                     rows="3"
-                                    class="w-full rounded-md border border-slate-600 bg-slate-900/50 px-4 py-2.5 text-sm text-white placeholder-slate-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all resize-none"
+                                    class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 resize-none"
                                     placeholder="Enter store description..."
                                 ></textarea>
-                                @error('storeDescription') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
+                                @error('storeDescription') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
                             </div>
 
                             <div class="flex items-center gap-3 pt-4">
                                 <button 
                                     type="submit"
-                                    class="flex-1 inline-flex justify-center items-center gap-2 rounded-xl bg-gradient-to-r from-teal-600 to-teal-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-teal-500/30 hover:shadow-teal-500/50 hover:scale-105 transition-all duration-200"
+                                    class="flex-1 inline-flex justify-center items-center gap-2 rounded-xl bg-gradient-to-r from-teal-600 to-teal-500 px-4 py-2.5 text-sm font-semibold text-white hover:from-teal-700 hover:to-teal-600 transition-all"
                                 >
                                     {{ $isEditingStore ? 'Update Store' : 'Create Store' }}
                                 </button>
                                 <button 
                                     type="button"
                                     wire:click="closeStoreModal"
-                                    class="px-4 py-2.5 text-sm font-medium text-slate-400 hover:text-white transition-colors"
+                                    class="px-4 py-2.5 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
                                 >
                                     Cancel
                                 </button>

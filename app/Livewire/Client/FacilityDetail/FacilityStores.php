@@ -35,13 +35,28 @@ class FacilityStores extends Component
     
     public function hydrate()
     {
-        if($this->clientAccount) {
+        if ($this->clientAccount) {
             setPermissionsTeamId($this->clientAccount->id);
         }
     }
 
     public function mount(){
-        $this->clientAccount = app(ClientAccount::class);
+        if (!$this->clientAccount) {
+            $this->clientAccount = app(ClientAccount::class);
+        }
+        setPermissionsTeamId($this->clientAccount->id);
+        
+        // Check if we should auto-open edit modal
+        if (request()->has('editStore')) {
+            $storeId = Store::where('client_account_id', $this->clientAccount->id)
+                ->get()
+                ->firstWhere('hashid', request('editStore'))
+                ?->id;
+            
+            if ($storeId) {
+                $this->editStore($storeId);
+            }
+        }
     }
     
     public function getAvailableManagersProperty()
