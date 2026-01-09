@@ -43,6 +43,41 @@
         <li>
             <div class="text-xs font-semibold leading-6 text-slate-500 uppercase tracking-widest mb-4 px-2">Compliance & People</div>
             <ul role="list" class="-mx-2 space-y-2">
+                {{-- Contacts Dropdown --}}
+                @can('view contacts')
+                <li x-data="{ open: {{ request()->routeIs('app.contacts*') ? 'true' : 'false' }} }">
+                    <button @click="open = !open" class="group flex w-full items-center justify-between gap-x-3 rounded-xl p-2.5 text-sm leading-6 font-semibold transition-all duration-300 {{ request()->routeIs('app.contacts*') ? 'bg-gradient-to-r from-teal-500/10 to-transparent text-teal-400 border-l-4 border-teal-500' : 'text-slate-400 hover:text-white hover:bg-slate-800/50 border-l-4 border-transparent' }}">
+                        <div class="flex items-center gap-x-3">
+                            <svg class="h-6 w-6 shrink-0 {{ request()->routeIs('app.contacts*') ? 'text-teal-400' : 'text-slate-500 group-hover:text-teal-400 transition-colors' }}" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+                            </svg>
+                            <span>Contacts</span>
+                        </div>
+                        <svg class="h-5 w-5 shrink-0 transition-transform duration-200" :class="open ? 'rotate-90' : ''" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                        </svg>
+                    </button>
+                    
+                    <ul x-show="open" x-collapse class="mt-2 space-y-1 pl-11">
+                        <li>
+                            <a href="{{ route('app.contacts') }}" wire:navigate class="group flex gap-x-3 rounded-lg p-2 text-sm leading-6 font-medium transition-all {{ request()->routeIs('app.contacts') && !request()->routeIs('app.contacts.types') && !request()->routeIs('app.contacts.groups') ? 'text-teal-400' : 'text-slate-400 hover:text-white hover:bg-slate-800/30' }}">
+                                All Contacts
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('app.contacts.types') }}" wire:navigate class="group flex gap-x-3 rounded-lg p-2 text-sm leading-6 font-medium transition-all {{ request()->routeIs('app.contacts.types') ? 'text-teal-400' : 'text-slate-400 hover:text-white hover:bg-slate-800/30' }}">
+                                Contact Types
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('app.contacts.groups') }}" wire:navigate class="group flex gap-x-3 rounded-lg p-2 text-sm leading-6 font-medium transition-all {{ request()->routeIs('app.contacts.groups') ? 'text-teal-400' : 'text-slate-400 hover:text-white hover:bg-slate-800/30' }}">
+                                Contact Groups
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                @endcan
+                
                  @can('view sla policy')
                  <li>
                     <a href="{{ route('app.sla-policy') }}" wire:navigate class="group flex gap-x-3 rounded-xl p-2.5 text-sm leading-6 font-semibold transition-all duration-300 {{ request()->routeIs('app.sla-policy') ? 'bg-gradient-to-r from-teal-500/10 to-transparent text-teal-400 border-l-4 border-teal-500 shadow-[0_0_20px_rgba(45,212,191,0.1)]' : 'text-slate-400 hover:text-white hover:bg-slate-800/50 border-l-4 border-transparent' }}">
@@ -73,6 +108,7 @@
                     </a>
                 </li>
                 @endcan
+
                 @can('view roles')
                 <li>
                     <a href="{{ route('app.roles') }}" wire:navigate class="group flex gap-x-3 rounded-xl p-2.5 text-sm leading-6 font-semibold transition-all duration-300 {{ request()->routeIs('app.roles') ? 'bg-gradient-to-r from-teal-500/10 to-transparent text-teal-400 border-l-4 border-teal-500 shadow-[0_0_20px_rgba(45,212,191,0.1)]' : 'text-slate-400 hover:text-white hover:bg-slate-800/50 border-l-4 border-transparent' }}">

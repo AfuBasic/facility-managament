@@ -30,6 +30,13 @@ class PermissionSeeder extends Seeder
             'edit spaces',
             'delete spaces',
 
+            //Stores
+            'view stores',
+            'create stores',
+            'edit stores',
+            'delete stores',
+            'manage stores',
+
             //Consumables
             'view consumables',
             'create consumables',

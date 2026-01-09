@@ -135,22 +135,21 @@
                             </div>
 
                             <div>
-                                <label for="storeManagerId" class="block text-sm font-medium text-slate-300 mb-2">
-                                    Store Manager
-                                </label>
-                                <select 
-                                    wire:model="storeManagerId" 
-                                    id="storeManagerId"
-                                    class="w-full rounded-md border border-slate-600 bg-slate-900/50 px-4 py-2.5 text-sm text-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all"
-                                >
-                                    <option value="">Select a manager...</option>
-                                    @foreach($this->availableManagers as $membership)
-                                        <option value="{{ $membership->user->id }}">
-                                            {{ $membership->user->name ?? 'New User' }} • {{ $membership->user->email }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('storeManagerId') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
+                                @php
+                                    $managerOptions = [];
+                                    foreach($this->availableManagers as $membership) {
+                                        $managerOptions[$membership->user->id] = ($membership->user->name ?? 'New User') . ' • ' . $membership->user->email;
+                                    }
+                                @endphp
+                                
+                                <x-forms.searchable-select
+                                    wire:model="storeManagerId"
+                                    :options="$managerOptions"
+                                    :selected="$storeManagerId"
+                                    label="Store Manager"
+                                    placeholder="Select a manager..."
+                                    :error="$errors->first('storeManagerId')"
+                                />
                             </div>
 
                             <div>
