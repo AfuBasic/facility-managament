@@ -15,6 +15,6 @@ class SendUserInvitation implements ShouldQueue
 
     public function handle(UserInvited | InvitationResent $event): void
     {
-        Mail::to($event->user->email)->send(new UserInvitation($event->url, $event->user, $event->clientAccount));
+        Mail::to($event->user->email)->send(new UserInvitation($event->url, $event->user, $event->clientAccount, $event->role));
     }
 }

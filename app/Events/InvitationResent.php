@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Models\ClientAccount;
 use App\Models\User;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
@@ -14,6 +15,7 @@ class InvitationResent
     public function __construct(
         public User $user,
         public string $url,
-        public \App\Models\ClientAccount $clientAccount
+        public ClientAccount $clientAccount,
+        public string $role
     ) {}
 }

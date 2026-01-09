@@ -8,6 +8,7 @@ use App\Actions\Client\Facilities\UpdateFacility;
 use App\Livewire\Concerns\WithNotifications;
 use App\Models\ClientAccount;
 use App\Repositories\FacilityRepository;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -30,16 +31,12 @@ class Facilities extends Component
     // Form fields
     public $name = '';
     public $address = '';
-    public $contact_person_name = '';
-    public $contact_person_phone = '';
 
     public ClientAccount $clientAccount;
 
     protected $rules = [
         'name' => 'required|string|max:255',
         'address' => 'nullable|string|max:500',
-        'contact_person_name' => 'nullable|string|max:255',
-        'contact_person_phone' => 'nullable|string|max:20',
     ];
 
     public function hydrate()
@@ -64,7 +61,7 @@ class Facilities extends Component
     {
         $this->authorize('create facilities');
         
-        $this->reset(['name', 'address', 'contact_person_name', 'contact_person_phone', 'isEditing', 'editingFacilityId']);
+        $this->reset(['name', 'address', 'isEditing', 'editingFacilityId']);
         $this->showModal = true;
     }
 
@@ -82,8 +79,6 @@ class Facilities extends Component
         $this->editingFacilityId = $facility->id;
         $this->name = $facility->name;
         $this->address = $facility->address ?? '';
-        $this->contact_person_name = $facility->contact_person_name ?? '';
-        $this->contact_person_phone = $facility->contact_person_phone ?? '';
         $this->isEditing = true;
         $this->showModal = true;
     }
@@ -98,9 +93,7 @@ class Facilities extends Component
             $updateFacility->execute(
                 $facility,
                 $this->name,
-                $this->address,
-                $this->contact_person_name,
-                $this->contact_person_phone
+                $this->address
             );
             $this->success('Facility updated successfully!');
         } else {
@@ -108,8 +101,6 @@ class Facilities extends Component
             $createFacility->execute(
                 $this->name,
                 $this->address,
-                $this->contact_person_name,
-                $this->contact_person_phone,
                 $this->clientAccount->id
             );
             $this->success('Facility created successfully!');
@@ -135,10 +126,25 @@ class Facilities extends Component
 
     public function render()
     {
-        $facilities = $this->facilityRepo()->getPaginatedForClient(
-            $this->clientAccount->id,
-            $this->search
-        );
+        $user = Auth::user();
+        $facilityRepo = $this->facilityRepo();
+        
+        // Check if user is admin
+        $isAdmin = $user->hasRole('admin');
+        
+        // Admins see all facilities, others only see facilities they manage
+        if ($isAdmin) {
+            $facilities = $facilityRepo->getPaginatedForClient(
+                $this->clientAccount->id,
+                $this->search
+            );
+        } else {
+            $facilities = $facilityRepo->getPaginatedForUser(
+                $user->id,
+                $this->clientAccount->id,
+                $this->search
+            );
+        }
 
         return view('livewire.client.facilities.index', [
             'facilities' => $facilities
@@ -153,6 +159,6 @@ class Facilities extends Component
     public function closeModal(): void
     {
         $this->showModal = false;
-        $this->reset(['name', 'address', 'contact_person_name', 'contact_person_phone', 'isEditing', 'editingFacilityId']);
+        $this->reset(['name', 'address', 'isEditing', 'editingFacilityId']);
     }
 }

@@ -18,7 +18,6 @@ class InvitationTracker
         bool $isNewUser
     ): InvitationLog {
         return InvitationLog::create([
-            'client_account_id' => $clientAccountId,
             'user_id' => null, // Will be set when accepted
             'email' => $email,
             'role_name' => $roleName,

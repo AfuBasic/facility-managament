@@ -92,7 +92,6 @@
 
                     {{-- Actions --}}
                     <div class="mt-6 flex items-center gap-2">
-                        @can('manage facilities')
                         <a href="{{ route('app.facilities.show', $facility) }}" class="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-teal-600 to-teal-500 px-3 py-2 text-sm font-semibold text-white hover:from-teal-700 hover:to-teal-600 transition-all">
                             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
@@ -100,7 +99,6 @@
                             </svg>
                             Manage
                         </a>
-                        @endcan
                         @can('edit facilities')
                             <button wire:click="edit({{ $facility->id }})" class="@cannot('manage facilities') flex-1 @endcannot inline-flex items-center justify-center rounded-lg bg-slate-100 p-2 text-slate-700 hover:bg-slate-200 transition-all">
                                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -224,36 +222,6 @@
                                     placeholder="Enter facility address"
                                 ></textarea>
                                 @error('address') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
-                            </div>
-
-                            {{-- Contact Person Name --}}
-                            <div>
-                                <label for="contact_person_name" class="block text-sm font-medium text-slate-300 mb-2">
-                                    Contact Person Name
-                                </label>
-                                <input 
-                                    wire:model="contact_person_name" 
-                                    type="text" 
-                                    id="contact_person_name"
-                                    class="w-full rounded-md border border-slate-600 bg-slate-900/50 px-4 py-2.5 text-sm text-white placeholder-slate-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all"
-                                    placeholder="Enter contact person name"
-                                />
-                                @error('contact_person_name') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
-                            </div>
-
-                            {{-- Contact Person Phone --}}
-                            <div>
-                                <label for="contact_person_phone" class="block text-sm font-medium text-slate-300 mb-2">
-                                    Contact Person Phone
-                                </label>
-                                <input 
-                                    wire:model="contact_person_phone" 
-                                    type="tel" 
-                                    id="contact_person_phone"
-                                    class="w-full rounded-md border border-slate-600 bg-slate-900/50 px-4 py-2.5 text-sm text-white placeholder-slate-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all"
-                                    placeholder="Enter contact person phone"
-                                />
-                                @error('contact_person_phone') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
                             </div>
 
                             {{-- Actions --}}
