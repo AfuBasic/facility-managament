@@ -19,7 +19,6 @@
 
     <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
         <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-            
             {{-- Modal Panel --}}
             <div x-show="open"
                  x-transition:enter="ease-out duration-300"
@@ -76,7 +75,7 @@
                                     {{-- Quantity --}}
                                     <div>
                                         <label class="block text-sm font-medium text-slate-700">Quantity</label>
-                                        <input wire:model="quantity" type="number" min="1" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm">
+                                        <input wire:model="quantity" type="number" min="1" class="border p-2 bg-white mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm">
                                         @error('quantity') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
                                     </div>
 
@@ -86,9 +85,9 @@
                                             <label class="block text-sm font-medium text-slate-700">Cost per Unit (Optional)</label>
                                             <div class="relative mt-1 rounded-md shadow-sm">
                                                 <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                                    <span class="text-slate-500 sm:text-sm">$</span>
+                                                    <span class="text-slate-500 sm:text-sm">&#8358;</span>
                                                 </div>
-                                                <input wire:model="cost" type="number" step="0.01" class="block w-full rounded-md border-slate-300 pl-7 focus:border-teal-500 focus:ring-teal-500 sm:text-sm" placeholder="0.00">
+                                                <input wire:model="cost" type="number" step="0.01" class="block p-2 bg-white border w-full rounded-md border-slate-300 pl-7 focus:border-teal-500 focus:ring-teal-500 sm:text-sm" placeholder="0.00">
                                             </div>
                                         </div>
                                     @endif
@@ -97,13 +96,24 @@
                                     @if($actionType === 'checkout')
                                         <div>
                                             <label class="block text-sm font-medium text-slate-700">Assign To</label>
-                                            <select wire:model="targetUserId" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm">
-                                                <option value="">Select User</option>
-                                                @foreach($this->users as $user)
-                                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
-                                                @endforeach
-                                            </select>
+                                            <x-forms.searchable-select 
+                                                wire:model="targetUserId" 
+                                                :options="$this->userOptions" 
+                                                placeholder="Select User..."
+                                            />
                                             @error('targetUserId') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
+                                        </div>
+                                    @endif
+
+                                    @if(in_array($asset->type, ['fixed', 'consumable']))
+                                        <div class="mt-4">
+                                            <label class="block text-sm font-medium text-slate-700">Assign Location / Space</label>
+                                            <x-forms.searchable-select 
+                                                wire:model="targetSpaceId" 
+                                                :options="$this->spaceOptions" 
+                                                placeholder="Select Space..."
+                                            />
+                                            @error('targetSpaceId') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
                                         </div>
                                     @endif
                                     
@@ -122,7 +132,7 @@
                                     {{-- Notes --}}
                                     <div>
                                         <label class="block text-sm font-medium text-slate-700">Notes</label>
-                                        <textarea wire:model="notes" rows="2" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm"></textarea>
+                                        <textarea wire:model="notes" rows="2" class="mt-1 border p-2 bg-white block w-full rounded-md border-slate-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm"></textarea>
                                     </div>
                                     
                                     <div class="flex justify-end pt-2">
@@ -135,24 +145,27 @@
                         @else
                             {{-- Action Buttons --}}
                             <div class="flex gap-2 mb-6">
-                                @can('edit assets')
-                                    <button wire:click="setAction('restock')" class="flex-1 bg-white border border-slate-300 text-slate-700 px-3 py-2 rounded-lg text-sm font-medium hover:bg-slate-50 flex justify-center items-center gap-2">
-                                        <x-heroicon-o-plus class="h-4 w-4" /> Restock
-                                    </button>
-                                    
-                                    @if($asset->units > 0)
-                                        <button wire:click="setAction('checkout')" class="flex-1 bg-white border border-slate-300 text-slate-700 px-3 py-2 rounded-lg text-sm font-medium hover:bg-slate-50 flex justify-center items-center gap-2">
-                                            <x-heroicon-o-arrow-right-on-rectangle class="h-4 w-4" /> Check Out
-                                        </button>
-                                    @endif
+                                {{-- Debug Info (Temporary) --}}
+                                {{-- <div class="text-xs text-red-500">
+                                    Units: {{ $asset->units }} | Assigned: {{ $asset->assigned_to_user_id }}
+                                </div> --}}
 
-                                    @if($asset->user_id && $asset->user_id !== Auth::id()) 
-                                        {{-- Only show checkin if assigned to someone else (conceptually) --}}
-                                        <button wire:click="setAction('checkin')" class="flex-1 bg-white border border-slate-300 text-slate-700 px-3 py-2 rounded-lg text-sm font-medium hover:bg-slate-50 flex justify-center items-center gap-2">
-                                            <x-heroicon-o-arrow-left-on-rectangle class="h-4 w-4" /> Return / Check In
-                                        </button>
-                                    @endif
-                                @endcan
+                                <button wire:click="setAction('restock')" class="flex-1 bg-white border border-slate-300 text-slate-700 px-3 py-2 rounded-lg text-sm font-medium hover:bg-slate-50 flex justify-center items-center gap-2">
+                                    <x-heroicon-o-plus class="h-4 w-4" /> Restock
+                                </button>
+                                
+                                @if($asset->units > 0)
+                                    <button wire:click="setAction('checkout')" class="flex-1 bg-white border border-slate-300 text-slate-700 px-3 py-2 rounded-lg text-sm font-medium hover:bg-slate-50 flex justify-center items-center gap-2">
+                                        <x-heroicon-o-arrow-right-on-rectangle class="h-4 w-4" /> Check Out
+                                    </button>
+                                @endif
+
+                                @if($asset->assigned_to_user_id) 
+                                    {{-- Only show checkin if assigned to someone --}}
+                                    <button wire:click="setAction('checkin')" class="flex-1 bg-white border border-slate-300 text-slate-700 px-3 py-2 rounded-lg text-sm font-medium hover:bg-slate-50 flex justify-center items-center gap-2">
+                                        <x-heroicon-o-arrow-left-on-rectangle class="h-4 w-4" /> Return / Check In
+                                    </button>
+                                @endif
                             </div>
                         @endif
 
@@ -176,13 +189,13 @@
                                 <div>
                                     <dt class="text-sm font-medium text-slate-500">Assigned To</dt>
                                     <dd class="mt-1 text-sm text-slate-900 flex items-center gap-1">
-                                        @if($asset->user)
+                                        @if($asset->assignedUser)
                                             <div class="h-5 w-5 rounded-full bg-slate-200 flex items-center justify-center text-xs">
-                                                {{ substr($asset->user->name, 0, 1) }}
+                                                {{ substr($asset->assignedUser->name, 0, 1) }}
                                             </div>
-                                            {{ $asset->user->name }}
+                                            {{ $asset->assignedUser->name }}
                                         @else
-                                            <span class="text-slate-400 italic">Unassigned</span>
+                                            <span class="text-slate-400 italic">Available (In Store)</span>
                                         @endif
                                     </dd>
                                 </div>

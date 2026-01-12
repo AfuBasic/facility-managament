@@ -32,6 +32,7 @@ return new class extends Migration
             $table->integer('minimum')->default(0);
             $table->integer('maximum')->default(0);
             $table->date('purchased_at')->nullable();
+            $table->foreignIdFor(User::class, 'assigned_to_user_id')->nullable();
             $table->text('notes')->nullable();
             $table->foreignIdFor(Space::class)->nullable()->constrained()->onDelete('set null');
             $table->timestamps();

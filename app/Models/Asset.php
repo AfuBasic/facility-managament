@@ -14,7 +14,8 @@ class Asset extends Model
         'client_account_id',
         'facility_id',
         'store_id',
-        'user_id',
+        'user_id', // Created By
+        'assigned_to_user_id', // Checked Out To
         'serial',
         'units',
         'name',
@@ -26,10 +27,14 @@ class Asset extends Model
         'purchased_at',
         'notes',
         'space_id',
+        'checked_out_at',
+        'last_checked_in_at',
     ];
 
     protected $casts = [
         'purchased_at' => 'date',
+        'checked_out_at' => 'datetime',
+        'last_checked_in_at' => 'datetime',
         'type' => 'string',
     ];
 
@@ -39,6 +44,20 @@ class Asset extends Model
     public function clientAccount()
     {
         return $this->belongsTo(ClientAccount::class);
+    }
+
+    /**
+     * Get the user who currently has the asset (Borrower)
+     */
+    public function assignedUser()
+    {
+        return $this->belongsTo(User::class, 'assigned_to_user_id');
+    }
+
+
+    public function assignments()
+    {
+        return $this->hasMany(AssetAssignment::class);
     }
 
     /**

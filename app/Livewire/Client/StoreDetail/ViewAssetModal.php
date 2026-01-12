@@ -3,6 +3,7 @@
 namespace App\Livewire\Client\StoreDetail;
 
 use App\Models\Asset;
+use App\Models\AssetAssignment;
 use App\Models\AssetHistory;
 use App\Models\User;
 use App\Models\Contact;
@@ -10,12 +11,16 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Livewire\Attributes\On;
+use Livewire\Attributes\Url;
 
 class ViewAssetModal extends Component
 {
     public ?Asset $asset = null;
     public $showModal = false;
     public $activeTab = 'details'; // details, history
+
+    #[Url(as: 'view_asset')]
+    public $urlAssetId = '';
 
     // Action State
     public $actionType = null; // restock, checkout, checkin
@@ -28,17 +33,26 @@ class ViewAssetModal extends Component
     // Searchable Selects
     public $usersSearch = '';
     
+    public function mount()
+    {
+        if ($this->urlAssetId) {
+            $this->openModal($this->urlAssetId);
+        }
+    }
+
     #[On('open-view-asset-modal')]
     public function openModal($assetId)
     {
         Log::info('ViewAssetModal: Opening for Asset', ['id' => $assetId]);
-        $this->asset = Asset::with(['facility', 'store', 'user', 'supplierContact', 'images'])->find($assetId);
+        $this->asset = Asset::with(['facility', 'store', 'user', 'assignedUser', 'supplierContact', 'images'])->find($assetId);
         
         if (!$this->asset) {
             $this->dispatch('notify', variant: 'error', message: 'Asset not found.');
+            $this->urlAssetId = ''; // Reset if invalid
             return;
         }
 
+        $this->urlAssetId = $assetId;
         $this->showModal = true;
         $this->activeTab = 'details';
         $this->resetActionForm();
@@ -49,6 +63,7 @@ class ViewAssetModal extends Component
         $this->showModal = false;
         $this->resetActionForm();
         $this->asset = null;
+        $this->urlAssetId = '';
     }
 
     public function setTab($tab)
@@ -87,13 +102,12 @@ class ViewAssetModal extends Component
             ->get();
     }
 
-    public function getUsersProperty()
+    public function getUserOptionsProperty()
     {
-        // Simple user search for checkout
-        // In a real app, this might need optimizing for large user bases
-        return User::where('name', 'like', '%' . $this->usersSearch . '%')
-            ->take(10)
-            ->get();
+        return User::whereDoesntHave('roles', function ($query) {
+                $query->where('name', 'admin');
+            })->latest()
+            ->pluck('name', 'id');
     }
 
     public function submitAction()
@@ -106,6 +120,9 @@ class ViewAssetModal extends Component
         ]);
 
         $previousState = $this->asset->toArray();
+
+        // Common history data
+        $spaceIdToLog = null;
 
         if ($this->actionType === 'restock') {
             $this->validate([
@@ -121,65 +138,126 @@ class ViewAssetModal extends Component
             $this->validate([
                 'targetUserId' => 'required|exists:users,id',
             ]);
+            
+            // Refined Logic per Asset Type
+            if ($this->asset->type === 'fixed') {
+                // Fixed: Needs User AND Space
+                $this->validate(['targetSpaceId' => 'required|exists:spaces,id']);
+                $spaceIdToLog = $this->targetSpaceId;
+                
+                $this->asset->update([
+                    'assigned_to_user_id' => $this->targetUserId,
+                    'space_id' => $this->targetSpaceId,
+                    'checked_out_at' => now(),
+                ]);
 
-            if ($this->asset->type === 'consumable') {
-                if ($this->asset->units < $this->quantity) {
-                    $this->addError('quantity', 'Not enough units available.');
-                    return;
-                }
-                $this->asset->decrement('units', $this->quantity);
-            } else {
-                // Fixed/Tools - Assign the asset
+            } elseif ($this->asset->type === 'tools') {
+               // Tools: Needs User only (Location implicit or handled by user ownership)
+               // Validation already checked user above.
+               // We DO NOT set space_id on the asset if it's not required to be tracked there, 
+               // OR we keep previous space. For now, assume we just assign user.
+               
+               $this->asset->update([
+                    'assigned_to_user_id' => $this->targetUserId,
+                    'checked_out_at' => now(),
+                    // 'space_id' => null? or keep where it was picked from? usually keep.
+                ]);
+
+            } elseif ($this->asset->type === 'consumable') {
+                // Consumable: Needs User AND Location
+                $this->validate(['targetSpaceId' => 'required|exists:spaces,id']);
                 if ($this->asset->units < 1) {
                      $this->addError('quantity', 'Asset is not available.');
                      return;
                 }
                 
-                // For serialized items, we usually just assign the whole item.
-                // Assuming 1 unit for serialized checkout for now.
-                $this->asset->update([
+                // Check if enough stock is available (Total - Assigned)
+                $assignedCount = $this->asset->assignments()->sum('quantity');
+                $available = $this->asset->units - $assignedCount;
+                
+                if ($available < $this->quantity) {
+                    $this->addError('quantity', "Only {$available} units available.");
+                    return;
+                }
+
+                // Create Assignment
+                AssetAssignment::create([
+                    'asset_id' => $this->asset->id,
                     'user_id' => $this->targetUserId,
-                    // If we had a specific status column on asset, we'd update it here.
-                    // For now, user_id present means it's assigned.
+                    'space_id' => $this->targetSpaceId,
+                    'quantity' => $this->quantity,
+                    'checked_out_at' => now(),
+                    'notes' => $this->notes,
+                ]);
+                
+                // Update Asset State (Optional, but good for quick status view)
+                $this->asset->update([
+                   'checked_out_at' => now(), // Just marks last activity
                 ]);
             }
             
-            $this->logHistory('checkout', $this->quantity);
+            $this->logHistory('checkout', $this->quantity, null, $this->notes, $spaceIdToLog);
             $this->dispatch('notify', variant: 'success', message: 'Asset checked out successfully.');
 
         } elseif ($this->actionType === 'checkin') {
             
             if ($this->asset->type !== 'consumable') {
-                $this->asset->update(['user_id' => Auth::id()]); // Assign back to store manager/auth user? or null?
-                // Usually null or the store manager. Let's set to null (unassigned) for now
-                // OR better, set to the current user (Owner) as per previous logic.
-                $this->asset->update(['user_id' => Auth::id()]);
+                // Find assignment for this user (Wait, we need to know WHICH assignment to return if multiple)
+                // For now, let's assume we return ALL from this user or handle logic.
+                // Simplified: Find an assignment for this asset/user and decrement.
+                
+                // TODO: UI should ideally let you select which specific assignment to check in if a user has multiple separate checkouts.
+                // For now, we auto-resolve:
+                
+                $assignment = AssetAssignment::where('asset_id', $this->asset->id)
+                    // ->where('user_id', $targetUserId) // We need to select the user returning it!
+                    // If actionType is checkin, we usually select the Borrower.
+                    // But our UI currently selects "Assigned To" implicitly for single-assigns.
+                    // Implementation Detail: We need a "Select Assignment to Return" UI?
+                    // OR: "Select User returning item"? 
+                    
+                    // Let's stick to the simplest flow: User selects "Check In", 
+                    // IF asset has assignments, we show a list of WHO has it.
+                    
+                    ->where('user_id', $this->targetUserId) // We need to bind this input on Checkin too!
+                    ->first();
+                    
+                if ($assignment) {
+                    if ($assignment->quantity <= $this->quantity) {
+                        $assignment->delete();
+                    } else {
+                        $assignment->decrement('quantity', $this->quantity);
+                    }
+                }
+                
+                $this->asset->update([
+                    'last_checked_in_at' => now(),
+                ]);
             }
-             // For consumables, check-in isn't really a thing unless returning unused items.
              
-            $this->logHistory('checkin', $this->quantity, null, 'Condition: ' . $this->condition);
+            $this->logHistory('checkin', $this->quantity, null, 'Condition: ' . $this->condition . '. ' . $this->notes);
             $this->dispatch('notify', variant: 'success', message: 'Asset checked in successfully.');
         }
 
-        $this->asset->refresh();
-        $this->actionType = null;
-        $this->setTab('history'); // Switch to history to see the log
-        
-        // Refresh parent
+        $this->closeModal();
         $this->dispatch('refresh-asset-list'); 
     }
 
-    private function logHistory($type, $units, $cost = null, $extraNotes = '')
+    private function logHistory($action, $qty, $cost = null, $notes = null, $spaceId = null)
     {
+        if (!$notes) $notes = $this->notes;
+        if (!$cost) $cost = $this->cost;
+
         AssetHistory::create([
             'asset_id' => $this->asset->id,
-            'action_type' => $type,
+            'action_type' => $action,
+            'quantity_change' => $action === 'checkin' || $action === 'restock' ? $qty : -$qty,
             'performed_by_user_id' => Auth::id(),
             'target_user_id' => $this->targetUserId,
-            'units' => $units,
+            'space_id' => $spaceId, // Log where it went
             'cost_per_unit' => $cost,
-            'note' => trim($this->notes . ' ' . $extraNotes),
-            'previous_state' => null, // Simplified for now
+            'notes' => $notes,
+            'previous_state' => null, // Could implement full snapshot here
         ]);
     }
 

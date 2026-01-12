@@ -13,21 +13,16 @@ class AssetHistory extends Model
 
     protected $fillable = [
         'asset_id',
-        'action_type', // Replaces status for detailed tracking
+        'action_type', // restock, checkout, checkin, audit, maintenance
         'performed_by_user_id',
         'target_user_id',
+        'space_id', // Context location
         'cost_per_unit',
-        'previous_state',
-        'status', // Keeping for backward compatibility if needed, or mapping to action_type
-        'user_id', // Deprecated, use performed_by_user_id
-        'receiver_id', // Deprecated, use target_user_id
-        'units',
         'note',
-        'to_store',
+        'previous_state',
     ];
 
     protected $casts = [
-        'status' => 'string',
         'previous_state' => 'array',
         'cost_per_unit' => 'decimal:2',
     ];
