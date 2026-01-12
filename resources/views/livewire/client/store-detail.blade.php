@@ -86,10 +86,10 @@
                     Assets
                 </button>
                 <button 
-                    wire:click="setTab('consumables')"
-                    class="border-b-2 py-4 px-1 text-sm font-medium transition-colors {{ $activeTab === 'consumables' ? 'border-teal-500 text-teal-600' : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700' }}"
+                    wire:click="setTab('activity')"
+                    class="border-b-2 py-4 px-1 text-sm font-medium transition-colors {{ $activeTab === 'activity' ? 'border-teal-500 text-teal-600' : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700' }}"
                 >
-                    Consumables
+                    Activity Logs
                 </button>
             </nav>
         </div>
@@ -97,58 +97,15 @@
         {{-- Tab Content --}}
         <div class="p-6">
             @if($activeTab === 'overview')
-                <div class="space-y-6">
-                    <div>
-                        <h3 class="text-lg font-semibold text-slate-900 mb-4">Store Information</h3>
-                        <dl class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            <div>
-                                <dt class="text-sm font-medium text-slate-500">Store Name</dt>
-                                <dd class="mt-1 text-sm text-slate-900">{{ $store->name }}</dd>
-                            </div>
-                            <div>
-                                <dt class="text-sm font-medium text-slate-500">Status</dt>
-                                <dd class="mt-1">
-                                    <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium {{ $store->status === 'active' ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-800' }}">
-                                        {{ ucfirst($store->status) }}
-                                    </span>
-                                </dd>
-                            </div>
-                            <div>
-                                <dt class="text-sm font-medium text-slate-500">Facility</dt>
-                                <dd class="mt-1 text-sm text-slate-900">{{ $store->facility->name }}</dd>
-                            </div>
-                            @if($store->storeManager)
-                            <div>
-                                <dt class="text-sm font-medium text-slate-500">Manager</dt>
-                                <dd class="mt-1 text-sm text-slate-900">{{ $store->storeManager->name }}</dd>
-                            </div>
-                            @endif
-                            @if($store->description)
-                            <div class="sm:col-span-2">
-                                <dt class="text-sm font-medium text-slate-500">Description</dt>
-                                <dd class="mt-1 text-sm text-slate-900">{{ $store->description }}</dd>
-                            </div>
-                            @endif
-                        </dl>
-                    </div>
-                </div>
+                <livewire:client.store-detail.store-overview :store="$store" :clientAccount="$clientAccount" :key="'overview-'.$store->id" />
             @elseif($activeTab === 'assets')
-                <div class="text-center py-12">
-                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 mb-4">
-                        <x-heroicon-o-cube class="h-8 w-8 text-slate-400" />
-                    </div>
-                    <h3 class="text-lg font-semibold text-slate-700 mb-2">Assets Management</h3>
-                    <p class="text-sm text-slate-500">Coming soon...</p>
-                </div>
-            @elseif($activeTab === 'consumables')
-                <div class="text-center py-12">
-                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 mb-4">
-                        <x-heroicon-o-archive-box class="h-8 w-8 text-slate-400" />
-                    </div>
-                    <h3 class="text-lg font-semibold text-slate-700 mb-2">Consumables Management</h3>
-                    <p class="text-sm text-slate-500">Coming soon...</p>
-                </div>
+                <livewire:client.store-detail.store-assets :store="$store" :clientAccount="$clientAccount" :key="'assets-'.$store->id" />
+            @elseif($activeTab === 'activity')
+                <livewire:client.store-detail.store-activity-log :store="$store" :clientAccount="$clientAccount" :key="'activity-'.$store->id" />
             @endif
         </div>
     </div>
+
+    {{-- Global Modals --}}
+    <livewire:client.store-detail.view-asset-modal />
 </div>

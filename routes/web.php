@@ -5,7 +5,7 @@ use App\Http\Controllers\ClientSessionController;
 use App\Http\Controllers\SignupActivate;
 use App\Http\Middleware\IsVerified;
 use App\Http\Middleware\SetClientContext;
-use App\Livewire\Client\Assets;
+
 use App\Livewire\Client\ContactGroups;
 use App\Livewire\Client\Contacts;
 use App\Livewire\Client\ContactTypes;
@@ -52,7 +52,7 @@ Route::middleware(['auth', IsVerified::class])->group(function() {
              Route::get('/facilities', Facilities::class)->name('facilities');
              Route::get('/facilities/{facility}', FacilityDetail::class)->name('facilities.show');
              Route::get('/stores/{store}', StoreDetail::class)->name('stores.detail');
-             Route::get('/assets', Assets::class)->name('assets');
+
              Route::get('/work-orders', WorkOrders::class)->name('work-orders');
              Route::get('/sla-policy', SlaPolicy::class)->name('sla-policy');
              Route::get('/vendors', Vendors::class)->name('vendors');

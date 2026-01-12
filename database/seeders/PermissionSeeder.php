@@ -43,12 +43,6 @@ class PermissionSeeder extends Seeder
             'edit contacts',
             'delete contacts',
 
-            //Consumables
-            'view consumables',
-            'create consumables',
-            'edit consumables',
-            'delete consumables',
-
             //Facility Managers
             'view facility_managers',
             'assign facility_managers',
