@@ -1,28 +1,30 @@
 <?php
 
-namespace App\Livewire\Client\FacilityDetail;
+namespace App\Livewire\Client\StoreDetail;
 
 use App\Livewire\Concerns\WithNotifications;
 use App\Models\Asset;
 use App\Models\ClientAccount;
 use App\Models\Contact;
-use App\Models\Facility;
 use App\Models\Space;
 use App\Models\Store;
 use App\Models\User;
 use App\Models\ClientMembership;
 use App\Models\AssetImage;
 use App\Services\ImageUploadService;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use Livewire\Attributes\On;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Livewire\Client\StoreDetail\ViewAssetModal;
 
-class FacilityAssets extends Component
+class StoreAssets extends Component
 {
     use WithNotifications, WithFileUploads;
     
-    public Facility $facility;
+    public Store $store;
     public ClientAccount $clientAccount;
     
     // Filtering and search
@@ -42,14 +44,13 @@ class FacilityAssets extends Component
     public $assetMaximum = 0;
     public $assetDescription = '';
     public $assetNotes = '';
-    public $assetStoreId = null;
-    public $assetUserId = null;
     public $assetSupplierContactId = null;
     public $assetSpaceId = null;
     public $assetPurchasedAt = null;
     
     // Image upload
-    public $photos = [];
+    public $newPhotos = []; // For the file input
+    public $photos = [];    // For accumulating selected photos
     public $uploadedImages = [];
     public $existingImages = [];
     public $isUploading = false;
@@ -64,12 +65,10 @@ class FacilityAssets extends Component
         'assetMaximum' => 'required|integer|min:0',
         'assetDescription' => 'nullable|string',
         'assetNotes' => 'nullable|string',
-        'assetStoreId' => 'nullable|exists:stores,id',
-        'assetUserId' => 'nullable|exists:users,id',
         'assetSupplierContactId' => 'nullable|exists:contacts,id',
         'assetSpaceId' => 'nullable|exists:spaces,id',
-        'assetPurchasedAt' => 'nullable|date',
-        'photos.*' => 'nullable|image|max:2048', // max 2MB
+        'assetPurchasedAt' => 'required|date',
+        'newPhotos.*' => 'nullable|image|max:2048', // max 2MB
     ];
     
     public function hydrate()
@@ -79,18 +78,31 @@ class FacilityAssets extends Component
         }
     }
 
+    #[On('refresh-asset-list')]
+    public function refreshList()
+    {
+        // Triggers re-render
+    }
+
+    public function viewAsset($assetId)
+    {
+        Log::info('StoreAssets: Dispatching open-view-asset-modal (Global)', ['assetId' => $assetId]);
+        $this->dispatch('open-view-asset-modal', assetId: $assetId);
+    }
+
     public function mount()
     {
         if (!$this->clientAccount) {
             $this->clientAccount = app(ClientAccount::class);
         }
         setPermissionsTeamId($this->clientAccount->id);
+        
     }
     
     public function getAssetsProperty()
     {
         $query = Asset::with(['store', 'user', 'supplierContact', 'space', 'images'])
-            ->where('facility_id', $this->facility->id)
+            ->where('store_id', $this->store->id)
             ->where('client_account_id', $this->clientAccount->id);
         
         // Filter by type
@@ -109,14 +121,6 @@ class FacilityAssets extends Component
         return $query->orderBy('created_at', 'desc')->get();
     }
     
-    public function getAvailableStoresProperty()
-    {
-        return Store::where('facility_id', $this->facility->id)
-            ->where('client_account_id', $this->clientAccount->id)
-            ->where('status', 'active')
-            ->get();
-    }
-    
     public function getAvailableUsersProperty()
     {
         return ClientMembership::with('user')
@@ -126,14 +130,14 @@ class FacilityAssets extends Component
     
     public function getAvailableContactsProperty()
     {
-        return Contact::where('client_account_id', $this->clientAccount->id)
+        return Contact::with('contactType')->where('client_account_id', $this->clientAccount->id)
             ->where('contact_type_id', '!=', null) // Only contacts with types
             ->get();
     }
     
     public function getAvailableSpacesProperty()
     {
-        return Space::where('facility_id', $this->facility->id)
+        return Space::where('facility_id', $this->store->facility_id)
             ->get();
     }
     
@@ -148,7 +152,7 @@ class FacilityAssets extends Component
     {
         $this->authorize('edit assets');
         
-        $asset = Asset::with('images')->where('facility_id', $this->facility->id)->findOrFail($id);
+        $asset = Asset::with('images')->where('store_id', $this->store->id)->findOrFail($id);
         
         $this->editingAssetId = $asset->id;
         $this->assetName = $asset->name;
@@ -159,8 +163,7 @@ class FacilityAssets extends Component
         $this->assetMaximum = $asset->maximum;
         $this->assetDescription = $asset->description ?? '';
         $this->assetNotes = $asset->notes ?? '';
-        $this->assetStoreId = $asset->store_id;
-        $this->assetUserId = $asset->user_id;
+        // $this->assetUserId = $asset->user_id; // Auto-assigned on save
         $this->assetSupplierContactId = $asset->supplier_contact_id;
         $this->assetSpaceId = $asset->space_id;
         $this->assetPurchasedAt = $asset->purchased_at?->format('Y-m-d');
@@ -177,21 +180,30 @@ class FacilityAssets extends Component
         $this->showAssetModal = true;
     }
     
-    public function updatedPhotos()
+    public function updatedNewPhotos()
     {
         $this->validate([
-            'photos.*' => 'image|max:2048',
+            'newPhotos.*' => 'image|max:2048',
         ]);
         
-        // Check total images (existing + new) doesn't exceed 5
+        // Merge new photos into the pending photos list
+        if (!empty($this->newPhotos)) {
+            foreach ($this->newPhotos as $photo) {
+                $this->photos[] = $photo;
+            }
+        }
+        
+        // Check total images (existing + pending) doesn't exceed 5
         $totalImages = count($this->existingImages) + count($this->photos);
         if ($totalImages > 5) {
             $this->error('Maximum 5 images allowed per asset.');
-            $this->photos = [];
-            return;
+            // Remove the excess photos from the end
+            $excess = $totalImages - 5;
+            array_splice($this->photos, -$excess);
         }
         
-        $this->uploadImages();
+        // Reset the input so user can select more
+        $this->newPhotos = [];
     }
     
     private function uploadImages()
@@ -206,7 +218,8 @@ class FacilityAssets extends Component
         foreach ($this->photos as $index => $photo) {
             try {
                 $this->uploadProgress[$index] = 'uploading';
-                // Upload with deduplication
+                
+                // Upload with deduplication (preset handles folder structure)
                 $result = $imageService->uploadWithCache($photo);
                 
                 $this->uploadedImages[] = [
@@ -224,7 +237,6 @@ class FacilityAssets extends Component
         }
         
         $this->isUploading = false;
-        $this->photos = [];
     }
     
     public function removeUploadedImage($index)
@@ -259,6 +271,7 @@ class FacilityAssets extends Component
     
     public function saveAsset()
     {
+        $this->uploadImages(); // Ensure images are uploaded
         $this->validate();
         
         // Check for duplicate serial within client account
@@ -279,14 +292,16 @@ class FacilityAssets extends Component
         try {
             if ($this->isEditingAsset) {
                 $this->authorize('edit assets');
-                $asset = Asset::where('facility_id', $this->facility->id)->findOrFail($this->editingAssetId);
+                $asset = Asset::where('store_id', $this->store->id)->findOrFail($this->editingAssetId);
                 $asset->update($this->getAssetData());
                 $message = 'Asset updated successfully!';
             } else {
                 $this->authorize('create assets');
                 $asset = Asset::create(array_merge($this->getAssetData(), [
-                    'facility_id' => $this->facility->id,
+                    'facility_id' => $this->store->facility_id,
+                    'store_id' => $this->store->id,
                     'client_account_id' => $this->clientAccount->id,
+                    // 'user_id' handled by getAssetData now
                 ]));
                 $message = 'Asset created successfully!';
             }
@@ -302,7 +317,7 @@ class FacilityAssets extends Component
             DB::commit();
             $this->success($message);
             $this->closeAssetModal();
-            $this->facility->load('assets');
+            $this->store->load('assets');
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Asset save failed: ' . $e->getMessage());
@@ -321,8 +336,7 @@ class FacilityAssets extends Component
             'maximum' => $this->assetMaximum,
             'description' => $this->assetDescription,
             'notes' => $this->assetNotes,
-            'store_id' => $this->assetStoreId,
-            'user_id' => $this->assetUserId,
+            'user_id' => Auth::id(), // Always assign to current user
             'supplier_contact_id' => $this->assetSupplierContactId,
             'space_id' => $this->assetSpaceId,
             'purchased_at' => $this->assetPurchasedAt,
@@ -336,7 +350,7 @@ class FacilityAssets extends Component
         DB::beginTransaction();
         
         try {
-            $asset = Asset::with('images')->where('facility_id', $this->facility->id)->findOrFail($id);
+            $asset = Asset::with('images')->where('store_id', $this->store->id)->findOrFail($id);
             
             // Delete images from Cloudinary
             $imageService = app(ImageUploadService::class);
@@ -350,7 +364,7 @@ class FacilityAssets extends Component
             
             DB::commit();
             $this->success('Asset deleted successfully.');
-            $this->facility->load('assets');
+            $this->store->load('assets');
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Asset deletion failed: ' . $e->getMessage());
@@ -374,14 +388,14 @@ class FacilityAssets extends Component
         $this->assetMaximum = 0;
         $this->assetDescription = '';
         $this->assetNotes = '';
-        $this->assetStoreId = null;
-        $this->assetUserId = null;
+        // $this->assetUserId = null;
         $this->assetSupplierContactId = null;
         $this->assetSpaceId = null;
         $this->assetPurchasedAt = null;
         $this->isEditingAsset = false;
         $this->editingAssetId = null;
         $this->photos = [];
+        $this->newPhotos = [];
         $this->uploadedImages = [];
         $this->existingImages = [];
         $this->uploadProgress = [];
@@ -390,6 +404,6 @@ class FacilityAssets extends Component
     
     public function render()
     {
-        return view('livewire.client.facility-detail.facility-assets');
+        return view('livewire.client.store-detail.store-assets');
     }
 }

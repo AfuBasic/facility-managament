@@ -5,6 +5,7 @@ namespace App\Livewire\Client;
 use App\Models\ClientAccount;
 use App\Models\Store;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Url;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
@@ -14,6 +15,7 @@ class StoreDetail extends Component
 {
     public Store $store;
     public ClientAccount $clientAccount;
+    #[Url]
     public $activeTab = 'overview';
 
     public function hydrate()

@@ -122,13 +122,20 @@
                                     <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                                     </svg>
-                                    Assigned: {{ $asset->user->name }}
+                                    Created By: {{ $asset->user->name }}
                                 </div>
                             @endif
                         </div>
 
                         {{-- Actions --}}
                         <div class="flex items-center gap-2 pt-3 border-t border-slate-200">
+                             <button 
+                                wire:click="viewAsset({{ $asset->id }})"
+                                class="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 transition-all hover:text-teal-600"
+                            >
+                                <x-heroicon-o-eye class="h-4 w-4" />
+                                View
+                            </button>
                             @can('edit assets')
                                 <button 
                                     wire:click="editAsset({{ $asset->id }})" 
@@ -312,53 +319,13 @@
                                     @error('assetMaximum') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
                                 </div>
                             </div>
-
-                            {{-- Assignments --}}
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    @php
-                                        $storeOptions = [];
-                                        foreach($this->availableStores as $store) {
-                                            $storeOptions[$store->id] = $store->name;
-                                        }
-                                    @endphp
-                                    
-                                    <x-forms.searchable-select
-                                        wire:model="assetStoreId"
-                                        :options="$storeOptions"
-                                        :selected="$assetStoreId"
-                                        label="Store"
-                                        placeholder="Select a store..."
-                                        :error="$errors->first('assetStoreId')"
-                                    />
-                                </div>
-
-                                <div>
-                                    @php
-                                        $userOptions = [];
-                                        foreach($this->availableUsers as $membership) {
-                                            $userOptions[$membership->user->id] = ($membership->user->name ?? 'New User') . ' • ' . $membership->user->email;
-                                        }
-                                    @endphp
-                                    
-                                    <x-forms.searchable-select
-                                        wire:model="assetUserId"
-                                        :options="$userOptions"
-                                        :selected="$assetUserId"
-                                        label="Assigned User"
-                                        placeholder="Select a user..."
-                                        :error="$errors->first('assetUserId')"
-                                    />
-                                </div>
-                            </div>
-
                             {{-- More Details --}}
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     @php
                                         $contactOptions = [];
                                         foreach($this->availableContacts as $contact) {
-                                            $contactOptions[$contact->id] = $contact->name . ' • ' . $contact->email;
+                                            $contactOptions[$contact->id] = $contact->firstname . ' ' .  $contact->lastname . " (".$contact->contactType->name .")";
                                         }
                                     @endphp
                                     
@@ -436,7 +403,16 @@
                             </div>
 
                             {{-- Image Upload --}}
-                            <div>
+                            <div 
+                                x-data="{ 
+                                    uploadProgress: 0,
+                                    isUploadingFiles: false
+                                }"
+                                x-on:livewire-upload-start="isUploadingFiles = true"
+                                x-on:livewire-upload-finish="isUploadingFiles = false; uploadProgress = 0"
+                                x-on:livewire-upload-error="isUploadingFiles = false"
+                                x-on:livewire-upload-progress="uploadProgress = $event.detail.progress"
+                            >
                                 <label class="block text-sm font-medium text-slate-700 mb-2">
                                     Images (Max 5)
                                 </label>
@@ -452,14 +428,31 @@
                                                     wire:click="deleteExistingImage({{ $image['id'] }})"
                                                     class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                                                 >
-                                                    <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                                    </svg>
+                                                    <x-heroicon-o-x-mark class="h-3 w-3" />
                                                 </button>
+                                                <span class="absolute bottom-1 left-1 bg-slate-800 text-white text-xs px-1.5 py-0.5 rounded">Saved</span>
                                             </div>
                                         @endforeach
                                     </div>
                                 @endif
+
+                                {{-- File Upload Progress Bar --}}
+                                <div x-show="isUploadingFiles" class="mb-3">
+                                    <div class="bg-slate-100 rounded-lg p-4">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <span class="text-sm font-medium text-slate-700">Uploading files...</span>
+                                            <span class="text-sm font-medium text-teal-600" x-text="uploadProgress + '%'"></span>
+                                        </div>
+                                        <div class="w-full bg-slate-200 rounded-full h-2">
+                                            <div 
+                                                class="bg-gradient-to-r from-teal-600 to-teal-500 h-2 rounded-full transition-all duration-300"
+                                                :style="`width: ${uploadProgress}%`"
+                                            ></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                @include('livewire.client.store-detail.partials.pending-images')
 
                                 {{-- Upload Progress --}}
                                 @if(count($uploadedImages) > 0)
@@ -472,12 +465,12 @@
                                                     wire:click="removeUploadedImage({{ $index }})"
                                                     class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                                                 >
-                                                    <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                                    </svg>
+                                                    <x-heroicon-o-x-mark class="h-3 w-3" />
                                                 </button>
                                                 @if($image['cached'] ?? false)
                                                     <span class="absolute bottom-1 left-1 bg-green-500 text-white text-xs px-1.5 py-0.5 rounded">Cached</span>
+                                                @else
+                                                    <span class="absolute bottom-1 left-1 bg-blue-500 text-white text-xs px-1.5 py-0.5 rounded">Uploaded</span>
                                                 @endif
                                             </div>
                                         @endforeach
@@ -489,16 +482,14 @@
                                     <div class="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center hover:border-teal-400 transition-colors">
                                         <input 
                                             type="file" 
-                                            wire:model="photos" 
+                                            wire:model="newPhotos" 
                                             multiple 
                                             accept="image/jpeg,image/jpg,image/png"
                                             class="hidden" 
                                             id="photoInput"
                                         />
                                         <label for="photoInput" class="cursor-pointer">
-                                            <svg class="mx-auto h-12 w-12 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-                                            </svg>
+                                            <x-heroicon-o-photo class="mx-auto h-12 w-12 text-slate-400" />
                                             <p class="mt-2 text-sm text-slate-600">
                                                 <span class="font-semibold text-teal-600">Click to upload</span> or drag and drop
                                             </p>
@@ -513,7 +504,7 @@
                                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                         </svg>
-                                        Uploading images...
+                                        Uploading images to Cloudinary...
                                     </div>
                                 @endif
 
@@ -549,6 +540,6 @@
                     </div>
                 </div>
             </div>
-        </div>
+</div>
     @endif
 </div>

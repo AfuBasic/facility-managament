@@ -49,4 +49,9 @@ class Store extends Model
     {
         return $this->belongsTo(User::class, 'store_manager_id');
     }
+
+    public function assets()
+    {
+        return $this->hasMany(Asset::class);
+    }
 }
