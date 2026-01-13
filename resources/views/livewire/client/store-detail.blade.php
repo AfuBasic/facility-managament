@@ -106,6 +106,5 @@
         </div>
     </div>
 
-    {{-- Global Modals --}}
-    <livewire:client.store-detail.view-asset-modal />
+
 </div>

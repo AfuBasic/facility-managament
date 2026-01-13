@@ -13,10 +13,11 @@ class AssetHistory extends Model
 
     protected $fillable = [
         'asset_id',
-        'action_type', // restock, checkout, checkin, audit, maintenance
+        'action_type',
         'performed_by_user_id',
         'target_user_id',
-        'space_id', // Context location
+        'space_id',
+        'quantity',
         'cost_per_unit',
         'note',
         'previous_state',
@@ -52,10 +53,10 @@ class AssetHistory extends Model
     }
 
     /**
-     * Get the destination store
+     * Get the space where the action occurred
      */
-    public function toStore()
+    public function space()
     {
-        return $this->belongsTo(Store::class, 'to_store');
+        return $this->belongsTo(Space::class);
     }
 }
