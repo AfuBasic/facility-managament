@@ -18,7 +18,6 @@ use Livewire\WithFileUploads;
 use Livewire\Attributes\On;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Livewire\Client\StoreDetail\ViewAssetModal;
 
 class StoreAssets extends Component
 {
@@ -84,11 +83,6 @@ class StoreAssets extends Component
         // Triggers re-render
     }
 
-    public function viewAsset($assetId)
-    {
-        Log::info('StoreAssets: Dispatching open-view-asset-modal (Global)', ['assetId' => $assetId]);
-        $this->dispatch('open-view-asset-modal', assetId: $assetId);
-    }
 
     public function mount()
     {

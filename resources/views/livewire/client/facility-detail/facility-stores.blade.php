@@ -34,7 +34,7 @@
                     <div class="flex items-center gap-2 pt-4 border-t border-slate-200">
                         @can('view stores')
                             <a 
-                                href="{{ route('app.stores.detail', $store->hashid) }}" 
+                                href="{{ route('app.store.detail', $store->hashid) }}" 
                                 wire:navigate
                                 class="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-teal-600 to-teal-500 px-4 py-2 text-sm font-semibold text-white hover:from-teal-700 hover:to-teal-600 transition-all"
                             >

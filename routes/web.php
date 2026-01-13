@@ -51,16 +51,17 @@ Route::middleware(['auth', IsVerified::class])->group(function() {
              Route::get('/dashboard', Dashboard::class)->name('dashboard');
              Route::get('/facilities', Facilities::class)->name('facilities');
              Route::get('/facilities/{facility}', FacilityDetail::class)->name('facilities.show');
-             Route::get('/stores/{store}', StoreDetail::class)->name('stores.detail');
-
-             Route::get('/work-orders', WorkOrders::class)->name('work-orders');
-             Route::get('/sla-policy', SlaPolicy::class)->name('sla-policy');
-             Route::get('/vendors', Vendors::class)->name('vendors');
-             Route::get('/users', Users::class)->name('users');
-             Route::get('/contacts', Contacts::class)->name('contacts');
-             Route::get('/contacts/types', ContactTypes::class)->name('contacts.types');
-             Route::get('/contacts/groups', ContactGroups::class)->name('contacts.groups');
-             Route::get('/roles', Roles::class)->name('roles');
+             Route::get('/stores/{store}', StoreDetail::class)->name('store.detail');
+            Route::get('/assets/{asset}', \App\Livewire\Client\AssetDetail::class)->name('asset.detail');
+            
+            Route::get('/work-orders', WorkOrders::class)->name('work-orders');
+            Route::get('/sla-policy', SlaPolicy::class)->name('sla-policy');
+            Route::get('/vendors', Vendors::class)->name('vendors');
+            Route::get('/users', Users::class)->name('users');
+            Route::get('/contacts', Contacts::class)->name('contacts');
+            Route::get('/contacts/types', ContactTypes::class)->name('contacts.types');
+            Route::get('/contacts/groups', ContactGroups::class)->name('contacts.groups');
+            Route::get('/roles', Roles::class)->name('roles');
     });
 });
 
