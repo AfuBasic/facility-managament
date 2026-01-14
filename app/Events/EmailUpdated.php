@@ -12,7 +12,9 @@ class EmailUpdated
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $user;
+
     public $oldEmail;
+
     public $newEmail;
 
     /**

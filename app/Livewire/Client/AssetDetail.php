@@ -19,20 +19,31 @@ use Livewire\Component;
 class AssetDetail extends Component
 {
     public Asset $asset;
+
     public ClientAccount $clientAccount;
-    
+
     public $activeTab = 'details'; // details, history, assignments
-    
+
+    // Search
+    public $historySearch = '';
+
     // Action State
     public $actionType = null; // restock, checkout, checkin
+
     public $quantity = 1;
+
     public $cost = null;
+
     public $targetUserId = null;
+
     public $targetSpaceId = null;
+
     public $selectedAssignmentId = null;
+
     public $notes = '';
+
     public $condition = 'Good';
-    
+
     public function mount(Asset $asset)
     {
         $this->asset = $asset->load(['facility', 'store', 'user', 'assignedUser', 'supplierContact', 'space', 'images', 'assignments.user', 'assignments.space']);
@@ -44,7 +55,7 @@ class AssetDetail extends Component
         $this->activeTab = $tab;
         $this->actionType = null; // Reset action when switching tabs
     }
-    
+
     public function setAction($type)
     {
         $this->actionType = $type;
@@ -64,17 +75,44 @@ class AssetDetail extends Component
 
     public function getHistoryProperty()
     {
-        return AssetHistory::where('asset_id', $this->asset->id)
-            ->with(['performedBy', 'targetUser', 'space'])
-            ->latest()
-            ->get();
+        $query = AssetHistory::where('asset_id', $this->asset->id)
+            ->with(['performedBy', 'targetUser', 'space']);
+
+        // Apply search filter
+        if (! empty($this->historySearch)) {
+            $search = $this->historySearch;
+            $query->where(function ($q) use ($search) {
+                $q->where('action_type', 'like', "%{$search}%")
+                    ->orWhere('note', 'like', "%{$search}%")
+                    ->orWhereHas('performedBy', function ($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('targetUser', function ($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('space', function ($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%");
+                    });
+
+                // Try to parse as date and search created_at
+                try {
+                    // Try various date formats
+                    $date = \Carbon\Carbon::parse($search);
+                    $q->orWhereDate('created_at', $date->format('Y-m-d'));
+                } catch (\Exception $e) {
+                    // Not a valid date, skip date filtering
+                }
+            });
+        }
+
+        return $query->latest()->get();
     }
 
     public function getUserOptionsProperty()
     {
         return User::whereDoesntHave('roles', function ($query) {
-                $query->where('name', 'admin');
-            })
+            $query->where('name', 'admin');
+        })
             ->latest()
             ->pluck('name', 'id');
     }
@@ -89,6 +127,7 @@ class AssetDetail extends Component
     public function getAvailableUnitsProperty()
     {
         $assigned = $this->asset->assignments()->sum('quantity');
+
         return $this->asset->units - $assigned;
     }
 
@@ -114,15 +153,15 @@ class AssetDetail extends Component
 
                     $this->asset->increment('units', $this->quantity);
                     $this->logHistory('restock', $this->quantity, $this->cost);
-                    
+
                     session()->flash('success', 'Asset restocked successfully.');
 
                 } elseif ($this->actionType === 'checkout') {
                     $this->validate([
-                        'quantity' => 'required|integer|min:1|max:' . $this->availableUnits,
+                        'quantity' => 'required|integer|min:1|max:'.$this->availableUnits,
                         'targetUserId' => 'required|exists:users,id',
                     ]);
-                    
+
                     // Validate space based on asset type
                     if (in_array($this->asset->type, ['fixed', 'consumable'])) {
                         $this->validate(['targetSpaceId' => 'required|exists:spaces,id']);
@@ -144,7 +183,7 @@ class AssetDetail extends Component
                         ]);
                         $this->logHistory('checkout', $this->quantity, null, $this->notes, $this->targetSpaceId);
                     }
-                    
+
                     session()->flash('success', 'Asset checked out successfully.');
 
                 } elseif ($this->actionType === 'checkin') {
@@ -155,18 +194,18 @@ class AssetDetail extends Component
                     ]);
 
                     $assignment = AssetAssignment::find($this->selectedAssignmentId);
-                    
+
                     // Validate that return quantity doesn't exceed checked out quantity
                     if ($this->quantity > $assignment->quantity) {
                         throw new \Exception("Cannot return {$this->quantity} units. Only {$assignment->quantity} units were checked out.");
                     }
-                    
+
                     if ($assignment->quantity <= $this->quantity) {
                         $assignment->delete();
                     } else {
                         $assignment->decrement('quantity', $this->quantity);
                     }
-                    
+
                     $this->logHistory('checkin', $this->quantity, null, "Condition: {$this->condition}. {$this->notes}");
                     session()->flash('success', 'Asset checked in successfully.');
                 }
@@ -175,13 +214,13 @@ class AssetDetail extends Component
             $this->asset->refresh();
             $this->actionType = null;
             $this->setTab('history');
-            
+
         } catch (\Exception $e) {
-            session()->flash('error', 'An error occurred: ' . $e->getMessage());
+            session()->flash('error', 'An error occurred: '.$e->getMessage());
             Log::error('Asset action failed', [
                 'action' => $this->actionType,
                 'asset_id' => $this->asset->id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
         }
     }

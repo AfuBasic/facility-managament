@@ -253,6 +253,27 @@
 
                 {{-- History Tab --}}
                 @if($activeTab === 'history')
+                    {{-- Search Input --}}
+                    <div class="mb-6">
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <x-heroicon-o-magnifying-glass class="h-5 w-5 text-slate-400" />
+                            </div>
+                            <input 
+                                wire:model.live.debounce.300ms="historySearch" 
+                                type="text" 
+                                placeholder="Search by action, user, location, notes, or date (e.g., 'Jan 14, 2026')..." 
+                                class="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg leading-5 bg-white placeholder-slate-500 focus:outline-none focus:placeholder-slate-400 focus:ring-1 focus:ring-teal-500 focus:border-teal-500 sm:text-sm"
+                            >
+                        </div>
+                        @if($historySearch)
+                            <p class="mt-2 text-sm text-slate-600">
+                                Showing results for "<span class="font-semibold">{{ $historySearch }}</span>"
+                                <button wire:click="$set('historySearch', '')" class="ml-2 text-teal-600 hover:text-teal-700 font-medium">Clear</button>
+                            </p>
+                        @endif
+                    </div>
+
                     <div class="flow-root">
                         <ul role="list" class="-mb-8">
                             @forelse($this->history as $log)
@@ -294,7 +315,13 @@
                                     </div>
                                 </li>
                             @empty
-                                <li class="py-8 text-center text-sm text-slate-500">No history available for this asset.</li>
+                                <li class="py-8 text-center text-sm text-slate-500">
+                                    @if($historySearch)
+                                        No history found matching "{{ $historySearch }}".
+                                    @else
+                                        No history available for this asset.
+                                    @endif
+                                </li>
                             @endforelse
                         </ul>
                     </div>

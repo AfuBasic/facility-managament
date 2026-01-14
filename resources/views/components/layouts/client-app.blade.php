@@ -130,6 +130,9 @@
     
     <x-ui.confirm-modal />
     
+    {{-- Global AI Assistant Widget --}}
+    <livewire:ai-assistant />
+    
     @livewireScripts
 </body>
 </html>
