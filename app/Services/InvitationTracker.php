@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\InvitationLog;
-use App\Models\User;
 
 class InvitationTracker
 {

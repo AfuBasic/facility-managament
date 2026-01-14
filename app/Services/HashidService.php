@@ -6,9 +6,9 @@ use Hashids\Hashids;
 
 /**
  * Service for encoding/decoding IDs using Hashids
- * 
+ *
  * This obfuscates sequential IDs in URLs for better security and aesthetics.
- * 
+ *
  * To reverse this implementation:
  * 1. Remove calls to HashidService::encode() and HashidService::decode()
  * 2. Use regular IDs instead
@@ -23,7 +23,7 @@ class HashidService
         // Salt should be unique per application - stored in .env
         $salt = config('app.hashid_salt', 'optimaFMApp');
         $minLength = 140; // Minimum length of generated hash
-        
+
         $this->hashids = new Hashids($salt, $minLength);
     }
 
@@ -41,6 +41,7 @@ class HashidService
     public function decode(string $hash): ?int
     {
         $decoded = $this->hashids->decode($hash);
+
         return $decoded[0] ?? null;
     }
 

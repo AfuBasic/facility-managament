@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Log;
 
 /**
  * Service for handling image uploads with hash-based deduplication
- * 
+ *
  * This service generates a hash of uploaded images and checks if the same
  * image already exists in the cache. If it does, it returns the cached URL
  * instead of uploading again, saving storage space and upload time.
@@ -21,9 +21,9 @@ class ImageUploadService
 
     /**
      * Upload an image with deduplication check
-     * 
-     * @param UploadedFile $file The file to upload
-     * @param array $options Additional upload options
+     *
+     * @param  UploadedFile  $file  The file to upload
+     * @param  array  $options  Additional upload options
      * @return array Returns image data including URL and public ID
      */
     public function uploadWithCache(UploadedFile $file, array $options = []): array
@@ -37,7 +37,7 @@ class ImageUploadService
         if ($cachedImage) {
             // Image already exists, increment usage and return cached data
             $cachedImage->incrementUsage();
-            
+
             Log::info("Image cache hit for hash: {$imageHash}");
 
             return [
@@ -73,17 +73,17 @@ class ImageUploadService
 
             return array_merge($uploadResult, ['cached' => false]);
         } catch (\Exception $e) {
-            Log::error('Image upload failed: ' . $e->getMessage());
+            Log::error('Image upload failed: '.$e->getMessage());
             throw $e;
         }
     }
 
     /**
      * Upload multiple images with deduplication
-     * 
-     * @param array $files Array of UploadedFile objects
-     * @param string $folder The folder path in Cloudinary
-     * @param array $options Additional upload options
+     *
+     * @param  array  $files  Array of UploadedFile objects
+     * @param  string  $folder  The folder path in Cloudinary
+     * @param  array  $options  Additional upload options
      * @return array Array of upload results
      */
     public function uploadMultipleWithCache(array $files, string $folder = 'assets', array $options = []): array
@@ -95,7 +95,7 @@ class ImageUploadService
                 try {
                     $results[] = $this->uploadWithCache($file, $folder, $options);
                 } catch (\Exception $e) {
-                    Log::error('Failed to upload file: ' . $e->getMessage());
+                    Log::error('Failed to upload file: '.$e->getMessage());
                     $results[] = ['error' => $e->getMessage()];
                 }
             }
@@ -106,16 +106,15 @@ class ImageUploadService
 
     /**
      * Delete an image and update cache
-     * 
-     * @param string $publicId The public ID of the image to delete
-     * @return bool
+     *
+     * @param  string  $publicId  The public ID of the image to delete
      */
     public function deleteWithCache(string $publicId): bool
     {
         // Find the cached image
         $cachedImage = ImageCache::where('public_id', $publicId)->first();
 
-        if (!$cachedImage) {
+        if (! $cachedImage) {
             // Not in cache, just delete from Cloudinary
             return $this->cloudinary->deleteImage($publicId);
         }
@@ -126,7 +125,7 @@ class ImageUploadService
         // If usage count is 0, delete from Cloudinary and cache
         if ($cachedImage->usage_count <= 0) {
             $deleted = $this->cloudinary->deleteImage($publicId);
-            
+
             if ($deleted) {
                 $cachedImage->delete();
                 Log::info("Image deleted from cache and Cloudinary: {$publicId}");
@@ -137,14 +136,12 @@ class ImageUploadService
 
         // Still in use by other records, don't delete from Cloudinary
         Log::info("Image usage decremented but not deleted (still in use): {$publicId}");
+
         return true;
     }
 
     /**
      * Generate SHA-256 hash of a file
-     * 
-     * @param UploadedFile $file
-     * @return string
      */
     private function generateFileHash(UploadedFile $file): string
     {
@@ -153,9 +150,6 @@ class ImageUploadService
 
     /**
      * Check if an image hash exists in cache
-     * 
-     * @param string $hash
-     * @return ImageCache|null
      */
     public function findByHash(string $hash): ?ImageCache
     {
@@ -164,8 +158,6 @@ class ImageUploadService
 
     /**
      * Get cache statistics
-     * 
-     * @return array
      */
     public function getCacheStats(): array
     {
