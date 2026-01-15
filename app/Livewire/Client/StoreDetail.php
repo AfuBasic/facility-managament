@@ -5,8 +5,8 @@ namespace App\Livewire\Client;
 use App\Models\ClientAccount;
 use App\Models\Store;
 use Livewire\Attributes\Layout;
-use Livewire\Attributes\Url;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 
 #[Layout('components.layouts.client-app')]
@@ -14,7 +14,9 @@ use Livewire\Component;
 class StoreDetail extends Component
 {
     public Store $store;
+
     public ClientAccount $clientAccount;
+
     #[Url]
     public $activeTab = 'overview';
 
@@ -28,23 +30,23 @@ class StoreDetail extends Component
     public function mount(Store $store)
     {
         $this->clientAccount = app(ClientAccount::class);
-        
+
         // Verify the store belongs to the current client
         if ($store->client_account_id !== $this->clientAccount->id) {
             abort(404);
         }
-        
+
         $this->store = $store->load(['facility', 'storeManager']);
     }
 
     public function deleteStore()
     {
         $this->authorize('delete stores');
-        
+
         $facilityHashid = $this->store->facility->hashid;
         $this->store->delete();
-        
-        return $this->redirect(route('app.facilities.show', $facilityHashid) . '?tab=stores', navigate: true);
+
+        return $this->redirect(route('app.facilities.show', $facilityHashid).'?tab=stores', navigate: true);
     }
 
     public function setTab($tab)

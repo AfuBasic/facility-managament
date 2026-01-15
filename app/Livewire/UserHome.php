@@ -3,10 +3,10 @@
 namespace App\Livewire;
 
 use App\Models\ClientMembership;
-use Livewire\Attributes\Title;
-use Livewire\Attributes\Layout;
-use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
+use Livewire\Component;
 
 #[Layout('components.layouts.dashboard')]
 #[Title('My Organizations | Optima FM')]
@@ -22,7 +22,7 @@ class UserHome extends Component
 
         return view('livewire.user-home', [
             'memberships' => $memberships,
-            'pendingInvitationsCount' => $pendingInvitationsCount
+            'pendingInvitationsCount' => $pendingInvitationsCount,
         ]);
     }
 }

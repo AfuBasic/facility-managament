@@ -205,16 +205,16 @@
         
         <div>
             <label class="block text-sm font-medium text-slate-700 mb-1">Role</label>
-            <select wire:model="role" class="p-2 border w-full rounded-lg border-slate-200 focus:border-teal-500 focus:ring-teal-500">
-                <option value="">Select a role</option>
-                @foreach($roles as $role)
-                <option value="{{ $role->name }}">{{ ucwords($role->name) }}</option>
-                @endforeach
-            </select>
+            <x-forms.searchable-select
+                wire:model="role"
+                :options="$roles->pluck('name', 'name')->map(fn($name) => ucwords($name))->toArray()"
+                :selected="$role"
+                placeholder="Select a role"
+            />
             @error('role') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
         </div>
     </div>
-    
+
     <x-slot:footer>
     <x-ui.button variant="secondary" @click="show = false">Cancel</x-ui.button>
     <x-ui.button wire:click="invite" :disabled="$roles->isEmpty()" wire:loading.attr="disabled">
@@ -229,12 +229,12 @@
     <div class="space-y-4">
         <div>
             <label class="block text-sm font-medium text-slate-700 mb-1">Role</label>
-            <select wire:model="selectedRole" class="p-2 border w-full rounded-lg border-slate-200 focus:border-teal-500 focus:ring-teal-500">
-                <option value="">Select a role</option>
-                @foreach($roles as $role)
-                    <option value="{{ $role->name }}">{{ ucwords($role->name) }}</option>
-                @endforeach
-            </select>
+            <x-forms.searchable-select
+                wire:model="selectedRole"
+                :options="$roles->pluck('name', 'name')->map(fn($name) => ucwords($name))->toArray()"
+                :selected="$selectedRole"
+                placeholder="Select a role"
+            />
             @error('selectedRole') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
         </div>
     </div>

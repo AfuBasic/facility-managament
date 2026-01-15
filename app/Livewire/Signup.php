@@ -1,19 +1,23 @@
 <?php
 
 namespace App\Livewire;
+
 use App\Actions\PublicUserSignup;
 use Illuminate\Support\Facades\Auth;
-use Livewire\Component;
-
 use Livewire\Attributes\Layout;
+use Livewire\Component;
 
 #[Layout('components.layouts.auth')]
 class Signup extends Component
 {
     public $step = 1;
+
     public $organization_name = '';
+
     public $email = '';
+
     public $password = '';
+
     public $password_confirmation = '';
 
     public function nextStep()

@@ -2,19 +2,23 @@
 
 namespace App\Livewire;
 
+use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
-use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Auth;
 
 #[Layout('components.layouts.auth')]
 class ResetPassword extends Component
 {
     public $token;
+
     public $email;
+
     public $password;
+
     public $password_confirmation;
 
     public function mount($token)
@@ -25,7 +29,7 @@ class ResetPassword extends Component
 
     public function resetPassword()
     {
-        $validator = \Illuminate\Support\Facades\Validator::make(
+        $validator = Validator::make(
             [
                 'token' => $this->token,
                 'email' => $this->email,
@@ -43,6 +47,7 @@ class ResetPassword extends Component
             foreach ($validator->errors()->all() as $error) {
                 $this->dispatch('toast', message: $error, type: 'error');
             }
+
             return;
         }
 
@@ -55,17 +60,18 @@ class ResetPassword extends Component
             ],
             function ($user, $password) {
                 $user->forceFill([
-                    'password' => Hash::make($password)
+                    'password' => Hash::make($password),
                 ])->setRememberToken(Str::random(60));
 
                 $user->save();
 
-                event(new \Illuminate\Auth\Events\PasswordReset($user));
+                event(new PasswordReset($user));
             }
         );
 
         if ($status === Password::PASSWORD_RESET) {
             session()->flash('success', __($status));
+
             return redirect()->route('login');
         }
 

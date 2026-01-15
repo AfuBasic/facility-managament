@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Client\StoreDetail;
 
-use App\Models\Asset;
 use App\Models\AssetHistory;
 use App\Models\ClientAccount;
 use App\Models\Store;
@@ -14,9 +13,11 @@ class StoreActivityLog extends Component
     use WithPagination;
 
     public Store $store;
+
     public ClientAccount $clientAccount;
 
     public $search = '';
+
     public $actionFilter = '';
 
     public function mount(Store $store, ClientAccount $clientAccount)
@@ -33,15 +34,15 @@ class StoreActivityLog extends Component
     public function getLogsProperty()
     {
         return AssetHistory::whereHas('asset', function ($query) {
-                $query->where('store_id', $this->store->id);
-            })
+            $query->where('store_id', $this->store->id);
+        })
             ->with(['asset', 'performedBy', 'targetUser'])
             ->when($this->search, function ($query) {
                 $query->whereHas('asset', function ($q) {
-                    $q->where('name', 'like', '%' . $this->search . '%')
-                      ->orWhere('serial', 'like', '%' . $this->search . '%');
+                    $q->where('name', 'like', '%'.$this->search.'%')
+                        ->orWhere('serial', 'like', '%'.$this->search.'%');
                 })->orWhereHas('performedBy', function ($q) {
-                    $q->where('name', 'like', '%' . $this->search . '%');
+                    $q->where('name', 'like', '%'.$this->search.'%');
                 });
             })
             ->when($this->actionFilter, function ($query) {
@@ -54,7 +55,7 @@ class StoreActivityLog extends Component
     public function render()
     {
         return view('livewire.client.store-detail.store-activity-log', [
-            'logs' => $this->logs
+            'logs' => $this->logs,
         ]);
     }
 }

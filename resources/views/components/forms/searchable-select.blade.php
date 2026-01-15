@@ -35,6 +35,7 @@
                     placeholder: '{{ $placeholder }}',
                     searchField: ['text'],
                     maxOptions: null,
+                    dropdownParent: 'body',
                     onChange: (value) => {
                         this.value = value;
                     },
@@ -117,6 +118,7 @@
         border-radius: 0.5rem !important;
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
         margin-top: 0.25rem !important;
+        z-index: 9999 !important;
     }
     
     .ts-dropdown .option {

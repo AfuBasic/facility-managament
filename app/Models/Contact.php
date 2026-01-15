@@ -10,8 +10,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Contact extends Model
 {
-    use HasFactory, BelongsToClient;
-    
+    use BelongsToClient, HasFactory;
+
     protected $fillable = [
         'client_account_id',
         'firstname',
@@ -26,12 +26,12 @@ class Contact extends Model
         'notes',
         'contact_person_id',
     ];
-    
+
     protected $casts = [
         'gender' => 'string',
         'birthday' => 'date',
     ];
-    
+
     /**
      * Get the client account that owns the contact
      */
@@ -39,7 +39,7 @@ class Contact extends Model
     {
         return $this->belongsTo(ClientAccount::class);
     }
-    
+
     /**
      * Get the contact type
      */
@@ -47,7 +47,7 @@ class Contact extends Model
     {
         return $this->belongsTo(ContactType::class);
     }
-    
+
     /**
      * Get the contact group
      */
@@ -55,7 +55,7 @@ class Contact extends Model
     {
         return $this->belongsTo(ContactGroup::class);
     }
-    
+
     /**
      * Get the contact person (self-referencing)
      */
@@ -63,7 +63,7 @@ class Contact extends Model
     {
         return $this->belongsTo(Contact::class, 'contact_person_id');
     }
-    
+
     /**
      * Get contacts that have this contact as their contact person
      */
@@ -71,7 +71,7 @@ class Contact extends Model
     {
         return $this->hasMany(Contact::class, 'contact_person_id');
     }
-    
+
     /**
      * Get the full name attribute
      */

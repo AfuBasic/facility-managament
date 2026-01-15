@@ -77,7 +77,7 @@ class AiAssistant extends Component
     public function getListeners(): array
     {
         $userId = Auth::id();
-        
+
         return [
             "echo-private:user.{$userId},.ai.response.ready" => 'handleAiResponse',
         ];

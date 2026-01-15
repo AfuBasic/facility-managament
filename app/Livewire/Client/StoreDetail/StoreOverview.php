@@ -10,6 +10,7 @@ use Livewire\Component;
 class StoreOverview extends Component
 {
     public Store $store;
+
     public ClientAccount $clientAccount;
 
     public function mount(Store $store, ClientAccount $clientAccount)

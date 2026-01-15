@@ -1,24 +1,20 @@
 <?php
+
 namespace App\Models;
 
 use App\Models\Concerns\BelongsToClient;
 use App\Models\Concerns\HasHashid;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Builder;
-use App\Models\User;
-use App\Models\ClientAccount;
-use App\Models\Space;
-use App\Models\Store;
-use App\Models\FacilityUser;
 
 class Facility extends Model
 {
-    use HasFactory, BelongsToClient, HasHashid;
-    
+    use BelongsToClient, HasFactory, HasHashid;
+
     protected $fillable = [
         'name',
         'address',
@@ -39,11 +35,11 @@ class Facility extends Model
     public function getContactPersonNameAttribute(): string
     {
         $contactPerson = $this->getContactPerson();
-        
-        if (!$contactPerson) {
+
+        if (! $contactPerson) {
             return 'Unassigned';
         }
-        
+
         return $contactPerson->name ?? 'New User';
     }
 
@@ -53,11 +49,11 @@ class Facility extends Model
     public function getContactPersonPhoneAttribute(): ?string
     {
         $contactPerson = $this->getContactPerson();
-        
-        if (!$contactPerson) {
+
+        if (! $contactPerson) {
             return null;
         }
-        
+
         return $contactPerson->phone ?? $contactPerson->email ?? null;
     }
 
@@ -145,7 +141,7 @@ class Facility extends Model
     {
         // Check if user was previously assigned and removed
         $existing = $this->allUsers()->where('user_id', $userId)->first();
-        
+
         if ($existing && $existing->pivot->removed_at) {
             // Reactivate the assignment
             $this->allUsers()->updateExistingPivot($userId, [

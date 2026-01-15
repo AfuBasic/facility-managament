@@ -12,23 +12,23 @@ use Livewire\Component;
 #[Title('Signup Successful | Optima FM')]
 class SignedUp extends Component
 {
-
     public function sendVerificationEmail()
     {
         $user = Auth::user();
-        if(!$user) {
+        if (! $user) {
             return redirect('/login');
         }
-        $sendVerification = (new SendVerificationEmail())->execute($user);
+        $sendVerification = (new SendVerificationEmail)->execute($user);
 
-        if($sendVerification->isNotEmpty()) {
+        if ($sendVerification->isNotEmpty()) {
             $this->dispatch('toast', message: $sendVerification->first()['message'], type: $sendVerification->first()['type']);
+
             return;
-        } 
-        
+        }
+
         $this->dispatch('toast', message: 'Verification email sent', type: 'success');
     }
-    
+
     public function render()
     {
         return view('livewire.signed-up');

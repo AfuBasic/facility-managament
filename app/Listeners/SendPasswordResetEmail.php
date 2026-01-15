@@ -19,7 +19,7 @@ class SendPasswordResetEmail implements ShouldQueue
     public function handle(ForgotPasswordRequested $event): void
     {
         $token = Password::createToken($event->user);
-        
+
         $resetUrl = route('password.reset', ['token' => $token, 'email' => $event->user->email]);
 
         Mail::to($event->user->email)->queue(new PasswordResetEmail($event->user, $resetUrl));

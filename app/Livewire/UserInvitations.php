@@ -5,7 +5,6 @@ namespace App\Livewire;
 use App\Models\ClientMembership;
 use App\Models\InvitationLog;
 use App\Services\InvitationTracker;
-use Illuminate\Support\Facades\URL;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -31,7 +30,7 @@ class UserInvitations extends Component
 
         return view('livewire.user-invitations.index', [
             'invitations' => $invitations,
-            'invitationHistory' => $invitationHistory
+            'invitationHistory' => $invitationHistory,
         ]);
     }
 
@@ -48,15 +47,14 @@ class UserInvitations extends Component
 
         $membership->status = ClientMembership::STATUS_ACCEPTED;
         $membership->save();
-        
+
         // Track acceptance
         app(InvitationTracker::class)->recordAcceptance(
             email: $membership->user->email,
             clientAccountId: $membership->client_account_id,
             userId: auth()->id()
         );
-        
+
         $this->dispatch('toast', message: 'Invitation accepted successfully.', type: 'success');
     }
-
 }

@@ -9,9 +9,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Space extends Model
 {
-    use HasFactory;
     use BelongsToClient;
-    
+    use HasFactory;
+
     protected $fillable = [
         'facility_id',
         'client_account_id',

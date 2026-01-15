@@ -10,18 +10,18 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ContactType extends Model
 {
-    use HasFactory, BelongsToClient;
-    
+    use BelongsToClient, HasFactory;
+
     protected $fillable = [
         'client_account_id',
         'name',
         'status',
     ];
-    
+
     protected $casts = [
         'status' => 'string',
     ];
-    
+
     /**
      * Get the client account that owns the contact type
      */
@@ -29,7 +29,7 @@ class ContactType extends Model
     {
         return $this->belongsTo(ClientAccount::class);
     }
-    
+
     /**
      * Get the contacts for this type
      */

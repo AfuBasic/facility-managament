@@ -14,14 +14,20 @@ use Livewire\WithPagination;
 #[Title('Contact Types | Optima FM')]
 class ContactTypes extends Component
 {
-    use WithPagination, WithNotifications;
+    use WithNotifications, WithPagination;
 
     public $showModal = false;
+
     public $isEditing = false;
+
     public $editingTypeId;
+
     public $name = '';
+
     public $status = 'active';
+
     public $clientAccountId;
+
     public $search = '';
 
     protected $rules = [
@@ -58,9 +64,9 @@ class ContactTypes extends Component
     public function edit($id)
     {
         $this->authorize('edit contacts');
-        
+
         $type = ContactType::where('client_account_id', $this->clientAccountId)->findOrFail($id);
-        
+
         $this->editingTypeId = $type->id;
         $this->name = $type->name;
         $this->status = $type->status;
@@ -96,22 +102,22 @@ class ContactTypes extends Component
     public function delete($id)
     {
         $this->authorize('delete contacts');
-        
+
         $type = ContactType::where('client_account_id', $this->clientAccountId)->findOrFail($id);
         $type->delete();
-        
+
         $this->success('Contact type deleted successfully.');
     }
 
     public function toggleStatus($id)
     {
         $this->authorize('edit contacts');
-        
+
         $type = ContactType::where('client_account_id', $this->clientAccountId)->findOrFail($id);
         $type->update([
-            'status' => $type->status === 'active' ? 'inactive' : 'active'
+            'status' => $type->status === 'active' ? 'inactive' : 'active',
         ]);
-        
+
         $this->success('Status updated successfully.');
     }
 
@@ -124,14 +130,14 @@ class ContactTypes extends Component
     public function render()
     {
         $types = ContactType::where('client_account_id', $this->clientAccountId)
-            ->when($this->search, function($query) {
-                $query->where('name', 'like', '%' . $this->search . '%');
+            ->when($this->search, function ($query) {
+                $query->where('name', 'like', '%'.$this->search.'%');
             })
             ->orderBy('created_at', 'desc')
             ->paginate(15);
 
         return view('livewire.client.contact-types', [
-            'types' => $types
+            'types' => $types,
         ]);
     }
 }

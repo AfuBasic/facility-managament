@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class AssetImage extends Model
 {
-    use HasFactory, BelongsToClient;
+    use BelongsToClient, HasFactory;
 
     protected $fillable = [
         'asset_id',

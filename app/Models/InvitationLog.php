@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class InvitationLog extends Model
 {
     use BelongsToClient;
+
     protected $guarded = [];
 
     protected $casts = [

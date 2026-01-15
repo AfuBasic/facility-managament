@@ -19,27 +19,34 @@ use Spatie\Permission\Models\Permission;
 #[Title('Roles & Permissions | Optima FM')]
 class Roles extends Component
 {
-    use WithPagination, WithNotifications;
+    use WithNotifications, WithPagination;
 
     public $showModal = false;
+
     public $isEditing = false;
+
     public $editingRoleId;
+
     public $name;
+
     public $selectedPermissions = [];
+
     public $clientAccountId;
+
     public $search = '';
 
     protected $rules = [
         'name' => 'required|string|max:255',
         'selectedPermissions' => 'required|array|min:1',
     ];
-    
+
     public function hydrate()
     {
         if ($this->clientAccountId) {
             setPermissionsTeamId($this->clientAccountId);
         }
     }
+
     public function mount()
     {
         $this->authorize('view roles');
@@ -61,7 +68,7 @@ class Roles extends Component
     public function edit($id)
     {
         $role = $this->roleRepo()->findForClient($id, $this->clientAccountId);
-        
+
         $this->editingRoleId = $role->id;
         $this->name = $role->name;
         $this->selectedPermissions = $role->permissions->pluck('name')->toArray();
@@ -89,17 +96,17 @@ class Roles extends Component
     public function delete($id, DeleteRole $deleteRole)
     {
         $this->authorize('delete roles');
-        
+
         $role = $this->roleRepo()->findForClient($id, $this->clientAccountId);
         $deleteRole->execute($role);
-        
+
         $this->success('Role deleted successfully.');
     }
 
     public function toggleSelectAll()
     {
         $allPermissions = Permission::all()->pluck('name')->toArray();
-        
+
         $this->selectedPermissions = count($this->selectedPermissions) === count($allPermissions)
             ? []
             : $allPermissions;
@@ -109,7 +116,7 @@ class Roles extends Component
     {
         $groupPermissions = $this->getGroupPermissions($groupName);
         $intersect = array_intersect($this->selectedPermissions, $groupPermissions);
-        
+
         if (count($intersect) === count($groupPermissions)) {
             // Deselect group
             $this->selectedPermissions = array_values(
@@ -127,7 +134,7 @@ class Roles extends Component
     {
         return view('livewire.client.roles.index', [
             'roles' => $this->roleRepo()->getPaginatedForClient($this->clientAccountId, $this->search),
-            'groupedPermissions' => $this->roleRepo()->getGroupedPermissions()
+            'groupedPermissions' => $this->roleRepo()->getGroupedPermissions(),
         ]);
     }
 
@@ -145,9 +152,10 @@ class Roles extends Component
     private function getGroupPermissions(string $groupName): array
     {
         return Permission::all()
-            ->filter(function($perm) use ($groupName) {
+            ->filter(function ($perm) use ($groupName) {
                 $parts = explode(' ', $perm->name);
                 $module = count($parts) > 1 ? ucfirst($parts[1]) : 'Other';
+
                 return $module === $groupName;
             })
             ->pluck('name')
