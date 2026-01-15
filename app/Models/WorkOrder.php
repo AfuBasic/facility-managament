@@ -211,9 +211,19 @@ class WorkOrder extends Model
         return $this->status === 'on_hold';
     }
 
-    public function canComplete(): bool
+    public function canMarkDone(): bool
     {
         return $this->status === 'in_progress';
+    }
+
+    public function canApproveCompletion(): bool
+    {
+        return $this->status === 'completed';
+    }
+
+    public function canRejectCompletion(): bool
+    {
+        return $this->status === 'completed';
     }
 
     public function canClose(): bool

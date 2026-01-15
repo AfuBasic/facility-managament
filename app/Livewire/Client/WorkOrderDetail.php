@@ -2,9 +2,11 @@
 
 namespace App\Livewire\Client;
 
+use App\Models\Asset;
 use App\Models\ClientAccount;
 use App\Models\User;
 use App\Models\WorkOrder;
+use App\Models\WorkOrderAsset;
 use App\Services\WorkOrderStateManager;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
@@ -44,6 +46,8 @@ class WorkOrderDetail extends Component
     public $assigned_user_id = '';
 
     public $assignment_note = '';
+
+    public $selected_assets = [];
 
     public $update_note = '';
 
@@ -108,6 +112,13 @@ class WorkOrderDetail extends Component
         $this->activeTab = $tab;
     }
 
+    public function getAvailableAssetsProperty()
+    {
+        return Asset::where('facility_id', $this->workOrder->facility_id)
+            ->orderBy('name')
+            ->pluck('name', 'id');
+    }
+
     public function approve(WorkOrderStateManager $stateManager)
     {
         $this->authorize('approve', $this->workOrder);
@@ -142,12 +153,25 @@ class WorkOrderDetail extends Component
 
         $this->validate(['assigned_user_id' => 'required|exists:users,id']);
 
+        // Save selected assets to work_order_assets table FIRST (before event is dispatched)
+        if (!empty($this->selected_assets)) {
+            foreach ($this->selected_assets as $assetId) {
+                WorkOrderAsset::create([
+                    'work_order_id' => $this->workOrder->id,
+                    'asset_id' => $assetId,
+                    'action' => 'reserved',
+                    'user_id' => Auth::id(),
+                ]);
+            }
+        }
+
+        // Now assign (this dispatches the event, and assets will be in the DB)
         $assignee = User::findOrFail($this->assigned_user_id);
         $stateManager->assign($this->workOrder, $assignee, Auth::user(), $this->assignment_note);
 
         $this->workOrder->refresh();
         $this->showAssignModal = false;
-        $this->reset(['assigned_user_id', 'assignment_note']);
+        $this->reset(['assigned_user_id', 'assignment_note', 'selected_assets']);
 
         session()->flash('success', 'Work order assigned successfully.');
     }
@@ -162,6 +186,20 @@ class WorkOrderDetail extends Component
         $this->showStartModal = false;
 
         session()->flash('success', 'Work started successfully.');
+    }
+
+    public function pause(WorkOrderStateManager $stateManager)
+    {
+        $stateManager->pause($this->workOrder, Auth::user());
+        $this->workOrder->refresh();
+        session()->flash('success', 'Work order paused.');
+    }
+
+    public function resume(WorkOrderStateManager $stateManager)
+    {
+        $stateManager->resume($this->workOrder, Auth::user());
+        $this->workOrder->refresh();
+        session()->flash('success', 'Work order resumed.');
     }
 
     public function addUpdate(WorkOrderStateManager $stateManager)
@@ -187,9 +225,9 @@ class WorkOrderDetail extends Component
         session()->flash('success', 'Update added successfully.');
     }
 
-    public function complete(WorkOrderStateManager $stateManager)
+    public function markDone(WorkOrderStateManager $stateManager)
     {
-        $this->authorize('complete', $this->workOrder);
+        $this->authorize('markDone', $this->workOrder);
 
         $this->validate([
             'completion_notes' => 'nullable|string',
@@ -197,7 +235,7 @@ class WorkOrderDetail extends Component
             'total_cost' => 'nullable|numeric|min:0',
         ]);
 
-        $stateManager->complete($this->workOrder, Auth::user(), [
+        $stateManager->markDone($this->workOrder, Auth::user(), [
             'completion_notes' => $this->completion_notes,
             'time_spent' => $this->time_spent ?: null,
             'total_cost' => $this->total_cost ?: null,
@@ -207,7 +245,33 @@ class WorkOrderDetail extends Component
         $this->showCompleteModal = false;
         $this->reset(['completion_notes', 'time_spent', 'total_cost']);
 
-        session()->flash('success', 'Work order marked as completed.');
+        session()->flash('success', 'Work order marked as done. Awaiting creator approval.');
+    }
+
+    public function approveCompletion(WorkOrderStateManager $stateManager)
+    {
+        $this->authorize('approveCompletion', $this->workOrder);
+
+        $stateManager->approveCompletion($this->workOrder, Auth::user());
+        $this->workOrder->refresh();
+
+        session()->flash('success', 'Work order completion approved.');
+    }
+
+    public function rejectCompletion(WorkOrderStateManager $stateManager)
+    {
+        $this->authorize('rejectCompletion', $this->workOrder);
+
+        $this->validate([
+            'rejection_reason' => 'required|string|min:5',
+        ]);
+
+        $stateManager->rejectCompletion($this->workOrder, Auth::user(), $this->rejection_reason);
+        $this->workOrder->refresh();
+        $this->showRejectModal = false;
+        $this->rejection_reason = '';
+
+        session()->flash('success', 'Work order sent back for more work.');
     }
 
     public function close(WorkOrderStateManager $stateManager)

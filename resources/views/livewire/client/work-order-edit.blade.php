@@ -67,20 +67,6 @@
                 </div>
             @endif
 
-            {{-- Asset (Optional) --}}
-            @if($facility_id && $this->assets->isNotEmpty())
-                <div>
-                    <x-forms.searchable-select
-                        wire:model="asset_id"
-                        :options="$this->assets"
-                        :selected="$asset_id"
-                        label="Related Asset (Optional)"
-                        placeholder="Select asset..."
-                    />
-                    @error('asset_id') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
-                </div>
-            @endif
-
             {{-- Actions --}}
             <div class="flex justify-end gap-3 pt-4 border-t border-slate-200">
                 <a href="{{ route('app.work-orders.show', $workOrder) }}" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 focus:ring-teal-500">

@@ -97,12 +97,41 @@ class WorkOrderPolicy
     }
 
     /**
-     * Determine if the user can mark the work order as complete.
+     * Determine if the user can pause the work order.
      */
-    public function complete(User $user, WorkOrder $workOrder): bool
+    public function pause(User $user, WorkOrder $workOrder): bool
     {
-        // Only creator can mark as complete
-        return $workOrder->isCreator($user) && $workOrder->canComplete();
+        // Admin or assignee can pause
+        return ($user->hasRole('admin') || $workOrder->isAssignee($user))
+            && $workOrder->canPause();
+    }
+
+    /**
+     * Determine if the user can mark the work order as done.
+     */
+    public function markDone(User $user, WorkOrder $workOrder): bool
+    {
+        // Admin, creator, or assignee can mark as done
+        return ($user->hasRole('admin') || $workOrder->isCreator($user) || $workOrder->isAssignee($user))
+            && $workOrder->canMarkDone();
+    }
+
+    /**
+     * Determine if the user can approve the completion.
+     */
+    public function approveCompletion(User $user, WorkOrder $workOrder): bool
+    {
+        // Only creator can approve completion
+        return $workOrder->isCreator($user) && $workOrder->canApproveCompletion();
+    }
+
+    /**
+     * Determine if the user can reject the completion.
+     */
+    public function rejectCompletion(User $user, WorkOrder $workOrder): bool
+    {
+        // Only creator can reject completion
+        return $workOrder->isCreator($user) && $workOrder->canRejectCompletion();
     }
 
     /**

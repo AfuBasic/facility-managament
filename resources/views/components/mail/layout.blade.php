@@ -15,6 +15,7 @@
                     {{-- Header --}}
                     <tr>
                         <td style="background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%); padding: 40px; text-align: center; border-radius: 12px 12px 0 0;">
+                            <img src="{{ asset('images/logo-white.png') }}" alt="{{ config('app.name') }}" style="max-width: 180px; height: auto; margin-bottom: 20px;">
                             <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">
                                 {{ $title }}
                             </h1>

@@ -15,7 +15,8 @@ class WorkOrderApprovedMail extends Mailable
 
     public function __construct(public WorkOrder $workOrder)
     {
-        //
+        // Eager load relationships needed for the email template
+        $this->workOrder->loadMissing(['reportedBy', 'approvedBy', 'facility']);
     }
 
     public function envelope(): Envelope

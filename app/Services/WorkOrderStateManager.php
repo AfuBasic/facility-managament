@@ -23,23 +23,21 @@ class WorkOrderStateManager
             throw new \Exception("Work order cannot be approved in current state: {$workOrder->status}");
         }
 
-        // DB::transaction(function () use ($workOrder, $user, $note) {
-        //     $previousState = $workOrder->status;
+        DB::transaction(function () use ($workOrder, $user, $note) {
+            $previousState = $workOrder->status;
 
-        //     $workOrder->update([
-        //         'status' => 'approved',
-        //         'approved_by' => $user->id,
-        //         'approved_at' => now(),
-        //         'approval_note' => $note,
-        //     ]);
+            $workOrder->update([
+                'status' => 'approved',
+                'approved_by' => $user->id,
+                'approved_at' => now(),
+                'approval_note' => $note,
+            ]);
 
-        //     $this->recordHistory($workOrder, $previousState, 'approved', $user, $note);
-        // });
-
+            $this->recordHistory($workOrder, $previousState, 'approved', $user, $note);
+        });
 
         // Dispatch event
-        dd(WorkOrderApproved::dispatch($workOrder));
-
+        WorkOrderApproved::dispatch($workOrder);
     }
 
     /**
@@ -119,6 +117,46 @@ class WorkOrderStateManager
     }
 
     /**
+     * Pause a work order (put on hold)
+     */
+    public function pause(WorkOrder $workOrder, User $user, ?string $reason = null): void
+    {
+        if (! $workOrder->canPause()) {
+            throw new \Exception("Work order cannot be paused in current state: {$workOrder->status}");
+        }
+
+        DB::transaction(function () use ($workOrder, $user, $reason) {
+            $previousState = $workOrder->status;
+
+            $workOrder->update([
+                'status' => 'on_hold',
+            ]);
+
+            $this->recordHistory($workOrder, $previousState, 'on_hold', $user, $reason ?? 'Work paused');
+        });
+    }
+
+    /**
+     * Resume a paused work order
+     */
+    public function resume(WorkOrder $workOrder, User $user, ?string $note = null): void
+    {
+        if (! $workOrder->canResume()) {
+            throw new \Exception("Work order cannot be resumed in current state: {$workOrder->status}");
+        }
+
+        DB::transaction(function () use ($workOrder, $user, $note) {
+            $previousState = $workOrder->status;
+
+            $workOrder->update([
+                'status' => 'in_progress',
+            ]);
+
+            $this->recordHistory($workOrder, $previousState, 'in_progress', $user, $note ?? 'Work resumed');
+        });
+    }
+
+    /**
      * Add an update/note to a work order in progress
      */
     public function addUpdate(WorkOrder $workOrder, User $user, string $note, ?int $timeSpent = null): void
@@ -142,12 +180,12 @@ class WorkOrderStateManager
     }
 
     /**
-     * Complete work in progress
+     * Mark work as done (pending creator approval)
      */
-    public function complete(WorkOrder $workOrder, User $user, array $data): void
+    public function markDone(WorkOrder $workOrder, User $user, array $data): void
     {
-        if (! $workOrder->canComplete()) {
-            throw new \Exception("Work order cannot be completed in current state: {$workOrder->status}");
+        if (! $workOrder->canMarkDone()) {
+            throw new \Exception("Work order cannot be marked as done in current state: {$workOrder->status}");
         }
 
         DB::transaction(function () use ($workOrder, $user, $data) {
@@ -162,11 +200,51 @@ class WorkOrderStateManager
                 'total_cost' => $data['total_cost'] ?? null,
             ]);
 
-            $this->recordHistory($workOrder, $previousState, 'completed', $user, $data['completion_notes'] ?? 'Work completed');
+            $this->recordHistory($workOrder, $previousState, 'completed', $user, $data['completion_notes'] ?? 'Work marked as completed');
         });
 
         // Dispatch event
         WorkOrderCompleted::dispatch($workOrder);
+    }
+
+    /**
+     * Approve completion (creator approves the done work)
+     */
+    public function approveCompletion(WorkOrder $workOrder, User $user, ?string $note = null): void
+    {
+        if (! $workOrder->canApproveCompletion()) {
+            throw new \Exception("Work order completion cannot be approved in current state: {$workOrder->status}");
+        }
+
+        DB::transaction(function () use ($workOrder, $user, $note) {
+            $previousState = $workOrder->status;
+
+            $workOrder->update([
+                'status' => 'completed',
+            ]);
+
+            $this->recordHistory($workOrder, $previousState, 'completed', $user, $note ?? 'Completion approved by creator');
+        });
+    }
+
+    /**
+     * Reject completion (creator rejects, work goes back to in_progress)
+     */
+    public function rejectCompletion(WorkOrder $workOrder, User $user, string $reason): void
+    {
+        if (! $workOrder->canRejectCompletion()) {
+            throw new \Exception("Work order completion cannot be rejected in current state: {$workOrder->status}");
+        }
+
+        DB::transaction(function () use ($workOrder, $user, $reason) {
+            $previousState = $workOrder->status;
+
+            $workOrder->update([
+                'status' => 'in_progress',
+            ]);
+
+            $this->recordHistory($workOrder, $previousState, 'in_progress', $user, "Completion rejected: {$reason}");
+        });
     }
 
     /**

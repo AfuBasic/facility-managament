@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Client;
 
-use App\Models\Asset;
 use App\Models\ClientAccount;
 use App\Models\Facility;
 use App\Models\Space;
@@ -25,8 +24,6 @@ class WorkOrderEdit extends Component
 
     public $space_id = '';
 
-    public $asset_id = '';
-
     public function mount(WorkOrder $workOrder)
     {
         // Only allow editing if work order is in 'reported' status
@@ -42,7 +39,6 @@ class WorkOrderEdit extends Component
         $this->priority = $workOrder->priority;
         $this->facility_id = $workOrder->facility_id;
         $this->space_id = $workOrder->space_id;
-        $this->asset_id = $workOrder->asset_id;
     }
 
     public function getFacilitiesProperty()
@@ -50,17 +46,6 @@ class WorkOrderEdit extends Component
         $clientAccount = app(ClientAccount::class);
 
         return Facility::where('client_account_id', $clientAccount->id)
-            ->orderBy('name')
-            ->pluck('name', 'id');
-    }
-
-    public function getAssetsProperty()
-    {
-        if (! $this->facility_id) {
-            return collect();
-        }
-
-        return Asset::where('facility_id', $this->facility_id)
             ->orderBy('name')
             ->pluck('name', 'id');
     }
@@ -84,7 +69,6 @@ class WorkOrderEdit extends Component
             'priority' => 'required|in:low,medium,high,critical',
             'facility_id' => 'required|exists:facilities,id',
             'space_id' => 'nullable|exists:spaces,id',
-            'asset_id' => 'nullable|exists:assets,id',
         ]);
 
         $this->workOrder->update([
@@ -93,7 +77,6 @@ class WorkOrderEdit extends Component
             'priority' => $this->priority,
             'facility_id' => $this->facility_id,
             'space_id' => $this->space_id ?: null,
-            'asset_id' => $this->asset_id ?: null,
         ]);
 
         session()->flash('success', 'Work order updated successfully.');

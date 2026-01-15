@@ -131,14 +131,32 @@
                     </div>
 
                     @if($workOrder->assignedTo)
-                    <div>
-                        <label class="block text-sm font-medium text-slate-500">Assigned To</label>
-                        <p class="mt-1 text-sm text-slate-900">
-                            {{ $workOrder->assignedTo->name }}
-                            @if($workOrder->assigned_at)
-                                <span class="text-slate-500">on {{ $workOrder->assigned_at->format('M d, Y g:i A') }}</span>
-                            @endif
-                        </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-500">Assigned To</label>
+                            <p class="mt-1 text-sm text-slate-900">
+                                {{ $workOrder->assignedTo->name }}
+                                @if($workOrder->assigned_at)
+                                    <span class="text-slate-500">on {{ $workOrder->assigned_at->format('M d, Y g:i A') }}</span>
+                                @endif
+                            </p>
+                        </div>
+
+                        @if($workOrder->allocatedAssets && $workOrder->allocatedAssets->count() > 0)
+                        <div>
+                            <label class="block text-sm font-medium text-slate-500">Reserved Assets</label>
+                            <div class="mt-1 flex flex-wrap gap-2">
+                                @foreach($workOrder->allocatedAssets as $workOrderAsset)
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-teal-100 text-teal-800">
+                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                                        </svg>
+                                        {{ $workOrderAsset->asset->name }}
+                                    </span>
+                                @endforeach
+                            </div>
+                        </div>
+                        @endif
                     </div>
                     @endif
 
@@ -274,7 +292,7 @@
                         @can('approve', $workOrder)
                         <x-ui.button @click="$wire.showApproveModal = true" class="w-full">
                             <x-heroicon-o-check-circle class="h-5 w-5 mr-2" />
-                            Approve
+                            Approve & Close
                         </x-ui.button>
                         @endcan
                         @can('reject', $workOrder)
@@ -307,11 +325,42 @@
                             Add Update
                         </x-ui.button>
                         @endcan
-                        {{-- Mark Complete (only creator) --}}
-                        @can('complete', $workOrder)
+
+                        {{-- Pause Work --}}
+                        @can('pause', $workOrder)
+                        <x-ui.button variant="warning" wire:click="pause" wire:confirm="Are you sure you want to pause this work order?" class="w-full">
+                            <x-heroicon-o-pause class="h-5 w-5 mr-2" />
+                            Pause
+                        </x-ui.button>
+                        @endcan
+
+                        {{-- Mark as Done (only assignee) --}}
+                        @can('markDone', $workOrder)
                         <x-ui.button @click="$wire.showCompleteModal = true" class="w-full">
                             <x-heroicon-o-check-badge class="h-5 w-5 mr-2" />
-                            Mark as Completed
+                            Mark as Done
+                        </x-ui.button>
+                        @endcan
+
+                    @elseif($workOrder->status === 'on_hold')
+                        {{-- Resume Work --}}
+                        <x-ui.button wire:click="resume" class="w-full">
+                            <x-heroicon-o-play class="h-5 w-5 mr-2" />
+                            Resume
+                        </x-ui.button>
+                    @elseif($workOrder->status === 'completed')
+                        {{-- Approve Completion (only creator) --}}
+                        @can('approveCompletion', $workOrder)
+                        <x-ui.button wire:click="approveCompletion" wire:confirm="Are you sure you want to approve this work?" class="w-full">
+                            <x-heroicon-o-check class="h-5 w-5 mr-2" />
+                            Approve Work
+                        </x-ui.button>
+                        @endcan
+                        {{-- Reject Completion (only creator) --}}
+                        @can('rejectCompletion', $workOrder)
+                        <x-ui.button variant="danger" @click="$wire.showRejectModal = true" class="w-full">
+                            <x-heroicon-o-x-mark class="h-5 w-5 mr-2" />
+                            Request Changes
                         </x-ui.button>
                         @endcan
                     @elseif($workOrder->status === 'completed')
@@ -389,25 +438,38 @@
         </x-slot:footer>
     </x-ui.modal>
 
-    {{-- Reject Modal --}}
-    <x-ui.modal show="showRejectModal" title="Reject Work Order">
+    {{-- Reject Modal (handles both initial rejection and completion rejection) --}}
+    <x-ui.modal show="showRejectModal" :title="$workOrder->status === 'completed' ? 'Request Changes' : 'Reject Work Order'">
         <div class="space-y-4">
-            <p class="text-sm text-slate-600">Please provide a reason for rejecting this work order.</p>
+            <p class="text-sm text-slate-600">
+                @if($workOrder->status === 'completed')
+                    Please explain what changes or additional work is needed.
+                @else
+                    Please provide a reason for rejecting this work order.
+                @endif
+            </p>
             <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">Rejection Reason *</label>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Reason *</label>
                 <textarea wire:model="rejection_reason" rows="3"
                     class="p-2 border w-full rounded-lg border-slate-200 focus:border-teal-500 focus:ring-teal-500"
-                    placeholder="Explain why this work order is being rejected..."></textarea>
+                    placeholder="{{ $workOrder->status === 'completed' ? 'Describe what needs to be fixed or improved...' : 'Explain why this work order is being rejected...' }}"></textarea>
                 @error('rejection_reason') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
             </div>
         </div>
         
         <x-slot:footer>
             <x-ui.button variant="secondary" @click="$wire.showRejectModal = false">Cancel</x-ui.button>
-            <x-ui.button variant="danger" wire:click="reject" wire:loading.attr="disabled">
-                <span wire:loading.remove wire:target="reject">Reject</span>
-                <span wire:loading wire:target="reject">Rejecting...</span>
-            </x-ui.button>
+            @if($workOrder->status === 'completed')
+                <x-ui.button variant="danger" wire:click="rejectCompletion" wire:loading.attr="disabled">
+                    <span wire:loading.remove wire:target="rejectCompletion">Request Changes</span>
+                    <span wire:loading wire:target="rejectCompletion">Sending...</span>
+                </x-ui.button>
+            @else
+                <x-ui.button variant="danger" wire:click="reject" wire:loading.attr="disabled">
+                    <span wire:loading.remove wire:target="reject">Reject</span>
+                    <span wire:loading wire:target="reject">Rejecting...</span>
+                </x-ui.button>
+            @endif
         </x-slot:footer>
     </x-ui.modal>
 
@@ -424,6 +486,20 @@
                 />
                 @error('assigned_user_id') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
             </div>
+            
+            @if($this->availableAssets->isNotEmpty())
+            <div>
+                <x-forms.multi-select
+                    wire:model="selected_assets"
+                    :options="$this->availableAssets"
+                    :selected="$selected_assets"
+                    label="Allocate Assets (Optional)"
+                    placeholder="Select assets to allocate..."
+                />
+                <p class="mt-1 text-xs text-slate-500">These assets will be checked out to the assignee for this work order.</p>
+            </div>
+            @endif
+            
             <div>
                 <label class="block text-sm font-medium text-slate-700 mb-1">Assignment Note (Optional)</label>
                 <textarea wire:model="assignment_note" rows="3"
@@ -441,9 +517,10 @@
         </x-slot:footer>
     </x-ui.modal>
 
-    {{-- Complete Modal --}}
-    <x-ui.modal show="showCompleteModal" title="Mark as Completed">
+    {{-- Mark as Done Modal --}}
+    <x-ui.modal show="showCompleteModal" title="Mark as Done">
         <div class="space-y-4">
+            <p class="text-sm text-slate-600">Mark this work order as completed. The creator will need to approve or request changes before it can be closed.</p>
             <div>
                 <label class="block text-sm font-medium text-slate-700 mb-1">Completion Notes</label>
                 <textarea wire:model="completion_notes" rows="4"
@@ -471,9 +548,9 @@
         
         <x-slot:footer>
             <x-ui.button variant="secondary" @click="$wire.showCompleteModal = false">Cancel</x-ui.button>
-            <x-ui.button wire:click="complete" wire:loading.attr="disabled">
-                <span wire:loading.remove wire:target="complete">Mark as Completed</span>
-                <span wire:loading wire:target="complete">Completing...</span>
+            <x-ui.button wire:click="markDone" wire:loading.attr="disabled">
+                <span wire:loading.remove wire:target="markDone">Mark as Completed</span>
+                <span wire:loading wire:target="markDone">Submitting...</span>
             </x-ui.button>
         </x-slot:footer>
     </x-ui.modal>

@@ -2,9 +2,9 @@
 
 namespace App\Livewire\Client;
 
-use App\Models\Asset;
 use App\Models\ClientAccount;
 use App\Models\Facility;
+use App\Models\Space;
 use App\Models\WorkOrder;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
@@ -22,8 +22,6 @@ class WorkOrderCreate extends Component
     public $facility_id = '';
 
     public $space_id = '';
-
-    public $asset_id = '';
 
     public function mount()
     {
@@ -45,18 +43,7 @@ class WorkOrderCreate extends Component
             return collect();
         }
 
-        return \App\Models\Space::where('facility_id', $this->facility_id)
-            ->orderBy('name')
-            ->pluck('name', 'id');
-    }
-
-    public function getAssetsProperty()
-    {
-        if (! $this->facility_id) {
-            return collect();
-        }
-
-        return Asset::where('facility_id', $this->facility_id)
+        return Space::where('facility_id', $this->facility_id)
             ->orderBy('name')
             ->pluck('name', 'id');
     }
@@ -69,13 +56,11 @@ class WorkOrderCreate extends Component
             'priority' => 'required|in:low,medium,high,critical',
             'facility_id' => 'required|exists:facilities,id',
             'space_id' => 'nullable|exists:spaces,id',
-            'asset_id' => 'nullable|exists:assets,id',
         ]);
 
         WorkOrder::create([
             'facility_id' => $this->facility_id,
             'space_id' => $this->space_id ?: null,
-            'asset_id' => $this->asset_id ?: null,
             'title' => $this->title,
             'description' => $this->description,
             'priority' => $this->priority,
