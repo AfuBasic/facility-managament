@@ -10,28 +10,29 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class WorkOrderCompletedMail extends Mailable
+class WorkOrderCompletionRejectedMail extends Mailable
 {
     use Queueable, SerializesModels;
 
     public function __construct(
         public WorkOrder $workOrder,
-        public User $recipient
+        public User $rejectedBy,
+        public string $reason
     ) {
-        $this->workOrder->loadMissing(['completedBy', 'facility']);
+        $this->workOrder->loadMissing(['assignedTo', 'facility']);
     }
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "Work Order Completed: #{$this->workOrder->id} - {$this->workOrder->title}",
+            subject: "Work Order Completion Rejected: #{$this->workOrder->id} - {$this->workOrder->title}",
         );
     }
 
     public function content(): Content
     {
         return new Content(
-            markdown: 'mail.work-orders.completed',
+            markdown: 'mail.work-orders.completion-rejected',
         );
     }
 }

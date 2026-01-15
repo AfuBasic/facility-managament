@@ -10,6 +10,7 @@ use App\Models\WorkOrderAsset;
 use App\Services\WorkOrderStateManager;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 
 #[Layout('components.layouts.client-app')]
@@ -19,6 +20,7 @@ class WorkOrderDetail extends Component
 
     public ClientAccount $clientAccount;
 
+    #[Url(as: 'tab')]
     public $activeTab = 'details'; // details, history, updates
 
     // Modal states
@@ -97,14 +99,14 @@ class WorkOrderDetail extends Component
     public function getUpdatesProperty()
     {
         return $this->workOrder->history
-            ->filter(fn($log) => $log->previous_state === $log->new_state)
+            ->filter(fn ($log) => $log->previous_state === $log->new_state)
             ->sortByDesc('changed_at');
     }
 
     public function getStateChangesProperty()
     {
-        return $this->workOrder->history
-            ->filter(fn($log) => $log->previous_state !== $log->new_state);
+        return $this->workOrder->history()->latest()->get()
+            ->filter(fn ($log) => $log->previous_state !== $log->new_state);
     }
 
     public function setTab($tab)
@@ -154,7 +156,7 @@ class WorkOrderDetail extends Component
         $this->validate(['assigned_user_id' => 'required|exists:users,id']);
 
         // Save selected assets to work_order_assets table FIRST (before event is dispatched)
-        if (!empty($this->selected_assets)) {
+        if (! empty($this->selected_assets)) {
             foreach ($this->selected_assets as $assetId) {
                 WorkOrderAsset::create([
                     'work_order_id' => $this->workOrder->id,
@@ -255,7 +257,7 @@ class WorkOrderDetail extends Component
         $stateManager->approveCompletion($this->workOrder, Auth::user());
         $this->workOrder->refresh();
 
-        session()->flash('success', 'Work order completion approved.');
+        session()->flash('success', 'Work order approved and closed successfully.');
     }
 
     public function rejectCompletion(WorkOrderStateManager $stateManager)

@@ -349,11 +349,11 @@
                             Resume
                         </x-ui.button>
                     @elseif($workOrder->status === 'completed')
-                        {{-- Approve Completion (only creator) --}}
+                        {{-- Approve Completion (only creator) - this will close the work order --}}
                         @can('approveCompletion', $workOrder)
-                        <x-ui.button wire:click="approveCompletion" wire:confirm="Are you sure you want to approve this work?" class="w-full">
+                        <x-ui.button wire:click="approveCompletion" wire:confirm="Are you sure you want to approve and close this work order?" class="w-full">
                             <x-heroicon-o-check class="h-5 w-5 mr-2" />
-                            Approve Work
+                            Approve & Close
                         </x-ui.button>
                         @endcan
                         {{-- Reject Completion (only creator) --}}
@@ -363,23 +363,15 @@
                             Request Changes
                         </x-ui.button>
                         @endcan
-                    @elseif($workOrder->status === 'completed')
+                    @elseif($workOrder->status === 'closed')
+                        <p class="text-sm text-slate-500 text-center py-4 mb-3">This work order is closed.</p>
                         {{-- Reopen (only creator) --}}
                         @can('reopen', $workOrder)
                         <x-ui.button variant="secondary" @click="$wire.showReopenModal = true" class="w-full">
                             <x-heroicon-o-arrow-uturn-left class="h-5 w-5 mr-2" />
-                            Reopen
+                            Reopen Work Order
                         </x-ui.button>
                         @endcan
-                        {{-- Close --}}
-                        @can('close', $workOrder)
-                        <x-ui.button @click="$wire.showCloseModal = true" class="w-full">
-                            <x-heroicon-o-lock-closed class="h-5 w-5 mr-2" />
-                            Close Work Order
-                        </x-ui.button>
-                        @endcan
-                    @elseif($workOrder->status === 'closed')
-                        <p class="text-sm text-slate-500 text-center py-4">This work order is closed.</p>
                     @elseif($workOrder->status === 'rejected')
                         <p class="text-sm text-slate-500 text-center py-4">This work order was rejected.</p>
                     @endif

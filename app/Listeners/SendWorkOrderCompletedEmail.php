@@ -14,12 +14,21 @@ class SendWorkOrderCompletedEmail implements ShouldQueue
 
     public function handle(WorkOrderCompleted $event): void
     {
-        $workOrder = $event->workOrder->load(['assignedTo', 'completedBy', 'facility']);
+        $workOrder = $event->workOrder->load(['reportedBy', 'assignedTo', 'completedBy', 'facility']);
 
-        // Send to the assignee to notify them the work order was completed
-        if ($workOrder->assignedTo) {
-            Mail::to($workOrder->assignedTo->email)
-                ->queue(new WorkOrderCompletedMail($workOrder));
+        // Notify the "other party" - if creator marked done, notify assignee; if assignee marked done, notify creator
+        if ($workOrder->completed_by === $workOrder->reported_by) {
+            // Creator marked as done, notify the assignee
+            if ($workOrder->assignedTo) {
+                Mail::to($workOrder->assignedTo->email)
+                    ->queue(new WorkOrderCompletedMail($workOrder, $workOrder->assignedTo));
+            }
+        } else {
+            // Assignee (or someone else) marked as done, notify the creator
+            if ($workOrder->reportedBy) {
+                Mail::to($workOrder->reportedBy->email)
+                    ->queue(new WorkOrderCompletedMail($workOrder, $workOrder->reportedBy));
+            }
         }
     }
 }

@@ -6,6 +6,7 @@ use App\Events\WorkOrderApproved;
 use App\Events\WorkOrderAssigned;
 use App\Events\WorkOrderClosed;
 use App\Events\WorkOrderCompleted;
+use App\Events\WorkOrderCompletionRejected;
 use App\Events\WorkOrderRejected;
 use App\Models\User;
 use App\Models\WorkOrder;
@@ -62,6 +63,8 @@ class WorkOrderStateManager
             $this->recordHistory($workOrder, $previousState, 'rejected', $user, "Rejected: {$reason}");
         });
 
+        // Dispatch event
+        WorkOrderRejected::dispatch($workOrder);
     }
 
     /**
@@ -208,7 +211,7 @@ class WorkOrderStateManager
     }
 
     /**
-     * Approve completion (creator approves the done work)
+     * Approve completion (creator approves the done work and closes the work order)
      */
     public function approveCompletion(WorkOrder $workOrder, User $user, ?string $note = null): void
     {
@@ -220,11 +223,17 @@ class WorkOrderStateManager
             $previousState = $workOrder->status;
 
             $workOrder->update([
-                'status' => 'completed',
+                'status' => 'closed',
+                'closed_by' => $user->id,
+                'closed_at' => now(),
+                'closure_note' => $note,
             ]);
 
-            $this->recordHistory($workOrder, $previousState, 'completed', $user, $note ?? 'Completion approved by creator');
+            $this->recordHistory($workOrder, $previousState, 'closed', $user, $note ?? 'Work approved and closed by creator');
         });
+
+        // Dispatch event to notify both creator and assignee
+        WorkOrderClosed::dispatch($workOrder);
     }
 
     /**
@@ -245,6 +254,9 @@ class WorkOrderStateManager
 
             $this->recordHistory($workOrder, $previousState, 'in_progress', $user, "Completion rejected: {$reason}");
         });
+
+        // Dispatch event
+        WorkOrderCompletionRejected::dispatch($workOrder, $user, $reason);
     }
 
     /**

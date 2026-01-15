@@ -3,13 +3,15 @@
 namespace App\Models;
 
 use App\Models\Concerns\BelongsToClient;
+use App\Models\Concerns\HasHashid;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class WorkOrder extends Model
 {
-    use BelongsToClient;
+    use BelongsToClient, HasHashid;
+
     protected $fillable = [
         'client_account_id',
         'facility_id',
@@ -233,7 +235,7 @@ class WorkOrder extends Model
 
     public function canReopen(): bool
     {
-        return $this->status === 'completed';
+        return $this->status === 'closed';
     }
 
     public function isClosed(): bool
