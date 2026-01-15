@@ -18,7 +18,7 @@ class WorkOrderStartedMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "Work Started on Work Order #{$this->workOrder->id}",
+            subject: "Work Started on Work Order {$this->workOrder->workorder_serial}",
         );
     }
 

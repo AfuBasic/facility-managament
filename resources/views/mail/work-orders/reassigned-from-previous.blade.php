@@ -1,23 +1,23 @@
-<x-mail.layout title="Work Order Closed" :greeting="'Hi there,'">
+<x-mail.layout title="Work Order Reassigned" :greeting="'Hi there,'">
     <p style="margin: 0 0 30px; color: #374151; font-size: 16px; line-height: 1.6;">
-        The work order has been closed and archived. This issue is now resolved.
+        A work order previously assigned to you has been reassigned to <strong>{{ $newAssignee->name }}</strong> by <strong>{{ $reassignedBy->name }}</strong>.
     </p>
 
     {{-- Work Order Card --}}
     <table role="presentation" style="width: 100%; background-color: #f9fafb; border-radius: 8px; border: 2px solid #e5e7eb; margin-bottom: 30px;">
         <tr>
             <td style="padding: 24px;">
-                <h2 style="margin: 0 0 16px; color: #0d9488; font-size: 22px; font-weight: 600;">
+                <h2 style="margin: 0 0 16px; color: #6b7280; font-size: 22px; font-weight: 600;">
                     {{ $workOrder->title }}
                 </h2>
-                
+
                 <table role="presentation" style="width: 100%;">
                     <x-mail.detail-row label="Work Order ID" :value="$workOrder->workorder_serial" />
                     <x-mail.detail-row label="Facility" :value="$workOrder->facility->name" />
-                    <x-mail.detail-row label="Closed By" :value="$workOrder->closedBy->name" />
-                    <x-mail.detail-row label="Closed" :value="$workOrder->closed_at->format('M d, Y g:i A')" />
-                    @if($workOrder->closure_note)
-                    <x-mail.detail-row label="Note" :value="$workOrder->closure_note" />
+                    <x-mail.detail-row label="Reassigned To" :value="$newAssignee->name" />
+                    <x-mail.detail-row label="Reassigned By" :value="$reassignedBy->name" />
+                    @if($reason)
+                    <x-mail.detail-row label="Reason" :value="$reason" />
                     @endif
                 </table>
             </td>
@@ -25,7 +25,7 @@
     </table>
 
     <p style="margin: 0 0 10px; color: #374151; font-size: 16px; line-height: 1.6;">
-        Thank you for your patience while we resolved this issue.
+        You are no longer responsible for this work order. No further action is required from you.
     </p>
 
     <x-mail.button :url="route('app.work-orders.show', $workOrder)" text="View Work Order" />

@@ -1,6 +1,6 @@
-<x-mail.layout title="Work Order Closed" :greeting="'Hi there,'">
+<x-mail.layout title="Work Order Assigned to You" :greeting="'Hi ' . $workOrder->assignedTo->name . ','">
     <p style="margin: 0 0 30px; color: #374151; font-size: 16px; line-height: 1.6;">
-        The work order has been closed and archived. This issue is now resolved.
+        A work order has been reassigned to you by <strong>{{ $reassignedBy->name }}</strong>. Please review the details below and take appropriate action.
     </p>
 
     {{-- Work Order Card --}}
@@ -10,14 +10,19 @@
                 <h2 style="margin: 0 0 16px; color: #0d9488; font-size: 22px; font-weight: 600;">
                     {{ $workOrder->title }}
                 </h2>
-                
+
+                <p style="margin: 0 0 16px; color: #374151; font-size: 14px; line-height: 1.6;">
+                    {{ $workOrder->description }}
+                </p>
+
                 <table role="presentation" style="width: 100%;">
                     <x-mail.detail-row label="Work Order ID" :value="$workOrder->workorder_serial" />
                     <x-mail.detail-row label="Facility" :value="$workOrder->facility->name" />
-                    <x-mail.detail-row label="Closed By" :value="$workOrder->closedBy->name" />
-                    <x-mail.detail-row label="Closed" :value="$workOrder->closed_at->format('M d, Y g:i A')" />
-                    @if($workOrder->closure_note)
-                    <x-mail.detail-row label="Note" :value="$workOrder->closure_note" />
+                    <x-mail.detail-row label="Priority" :value="ucfirst($workOrder->priority)" />
+                    <x-mail.detail-row label="Status" :value="ucfirst(str_replace('_', ' ', $workOrder->status))" />
+                    <x-mail.detail-row label="Reassigned By" :value="$reassignedBy->name" />
+                    @if($reason)
+                    <x-mail.detail-row label="Reason" :value="$reason" />
                     @endif
                 </table>
             </td>
@@ -25,7 +30,7 @@
     </table>
 
     <p style="margin: 0 0 10px; color: #374151; font-size: 16px; line-height: 1.6;">
-        Thank you for your patience while we resolved this issue.
+        Click the button below to view the full work order details:
     </p>
 
     <x-mail.button :url="route('app.work-orders.show', $workOrder)" text="View Work Order" />

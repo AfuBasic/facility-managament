@@ -12,7 +12,7 @@
                 </h2>
                 
                 <table role="presentation" style="width: 100%;">
-                    <x-mail.detail-row label="Work Order ID" :value="'#' . $workOrder->id" />
+                    <x-mail.detail-row label="Work Order ID" :value="$workOrder->workorder_serial" />
                     <x-mail.detail-row label="Facility" :value="$workOrder->facility->name" />
                     <x-mail.detail-row label="Assigned To" :value="$workOrder->assignedTo->name" />
                     <x-mail.detail-row label="Started" :value="$workOrder->started_at->format('M d, Y g:i A')" />

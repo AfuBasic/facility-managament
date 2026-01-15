@@ -21,7 +21,7 @@ class WorkOrderClosedMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "Work Order Closed: #{$this->workOrder->id} - {$this->workOrder->title}",
+            subject: "Work Order Closed: {$this->workOrder->workorder_serial} - {$this->workOrder->title}",
         );
     }
 

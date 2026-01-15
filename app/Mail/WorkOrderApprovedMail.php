@@ -22,7 +22,7 @@ class WorkOrderApprovedMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "Work Order Approved: #{$this->workOrder->id} - {$this->workOrder->title}",
+            subject: "Work Order Approved: {$this->workOrder->workorder_serial} - {$this->workOrder->title}",
         );
     }
 

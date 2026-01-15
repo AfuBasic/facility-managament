@@ -1,6 +1,6 @@
 <div>
-    <x-ui.page-header 
-        :title="'Work Order #' . $workOrder->id" 
+    <x-ui.page-header
+        :title="'Work Order ' . $workOrder->workorder_serial"
         :description="$workOrder->title"
     >
         <x-slot:actions>
@@ -31,11 +31,11 @@
             {{-- Tab Navigation --}}
             <div class="border-b border-slate-200">
                 <nav class="-mb-px flex space-x-8" aria-label="Tabs">
-                    <button wire:click="setTab('details')" 
+                    <button wire:click="setTab('details')"
                         class="whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium transition-colors {{ $activeTab === 'details' ? 'border-teal-500 text-teal-600' : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700' }}">
                         Details
                     </button>
-                    <button wire:click="setTab('history')" 
+                    <button wire:click="setTab('history')"
                         class="whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium transition-colors {{ $activeTab === 'history' ? 'border-teal-500 text-teal-600' : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700' }}">
                         History
                         @if($this->stateChanges->count() > 0)
@@ -132,7 +132,7 @@
                     <div>
                         <label class="block text-sm font-medium text-slate-500">Reported By</label>
                         <p class="mt-1 text-sm text-slate-900">
-                            {{ $workOrder->reportedBy->name }} 
+                            {{ $workOrder->reportedBy->name }}
                             <span class="text-slate-500">on {{ $workOrder->reported_at->format('M d, Y g:i A') }}</span>
                         </p>
                     </div>
@@ -432,7 +432,7 @@
                         @can('approveCompletion', $workOrder)
                         <x-ui.button wire:click="approveCompletion" wire:confirm="Are you sure you want to approve and close this work order?" class="w-full">
                             <x-heroicon-o-check class="h-5 w-5 mr-2" />
-                            Approve & Close
+                            Approve
                         </x-ui.button>
                         @endcan
                         {{-- Reject Completion (only creator) --}}
@@ -499,7 +499,7 @@
                     placeholder="Add any approval notes..."></textarea>
             </div>
         </div>
-        
+
         <x-slot:footer>
             <x-ui.button variant="secondary" @click="$wire.showApproveModal = false">Cancel</x-ui.button>
             <x-ui.button wire:click="approve" wire:loading.attr="disabled">
@@ -527,7 +527,7 @@
                 @error('rejection_reason') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
             </div>
         </div>
-        
+
         <x-slot:footer>
             <x-ui.button variant="secondary" @click="$wire.showRejectModal = false">Cancel</x-ui.button>
             @if($workOrder->status === 'completed')
@@ -557,7 +557,7 @@
                 />
                 @error('assigned_user_id') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
             </div>
-            
+
             @if($this->availableAssets->isNotEmpty())
             <div>
                 <x-forms.multi-select
@@ -570,7 +570,7 @@
                 <p class="mt-1 text-xs text-slate-500">These assets will be checked out to the assignee for this work order.</p>
             </div>
             @endif
-            
+
             <div>
                 <label class="block text-sm font-medium text-slate-700 mb-1">Assignment Note (Optional)</label>
                 <textarea wire:model="assignment_note" rows="3"
@@ -578,7 +578,7 @@
                     placeholder="Add any instructions or notes for the assignee..."></textarea>
             </div>
         </div>
-        
+
         <x-slot:footer>
             <x-ui.button variant="secondary" @click="$wire.showAssignModal = false">Cancel</x-ui.button>
             <x-ui.button wire:click="assign" wire:loading.attr="disabled">
@@ -616,7 +616,7 @@
                 </div>
             </div>
         </div>
-        
+
         <x-slot:footer>
             <x-ui.button variant="secondary" @click="$wire.showCompleteModal = false">Cancel</x-ui.button>
             <x-ui.button wire:click="markDone" wire:loading.attr="disabled">
@@ -637,7 +637,7 @@
                     placeholder="Add any final notes or comments..."></textarea>
             </div>
         </div>
-        
+
         <x-slot:footer>
             <x-ui.button variant="secondary" @click="$wire.showCloseModal = false">Cancel</x-ui.button>
             <x-ui.button wire:click="close" wire:loading.attr="disabled">
@@ -652,7 +652,7 @@
         <p class="text-sm text-slate-600">
             Are you ready to start working on this work order? This will change the status to "In Progress".
         </p>
-        
+
         <x-slot:footer>
             <x-ui.button variant="secondary" @click="$wire.showStartModal = false">Cancel</x-ui.button>
             <x-ui.button wire:click="start" wire:loading.attr="disabled">
@@ -673,7 +673,7 @@
                 @error('update_note') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
             </div>
         </div>
-        
+
         <x-slot:footer>
             <x-ui.button variant="secondary" @click="$wire.showUpdateModal = false">Cancel</x-ui.button>
             <x-ui.button wire:click="addUpdate" wire:loading.attr="disabled">
@@ -697,7 +697,7 @@
                 @error('reopen_reason') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
             </div>
         </div>
-        
+
         <x-slot:footer>
             <x-ui.button variant="secondary" @click="$wire.showReopenModal = false">Cancel</x-ui.button>
             <x-ui.button wire:click="reopen" wire:loading.attr="disabled">
@@ -716,7 +716,7 @@
             <div>
                 <x-forms.searchable-select
                     wire:model="reassign_user_id"
-                    :options="$this->users"
+                    :options="$this->reassignableUsers"
                     :selected="$reassign_user_id"
                     label="Reassign To *"
                     placeholder="Select new assignee..."

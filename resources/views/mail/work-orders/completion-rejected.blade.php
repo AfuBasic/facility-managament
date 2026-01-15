@@ -12,7 +12,7 @@
                 </h2>
 
                 <table role="presentation" style="width: 100%;">
-                    <x-mail.detail-row label="Work Order ID" :value="'#' . $workOrder->id" />
+                    <x-mail.detail-row label="Work Order ID" :value="$workOrder->workorder_serial" />
                     <x-mail.detail-row label="Facility" :value="$workOrder->facility->name" />
                     <x-mail.detail-row label="Rejected By" :value="$rejectedBy->name" />
                     <x-mail.detail-row label="Rejection Reason" :value="$reason" />

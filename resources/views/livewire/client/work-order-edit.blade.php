@@ -1,7 +1,7 @@
 <div>
-    <x-ui.page-header 
-        title="Edit Work Order" 
-        :description="'Work Order #' . $workOrder->id"
+    <x-ui.page-header
+        title="Edit Work Order"
+        :description="'Work Order ' . $workOrder->workorder_serial"
     />
 
     <x-ui.card>

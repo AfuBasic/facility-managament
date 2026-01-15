@@ -4,13 +4,14 @@ namespace App\Models;
 
 use App\Models\Concerns\BelongsToClient;
 use App\Models\Concerns\HasHashid;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class WorkOrder extends Model
 {
-    use BelongsToClient, HasHashid;
+    use BelongsToClient, HasFactory, HasHashid;
 
     protected static function booted(): void
     {
@@ -23,17 +24,18 @@ class WorkOrder extends Model
 
     /**
      * Generate a unique serial number for the work order.
-     * Format: #{INITIALS}{TIMESTAMP}
-     * Example: #LC1736956800 (for "Lara Corp")
+     * Format: #{INITIALS}{TIMESTAMP}{RANDOM}
+     * Example: #LC17369568001234 (for "Lara Corp")
      */
     public static function generateSerial(int $clientAccountId): string
     {
         $clientAccount = ClientAccount::find($clientAccountId);
         $initials = static::extractInitials($clientAccount?->name ?? 'WO');
 
-        $timestamp = now()->timestamp;
+        $timestamp = now()->format('ymdHis');
+        $random = str_pad((string) random_int(0, 999), 3, '0', STR_PAD_LEFT);
 
-        return "#{$initials}{$timestamp}";
+        return "#{$initials}{$timestamp}{$random}";
     }
 
     /**

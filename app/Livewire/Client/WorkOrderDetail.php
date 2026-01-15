@@ -102,6 +102,13 @@ class WorkOrderDetail extends Component
         return User::orderBy('name')->pluck('name', 'id');
     }
 
+    public function getReassignableUsersProperty()
+    {
+        return User::where('id', '!=', $this->workOrder->assigned_to)
+            ->orderBy('name')
+            ->pluck('name', 'id');
+    }
+
     public function getUpdatesProperty()
     {
         return $this->workOrder->history

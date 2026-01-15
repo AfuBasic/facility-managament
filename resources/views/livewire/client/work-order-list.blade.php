@@ -86,7 +86,7 @@
                     @forelse($workOrders as $workOrder)
                         <tr wire:key="work-order-{{ $workOrder->id }}" class="hover:bg-slate-50">
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
-                                #{{ $workOrder->id }}
+                                {{ $workOrder->workorder_serial }}
                             </td>
                             <td class="px-6 py-4">
                                 <div class="text-sm font-medium text-slate-900">{{ $workOrder->title }}</div>

@@ -24,7 +24,7 @@ class WorkOrderCompletedMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "Work Order Completed: #{$this->workOrder->id} - {$this->workOrder->title}",
+            subject: "Work Order Completed: {$this->workOrder->workorder_serial} - {$this->workOrder->title}",
         );
     }
 

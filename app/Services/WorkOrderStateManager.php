@@ -7,6 +7,7 @@ use App\Events\WorkOrderAssigned;
 use App\Events\WorkOrderClosed;
 use App\Events\WorkOrderCompleted;
 use App\Events\WorkOrderCompletionRejected;
+use App\Events\WorkOrderReassigned;
 use App\Events\WorkOrderRejected;
 use App\Models\User;
 use App\Models\WorkOrder;
@@ -155,8 +156,8 @@ class WorkOrderStateManager
             );
         });
 
-        // Dispatch event to notify the new assignee
-        WorkOrderAssigned::dispatch($workOrder);
+        // Dispatch event to notify both assignees
+        WorkOrderReassigned::dispatch($workOrder, $previousAssignee, $newAssignee, $reassigner, $reason);
     }
 
     /**

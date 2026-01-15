@@ -25,7 +25,7 @@ class WorkOrderCompletionRejectedMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "Work Order Completion Rejected: #{$this->workOrder->id} - {$this->workOrder->title}",
+            subject: "Work Order Completion Rejected: {$this->workOrder->workorder_serial} - {$this->workOrder->title}",
         );
     }
 
