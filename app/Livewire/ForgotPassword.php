@@ -11,6 +11,7 @@ use Livewire\Component;
 class ForgotPassword extends Component
 {
     public $email = '';
+
     public $status = null;
 
     public function submit()
@@ -25,7 +26,7 @@ class ForgotPassword extends Component
             ForgotPasswordRequested::dispatch($user);
         }
 
-        // We show the same message whether user exists or not for security, 
+        // We show the same message whether user exists or not for security,
         // but here we know it exists due to validation.
         $this->status = 'We have emailed your password reset link.';
         $this->email = '';

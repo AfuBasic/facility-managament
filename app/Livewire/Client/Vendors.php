@@ -2,11 +2,10 @@
 
 namespace App\Livewire\Client;
 
+use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
-
-use Illuminate\Support\Facades\Gate;
 
 #[Layout('components.layouts.client-app')]
 #[Title('Vendors | Optima FM')]

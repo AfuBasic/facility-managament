@@ -5,7 +5,7 @@ use App\Http\Controllers\ClientSessionController;
 use App\Http\Controllers\SignupActivate;
 use App\Http\Middleware\IsVerified;
 use App\Http\Middleware\SetClientContext;
-
+use App\Livewire\Client\AssetDetail;
 use App\Livewire\Client\ContactGroups;
 use App\Livewire\Client\Contacts;
 use App\Livewire\Client\ContactTypes;
@@ -17,6 +17,10 @@ use App\Livewire\Client\Roles;
 use App\Livewire\Client\SlaPolicy;
 use App\Livewire\Client\Users;
 use App\Livewire\Client\Vendors;
+use App\Livewire\Client\WorkOrderCreate;
+use App\Livewire\Client\WorkOrderDetail;
+use App\Livewire\Client\WorkOrderEdit;
+use App\Livewire\Client\WorkOrderList;
 use App\Livewire\Client\WorkOrders;
 use App\Livewire\ForgotPassword;
 use Illuminate\Support\Facades\Route;
@@ -52,9 +56,14 @@ Route::middleware(['auth', IsVerified::class])->group(function() {
              Route::get('/facilities', Facilities::class)->name('facilities');
              Route::get('/facilities/{facility}', FacilityDetail::class)->name('facilities.show');
              Route::get('/stores/{store}', StoreDetail::class)->name('store.detail');
-            Route::get('/assets/{asset}', \App\Livewire\Client\AssetDetail::class)->name('asset.detail');
+            Route::get('/assets/{asset}', AssetDetail::class)->name('asset.detail');
             
-            Route::get('/work-orders', WorkOrders::class)->name('work-orders');
+            // Work Orders
+            Route::get('/work-orders', WorkOrderList::class)->name('work-orders.index');
+            Route::get('/work-orders/create', WorkOrderCreate::class)->name('work-orders.create');
+            Route::get('/work-orders/{workOrder}/edit', WorkOrderEdit::class)->name('work-orders.edit');
+            Route::get('/work-orders/{workOrder}', WorkOrderDetail::class)->name('work-orders.show');
+            
             Route::get('/sla-policy', SlaPolicy::class)->name('sla-policy');
             Route::get('/vendors', Vendors::class)->name('vendors');
             Route::get('/users', Users::class)->name('users');

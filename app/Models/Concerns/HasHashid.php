@@ -6,7 +6,7 @@ use App\Services\HashidService;
 
 /**
  * Trait for models that use Hashids for URL obfuscation
- * 
+ *
  * TO REVERSE THIS IMPLEMENTATION:
  * 1. Remove this trait from models
  * 2. Remove getRouteKey() and resolveRouteBinding() methods

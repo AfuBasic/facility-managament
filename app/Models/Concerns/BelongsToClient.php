@@ -20,6 +20,7 @@ trait BelongsToClient
                     $clientAccount = app(ClientAccount::class);
                     if ($clientAccount && $clientAccount->id) {
                         $model->client_account_id = $clientAccount->id;
+
                         return;
                     }
                 } catch (\Exception $e) {

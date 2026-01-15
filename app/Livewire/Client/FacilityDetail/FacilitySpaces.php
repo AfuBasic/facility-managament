@@ -11,24 +11,33 @@ use Livewire\Component;
 class FacilitySpaces extends Component
 {
     use WithNotifications;
-    
+
     public Facility $facility;
-    
+
     public ClientAccount $clientAccount;
+
     // Space form fields
     public $showSpaceModal = false;
+
     public $isEditingSpace = false;
+
     public $editingSpaceId = null;
+
     public $spaceName = '';
+
     public $spaceType = '';
+
     public $spaceFloor = '';
+
     public $spaceDescription = '';
+
     public $spaceStatus = 'active';
-    
+
     // View space modal
     public $showViewSpaceModal = false;
+
     public $viewingSpace = null;
-    
+
     protected $rules = [
         'spaceName' => 'required|string|max:255',
         'spaceType' => 'nullable|string|max:255',
@@ -36,7 +45,7 @@ class FacilitySpaces extends Component
         'spaceDescription' => 'nullable|string',
         'spaceStatus' => 'required|in:active,inactive,maintenance',
     ];
-    
+
     public function hydrate()
     {
         if ($this->clientAccount) {
@@ -44,25 +53,27 @@ class FacilitySpaces extends Component
         }
     }
 
-    public function mount(){
-        if (!$this->clientAccount) {
+    public function mount()
+    {
+        if (! $this->clientAccount) {
             $this->clientAccount = app(ClientAccount::class);
         }
         setPermissionsTeamId($this->clientAccount->id);
     }
+
     public function createSpace()
     {
         $this->authorize('create spaces');
         $this->resetSpaceForm();
         $this->showSpaceModal = true;
     }
-    
+
     public function editSpace($id)
     {
         $this->authorize('edit spaces');
-        
+
         $space = Space::where('facility_id', $this->facility->id)->findOrFail($id);
-        
+
         $this->editingSpaceId = $space->id;
         $this->spaceName = $space->name;
         $this->spaceType = $space->type ?? '';
@@ -72,11 +83,11 @@ class FacilitySpaces extends Component
         $this->isEditingSpace = true;
         $this->showSpaceModal = true;
     }
-    
+
     public function saveSpace()
     {
         $this->validate();
-        
+
         if ($this->isEditingSpace) {
             $this->authorize('edit spaces');
             $space = Space::where('facility_id', $this->facility->id)->findOrFail($this->editingSpaceId);
@@ -100,40 +111,40 @@ class FacilitySpaces extends Component
             ]);
             $this->success('Space created successfully!');
         }
-        
+
         $this->closeSpaceModal();
         $this->facility->load('spaces');
     }
-    
+
     public function deleteSpace($id)
     {
         $this->authorize('delete spaces');
-        
+
         $space = Space::where('facility_id', $this->facility->id)->findOrFail($id);
         $space->delete();
-        
+
         $this->success('Space deleted successfully.');
         $this->facility->load('spaces');
     }
-    
+
     public function viewSpace($id)
     {
         $this->viewingSpace = Space::where('facility_id', $this->facility->id)->findOrFail($id);
         $this->showViewSpaceModal = true;
     }
-    
+
     public function closeViewSpaceModal()
     {
         $this->showViewSpaceModal = false;
         $this->viewingSpace = null;
     }
-    
+
     public function closeSpaceModal()
     {
         $this->showSpaceModal = false;
         $this->resetSpaceForm();
     }
-    
+
     private function resetSpaceForm()
     {
         $this->spaceName = '';
@@ -144,7 +155,7 @@ class FacilitySpaces extends Component
         $this->isEditingSpace = false;
         $this->editingSpaceId = null;
     }
-    
+
     public function render()
     {
         return view('livewire.client.facility-detail.facility-spaces');

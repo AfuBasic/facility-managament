@@ -5,8 +5,8 @@ namespace App\Livewire\Client;
 use App\Livewire\Concerns\WithNotifications;
 use App\Models\ClientAccount;
 use App\Models\Contact;
-use App\Models\ContactType;
 use App\Models\ContactGroup;
+use App\Models\ContactType;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -16,30 +16,44 @@ use Livewire\WithPagination;
 #[Title('Contacts | Optima FM')]
 class Contacts extends Component
 {
-    use WithPagination, WithNotifications;
+    use WithNotifications, WithPagination;
 
     public $showModal = false;
+
     public $isEditing = false;
+
     public $editingContactId;
-    
+
     // Form fields
     public $firstname = '';
+
     public $lastname = '';
+
     public $email = '';
+
     public $phone = '';
+
     public $birthday = '';
+
     public $gender = '';
+
     public $address = '';
+
     public $notes = '';
+
     public $contact_type_id = '';
+
     public $contact_group_id = '';
+
     public $contact_person_id = '';
-    
+
     // Filters
     public $search = '';
+
     public $filterType = '';
+
     public $filterGroup = '';
-    
+
     public $clientAccountId;
 
     protected $rules = [
@@ -94,9 +108,9 @@ class Contacts extends Component
     public function edit($id)
     {
         $this->authorize('edit contacts');
-        
+
         $contact = Contact::where('client_account_id', $this->clientAccountId)->findOrFail($id);
-        
+
         $this->editingContactId = $contact->id;
         $this->firstname = $contact->firstname;
         $this->lastname = $contact->lastname;
@@ -149,10 +163,10 @@ class Contacts extends Component
     public function delete($id)
     {
         $this->authorize('delete contacts');
-        
+
         $contact = Contact::where('client_account_id', $this->clientAccountId)->findOrFail($id);
         $contact->delete();
-        
+
         $this->success('Contact deleted successfully.');
     }
 
@@ -165,9 +179,9 @@ class Contacts extends Component
     private function resetForm()
     {
         $this->reset([
-            'firstname', 'lastname', 'email', 'phone', 'birthday', 
-            'gender', 'address', 'notes', 'contact_type_id', 
-            'contact_group_id', 'contact_person_id', 'isEditing', 'editingContactId'
+            'firstname', 'lastname', 'email', 'phone', 'birthday',
+            'gender', 'address', 'notes', 'contact_type_id',
+            'contact_group_id', 'contact_person_id', 'isEditing', 'editingContactId',
         ]);
     }
 
@@ -175,18 +189,18 @@ class Contacts extends Component
     {
         $contacts = Contact::where('client_account_id', $this->clientAccountId)
             ->with(['contactType', 'contactGroup', 'contactPerson'])
-            ->when($this->search, function($query) {
-                $query->where(function($q) {
-                    $q->where('firstname', 'like', '%' . $this->search . '%')
-                      ->orWhere('lastname', 'like', '%' . $this->search . '%')
-                      ->orWhere('email', 'like', '%' . $this->search . '%')
-                      ->orWhere('phone', 'like', '%' . $this->search . '%');
+            ->when($this->search, function ($query) {
+                $query->where(function ($q) {
+                    $q->where('firstname', 'like', '%'.$this->search.'%')
+                        ->orWhere('lastname', 'like', '%'.$this->search.'%')
+                        ->orWhere('email', 'like', '%'.$this->search.'%')
+                        ->orWhere('phone', 'like', '%'.$this->search.'%');
                 });
             })
-            ->when($this->filterType, function($query) {
+            ->when($this->filterType, function ($query) {
                 $query->where('contact_type_id', $this->filterType);
             })
-            ->when($this->filterGroup, function($query) {
+            ->when($this->filterGroup, function ($query) {
                 $query->where('contact_group_id', $this->filterGroup);
             })
             ->orderBy('created_at', 'desc')
@@ -201,7 +215,7 @@ class Contacts extends Component
             ->get();
 
         $availableContacts = Contact::where('client_account_id', $this->clientAccountId)
-            ->when($this->editingContactId, function($query) {
+            ->when($this->editingContactId, function ($query) {
                 $query->where('id', '!=', $this->editingContactId);
             })
             ->orderBy('firstname')

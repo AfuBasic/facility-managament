@@ -24,9 +24,9 @@
                     </a>
                 </li>
                 @endcan
-                @can('view work orders')
+                @can('viewAny', \App\Models\WorkOrder::class)
                  <li>
-                    <a href="{{ route('app.work-orders') }}" wire:navigate class="group flex gap-x-3 rounded-xl p-2.5 text-sm leading-6 font-semibold transition-all duration-300 {{ request()->routeIs('app.work-orders') ? 'bg-gradient-to-r from-teal-500/10 to-transparent text-teal-400 border-l-4 border-teal-500 shadow-[0_0_20px_rgba(45,212,191,0.1)]' : 'text-slate-400 hover:text-white hover:bg-slate-800/50 border-l-4 border-transparent' }}">
+                    <a href="{{ route('app.work-orders.index') }}" wire:navigate class="group flex gap-x-3 rounded-xl p-2.5 text-sm leading-6 font-semibold transition-all duration-300 {{ request()->routeIs('app.work-orders') ? 'bg-gradient-to-r from-teal-500/10 to-transparent text-teal-400 border-l-4 border-teal-500 shadow-[0_0_20px_rgba(45,212,191,0.1)]' : 'text-slate-400 hover:text-white hover:bg-slate-800/50 border-l-4 border-transparent' }}">
                         <x-heroicon-o-clipboard-document-list class="h-6 w-6 shrink-0 {{ request()->routeIs('app.work-orders') ? 'text-teal-400' : 'text-slate-500 group-hover:text-teal-400 transition-colors' }}" />
                         Work Orders
                     </a>

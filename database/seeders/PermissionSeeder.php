@@ -60,6 +60,9 @@ class PermissionSeeder extends Seeder
             'create workorders',
             'edit workorders',
             'delete workorders',
+            'approve workorders',
+            'assign workorders',
+            'close workorders',
 
             // Users
             'view users',

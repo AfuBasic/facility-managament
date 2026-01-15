@@ -18,18 +18,21 @@ use Livewire\WithPagination;
 #[Title('Facilities | Optima FM')]
 class Facilities extends Component
 {
-    use WithPagination, WithNotifications;
+    use WithNotifications, WithPagination;
 
     // Search
     public $search = '';
 
     // Modal state
     public $showModal = false;
+
     public $isEditing = false;
+
     public $editingFacilityId = null;
 
     // Form fields
     public $name = '';
+
     public $address = '';
 
     public ClientAccount $clientAccount;
@@ -45,7 +48,7 @@ class Facilities extends Component
             setPermissionsTeamId($this->clientAccount->id);
         }
     }
-    
+
     public function mount()
     {
         $this->authorize('view facilities');
@@ -60,7 +63,7 @@ class Facilities extends Component
     public function create()
     {
         $this->authorize('create facilities');
-        
+
         $this->reset(['name', 'address', 'isEditing', 'editingFacilityId']);
         $this->showModal = true;
     }
@@ -68,11 +71,12 @@ class Facilities extends Component
     public function edit($id)
     {
         $this->authorize('edit facilities');
-        
+
         $facility = $this->facilityRepo()->findForClient($id, $this->clientAccount->id);
-        
-        if (!$facility) {
+
+        if (! $facility) {
             $this->error('Facility not found.');
+
             return;
         }
 
@@ -112,11 +116,12 @@ class Facilities extends Component
     public function delete($id, DeleteFacility $deleteFacility)
     {
         $this->authorize('delete facilities');
-        
+
         $facility = $this->facilityRepo()->findForClient($id, $this->clientAccount->id);
-        
-        if (!$facility) {
+
+        if (! $facility) {
             $this->error('Facility not found.');
+
             return;
         }
 
@@ -128,10 +133,10 @@ class Facilities extends Component
     {
         $user = Auth::user();
         $facilityRepo = $this->facilityRepo();
-        
+
         // Check if user is admin
         $isAdmin = $user->hasRole('admin');
-        
+
         // Admins see all facilities, others only see facilities they manage
         if ($isAdmin) {
             $facilities = $facilityRepo->getPaginatedForClient(
@@ -147,7 +152,7 @@ class Facilities extends Component
         }
 
         return view('livewire.client.facilities.index', [
-            'facilities' => $facilities
+            'facilities' => $facilities,
         ]);
     }
 

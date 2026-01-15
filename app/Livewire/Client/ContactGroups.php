@@ -14,14 +14,20 @@ use Livewire\WithPagination;
 #[Title('Contact Groups | Optima FM')]
 class ContactGroups extends Component
 {
-    use WithPagination, WithNotifications;
+    use WithNotifications, WithPagination;
 
     public $showModal = false;
+
     public $isEditing = false;
+
     public $editingGroupId;
+
     public $name = '';
+
     public $status = 'active';
+
     public $clientAccountId;
+
     public $search = '';
 
     protected $rules = [
@@ -58,9 +64,9 @@ class ContactGroups extends Component
     public function edit($id)
     {
         $this->authorize('edit contacts');
-        
+
         $group = ContactGroup::where('client_account_id', $this->clientAccountId)->findOrFail($id);
-        
+
         $this->editingGroupId = $group->id;
         $this->name = $group->name;
         $this->status = $group->status;
@@ -96,22 +102,22 @@ class ContactGroups extends Component
     public function delete($id)
     {
         $this->authorize('delete contacts');
-        
+
         $group = ContactGroup::where('client_account_id', $this->clientAccountId)->findOrFail($id);
         $group->delete();
-        
+
         $this->success('Contact group deleted successfully.');
     }
 
     public function toggleStatus($id)
     {
         $this->authorize('edit contacts');
-        
+
         $group = ContactGroup::where('client_account_id', $this->clientAccountId)->findOrFail($id);
         $group->update([
-            'status' => $group->status === 'active' ? 'inactive' : 'active'
+            'status' => $group->status === 'active' ? 'inactive' : 'active',
         ]);
-        
+
         $this->success('Status updated successfully.');
     }
 
@@ -124,14 +130,14 @@ class ContactGroups extends Component
     public function render()
     {
         $groups = ContactGroup::where('client_account_id', $this->clientAccountId)
-            ->when($this->search, function($query) {
-                $query->where('name', 'like', '%' . $this->search . '%');
+            ->when($this->search, function ($query) {
+                $query->where('name', 'like', '%'.$this->search.'%');
             })
             ->orderBy('created_at', 'desc')
             ->paginate(15);
 
         return view('livewire.client.contact-groups', [
-            'groups' => $groups
+            'groups' => $groups,
         ]);
     }
 }

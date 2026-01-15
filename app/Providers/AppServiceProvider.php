@@ -26,7 +26,12 @@ class AppServiceProvider extends ServiceProvider
             return route('user.home');
         });
 
-        Gate::before(function ($user) {
+        Gate::before(function ($user, $ability) {
+            // Admins bypass all checks EXCEPT delete for work orders
+            if ($ability === 'delete' && request()->route('workOrder')) {
+                return null; // Let the policy decide
+            }
+            
             return $user->hasRole('admin') ?: null;
         });
     }

@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class ClientAccount extends Model
 {
     use HasFactory;
-    
+
     protected $fillable = ['name'];
 
     public function memberships(): HasMany
