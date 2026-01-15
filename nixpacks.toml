@@ -1,8 +1,8 @@
 [phases.setup]
-nixPkgs = ["...", "python311Packages.supervisor"]
+nixPkgs = ["...", "python311Packages.supervisor", "nodejs_20"]
 
 [phases.install]
-cmds = ["npm ci"]
+cmds = ["composer install --no-dev --optimize-autoloader", "npm ci"]
 
 [phases.build]
 cmds = [
