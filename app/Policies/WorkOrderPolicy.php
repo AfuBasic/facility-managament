@@ -78,6 +78,14 @@ class WorkOrderPolicy
     }
 
     /**
+     * Determine if the user can reassign the work order.
+     */
+    public function reassign(User $user, WorkOrder $workOrder): bool
+    {
+        return $user->can('assign workorders') && $workOrder->canReassign();
+    }
+
+    /**
      * Determine if the user can start work on the work order.
      */
     public function start(User $user, WorkOrder $workOrder): bool

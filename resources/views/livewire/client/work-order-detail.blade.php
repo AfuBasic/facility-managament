@@ -43,10 +43,17 @@
                         @endif
                     </button>
                     @if($this->updates->count() > 0)
-                    <button wire:click="setTab('updates')" 
+                    <button wire:click="setTab('updates')"
                         class="whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium transition-colors {{ $activeTab === 'updates' ? 'border-teal-500 text-teal-600' : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700' }}">
                         Updates
                         <span class="ml-2 rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-600">{{ $this->updates->count() }}</span>
+                    </button>
+                    @endif
+                    @if($this->assignmentHistory->count() > 0)
+                    <button wire:click="setTab('assignments')"
+                        class="whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium transition-colors {{ $activeTab === 'assignments' ? 'border-teal-500 text-teal-600' : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700' }}">
+                        Assignments
+                        <span class="ml-2 rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-600">{{ $this->assignmentHistory->count() }}</span>
                     </button>
                     @endif
                 </nav>
@@ -277,6 +284,70 @@
                 </div>
             </x-ui.card>
             @endif
+
+            {{-- Assignments Tab --}}
+            @if($activeTab === 'assignments')
+            <x-ui.card>
+                <div class="px-6 py-4 border-b border-slate-200">
+                    <h3 class="text-lg font-semibold text-slate-900">Assignment History</h3>
+                </div>
+                <div class="p-6">
+                    @if($this->assignmentHistory->isNotEmpty())
+                    <div class="flow-root">
+                        <ul role="list" class="-mb-8">
+                            @foreach($this->assignmentHistory as $assignment)
+                            <li>
+                                <div class="relative pb-8">
+                                    @if(!$loop->last)
+                                    <span class="absolute left-4 top-4 -ml-px h-full w-0.5 bg-purple-200" aria-hidden="true"></span>
+                                    @endif
+                                    <div class="relative flex space-x-3">
+                                        <div>
+                                            <span class="h-8 w-8 rounded-full {{ $assignment->is_current ? 'bg-purple-500' : 'bg-slate-400' }} flex items-center justify-center ring-8 ring-white">
+                                                <x-heroicon-o-user class="h-5 w-5 text-white" />
+                                            </span>
+                                        </div>
+                                        <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
+                                            <div>
+                                                <p class="text-sm text-slate-900">
+                                                    <span class="font-medium">{{ $assignment->assignee->name }}</span>
+                                                    @if($assignment->is_current)
+                                                        <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">Current</span>
+                                                    @endif
+                                                </p>
+                                                <p class="mt-1 text-sm text-slate-500">
+                                                    Assigned by {{ $assignment->assigner->name }}
+                                                </p>
+                                                @if($assignment->assignment_note)
+                                                <p class="mt-1 text-sm text-slate-500 italic">"{{ $assignment->assignment_note }}"</p>
+                                                @endif
+                                                @if($assignment->unassigned_at)
+                                                <p class="mt-2 text-sm text-slate-500">
+                                                    <span class="text-red-600">Unassigned</span> by {{ $assignment->unassigner?->name ?? 'System' }}
+                                                    on {{ $assignment->unassigned_at->format('M d, Y g:i A') }}
+                                                    @if($assignment->unassignment_reason)
+                                                    <br><span class="italic">"{{ $assignment->unassignment_reason }}"</span>
+                                                    @endif
+                                                </p>
+                                                @endif
+                                            </div>
+                                            <div class="whitespace-nowrap text-right text-sm text-slate-500">
+                                                <div>{{ $assignment->assigned_at->format('M d, Y') }}</div>
+                                                <div>{{ $assignment->assigned_at->format('g:i A') }}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    @else
+                    <p class="text-sm text-slate-500 text-center py-8">No assignment history.</p>
+                    @endif
+                </div>
+            </x-ui.card>
+            @endif
         </div>
 
         {{-- Sidebar --}}
@@ -339,6 +410,14 @@
                         <x-ui.button @click="$wire.showCompleteModal = true" class="w-full">
                             <x-heroicon-o-check-badge class="h-5 w-5 mr-2" />
                             Mark as Done
+                        </x-ui.button>
+                        @endcan
+
+                        {{-- Reassign --}}
+                        @can('reassign', $workOrder)
+                        <x-ui.button variant="secondary" @click="$wire.showReassignModal = true" class="w-full">
+                            <x-heroicon-o-arrow-path-rounded-square class="h-5 w-5 mr-2" />
+                            Reassign
                         </x-ui.button>
                         @endcan
 
@@ -624,6 +703,40 @@
             <x-ui.button wire:click="reopen" wire:loading.attr="disabled">
                 <span wire:loading.remove wire:target="reopen">Reopen Work Order</span>
                 <span wire:loading wire:target="reopen">Reopening...</span>
+            </x-ui.button>
+        </x-slot:footer>
+    </x-ui.modal>
+
+    {{-- Reassign Modal --}}
+    <x-ui.modal show="showReassignModal" title="Reassign Work Order">
+        <div class="space-y-4">
+            <p class="text-sm text-slate-600">
+                Currently assigned to: <strong>{{ $workOrder->assignedTo?->name ?? 'Unassigned' }}</strong>
+            </p>
+            <div>
+                <x-forms.searchable-select
+                    wire:model="reassign_user_id"
+                    :options="$this->users"
+                    :selected="$reassign_user_id"
+                    label="Reassign To *"
+                    placeholder="Select new assignee..."
+                />
+                @error('reassign_user_id') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Reason for Reassignment (Optional)</label>
+                <textarea wire:model="reassign_reason" rows="3"
+                    class="p-2 border w-full rounded-lg border-slate-200 focus:border-teal-500 focus:ring-teal-500"
+                    placeholder="Explain why this work order is being reassigned..."></textarea>
+                @error('reassign_reason') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
+            </div>
+        </div>
+
+        <x-slot:footer>
+            <x-ui.button variant="secondary" @click="$wire.showReassignModal = false">Cancel</x-ui.button>
+            <x-ui.button wire:click="reassign" wire:loading.attr="disabled">
+                <span wire:loading.remove wire:target="reassign">Reassign</span>
+                <span wire:loading wire:target="reassign">Reassigning...</span>
             </x-ui.button>
         </x-slot:footer>
     </x-ui.modal>

@@ -12,11 +12,54 @@ class WorkOrder extends Model
 {
     use BelongsToClient, HasHashid;
 
+    protected static function booted(): void
+    {
+        static::creating(function (WorkOrder $workOrder) {
+            if (empty($workOrder->workorder_serial)) {
+                $workOrder->workorder_serial = static::generateSerial($workOrder->client_account_id);
+            }
+        });
+    }
+
+    /**
+     * Generate a unique serial number for the work order.
+     * Format: #{INITIALS}{TIMESTAMP}
+     * Example: #LC1736956800 (for "Lara Corp")
+     */
+    public static function generateSerial(int $clientAccountId): string
+    {
+        $clientAccount = ClientAccount::find($clientAccountId);
+        $initials = static::extractInitials($clientAccount?->name ?? 'WO');
+
+        $timestamp = now()->timestamp;
+
+        return "#{$initials}{$timestamp}";
+    }
+
+    /**
+     * Extract initials from an organization name.
+     * Example: "Lara Corp" => "LC", "Facility Management Inc" => "FMI"
+     */
+    protected static function extractInitials(string $name): string
+    {
+        $words = preg_split('/\s+/', trim($name));
+        $initials = '';
+
+        foreach ($words as $word) {
+            if (! empty($word)) {
+                $initials .= strtoupper($word[0]);
+            }
+        }
+
+        return $initials ?: 'WO';
+    }
+
     protected $fillable = [
         'client_account_id',
         'facility_id',
         'space_id',
         'asset_id',
+        'workorder_serial',
         'title',
         'description',
         'priority',
@@ -135,7 +178,7 @@ class WorkOrder extends Model
         return $this->belongsTo(User::class, 'closed_by');
     }
 
-    // History & Assets
+    // History, Assets & Assignments
     public function history(): HasMany
     {
         return $this->hasMany(WorkOrderHistory::class);
@@ -144,6 +187,26 @@ class WorkOrder extends Model
     public function allocatedAssets(): HasMany
     {
         return $this->hasMany(WorkOrderAsset::class);
+    }
+
+    public function assignments(): HasMany
+    {
+        return $this->hasMany(WorkOrderAssignment::class);
+    }
+
+    public function currentAssignment()
+    {
+        return $this->hasOne(WorkOrderAssignment::class)->where('is_current', true);
+    }
+
+    public function pastAssignments(): HasMany
+    {
+        return $this->hasMany(WorkOrderAssignment::class)->where('is_current', false);
+    }
+
+    public function canReassign(): bool
+    {
+        return in_array($this->status, ['assigned', 'in_progress', 'on_hold']);
     }
 
     // Scopes

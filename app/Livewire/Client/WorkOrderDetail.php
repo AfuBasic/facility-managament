@@ -40,6 +40,8 @@ class WorkOrderDetail extends Component
 
     public $showReopenModal = false;
 
+    public $showReassignModal = false;
+
     // Form fields
     public $approval_note = '';
 
@@ -64,6 +66,10 @@ class WorkOrderDetail extends Component
     public $closure_note = '';
 
     public $reopen_reason = '';
+
+    public $reassign_user_id = '';
+
+    public $reassign_reason = '';
 
     public function hydrate()
     {
@@ -176,6 +182,33 @@ class WorkOrderDetail extends Component
         $this->reset(['assigned_user_id', 'assignment_note', 'selected_assets']);
 
         session()->flash('success', 'Work order assigned successfully.');
+    }
+
+    public function reassign(WorkOrderStateManager $stateManager)
+    {
+        $this->authorize('reassign', $this->workOrder);
+
+        $this->validate([
+            'reassign_user_id' => 'required|exists:users,id',
+            'reassign_reason' => 'nullable|string|max:500',
+        ]);
+
+        $newAssignee = User::findOrFail($this->reassign_user_id);
+        $stateManager->reassign($this->workOrder, $newAssignee, Auth::user(), $this->reassign_reason);
+
+        $this->workOrder->refresh();
+        $this->showReassignModal = false;
+        $this->reset(['reassign_user_id', 'reassign_reason']);
+
+        session()->flash('success', 'Work order reassigned successfully.');
+    }
+
+    public function getAssignmentHistoryProperty()
+    {
+        return $this->workOrder->assignments()
+            ->with(['assignee', 'assigner', 'unassigner'])
+            ->orderBy('assigned_at', 'desc')
+            ->get();
     }
 
     public function start(WorkOrderStateManager $stateManager)

@@ -10,6 +10,7 @@ use App\Events\WorkOrderCompletionRejected;
 use App\Events\WorkOrderRejected;
 use App\Models\User;
 use App\Models\WorkOrder;
+use App\Models\WorkOrderAssignment;
 use App\Models\WorkOrderHistory;
 use Illuminate\Support\Facades\DB;
 
@@ -87,10 +88,74 @@ class WorkOrderStateManager
                 'assignment_note' => $note,
             ]);
 
+            // Create assignment record
+            WorkOrderAssignment::create([
+                'work_order_id' => $workOrder->id,
+                'assigned_to' => $assignee->id,
+                'assigned_by' => $assigner->id,
+                'assigned_at' => now(),
+                'assignment_note' => $note,
+                'is_current' => true,
+            ]);
+
             $this->recordHistory($workOrder, $previousState, 'assigned', $assigner, "Assigned to {$assignee->name}. {$note}");
         });
 
         // Dispatch event
+        WorkOrderAssigned::dispatch($workOrder);
+    }
+
+    /**
+     * Reassign a work order to a different user
+     */
+    public function reassign(WorkOrder $workOrder, User $newAssignee, User $reassigner, ?string $reason = null): void
+    {
+        if (! $workOrder->canReassign()) {
+            throw new \Exception("Work order cannot be reassigned in current state: {$workOrder->status}");
+        }
+
+        $previousAssignee = $workOrder->assignedTo;
+
+        DB::transaction(function () use ($workOrder, $newAssignee, $reassigner, $reason, $previousAssignee) {
+            // Mark current assignment as no longer current
+            WorkOrderAssignment::where('work_order_id', $workOrder->id)
+                ->where('is_current', true)
+                ->update([
+                    'is_current' => false,
+                    'unassigned_by' => $reassigner->id,
+                    'unassigned_at' => now(),
+                    'unassignment_reason' => $reason,
+                ]);
+
+            // Update work order with new assignee
+            $workOrder->update([
+                'assigned_to' => $newAssignee->id,
+                'assigned_by' => $reassigner->id,
+                'assigned_at' => now(),
+                'assignment_note' => $reason,
+            ]);
+
+            // Create new assignment record
+            WorkOrderAssignment::create([
+                'work_order_id' => $workOrder->id,
+                'assigned_to' => $newAssignee->id,
+                'assigned_by' => $reassigner->id,
+                'assigned_at' => now(),
+                'assignment_note' => $reason,
+                'is_current' => true,
+            ]);
+
+            $previousName = $previousAssignee ? $previousAssignee->name : 'unassigned';
+            $this->recordHistory(
+                $workOrder,
+                $workOrder->status,
+                $workOrder->status,
+                $reassigner,
+                "Reassigned from {$previousName} to {$newAssignee->name}. {$reason}"
+            );
+        });
+
+        // Dispatch event to notify the new assignee
         WorkOrderAssigned::dispatch($workOrder);
     }
 
