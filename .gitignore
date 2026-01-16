@@ -8,6 +8,7 @@
 /storage/pail
 /vendor
 .env
+.mcp.json
 .gitignore
 .editorconfig
 .DS_Store
