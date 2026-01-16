@@ -7,6 +7,7 @@ use App\Models\ClientAccount;
 use App\Models\User;
 use App\Models\WorkOrder;
 use App\Models\WorkOrderAsset;
+use App\Services\SlaCalculatorService;
 use App\Services\WorkOrderStateManager;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
@@ -120,6 +121,11 @@ class WorkOrderDetail extends Component
     {
         return $this->workOrder->history()->latest()->get()
             ->filter(fn ($log) => $log->previous_state !== $log->new_state);
+    }
+
+    public function getSlaStatusProperty(): array
+    {
+        return app(SlaCalculatorService::class)->getSlaStatus($this->workOrder);
     }
 
     public function setTab($tab)

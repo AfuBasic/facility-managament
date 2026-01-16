@@ -127,6 +127,30 @@
                                 </x-ui.badge>
                             </div>
                         </div>
+
+                        @if($workOrder->sla_policy_id && !in_array($workOrder->status, ['closed', 'rejected']))
+                        <div>
+                            <label class="block text-sm font-medium text-slate-500">SLA Status</label>
+                            <div class="mt-1">
+                                @php
+                                    $slaVariants = [
+                                        'on_track' => 'success',
+                                        'at_risk' => 'warning',
+                                        'breached' => 'danger',
+                                        'none' => 'neutral',
+                                    ];
+                                @endphp
+                                <x-ui.badge :variant="$slaVariants[$this->slaStatus['status']] ?? 'neutral'">
+                                    {{ $this->slaStatus['label'] }}
+                                </x-ui.badge>
+                                @if($workOrder->resolution_due_at && !in_array($workOrder->status, ['completed', 'closed']))
+                                <div class="text-xs text-slate-400 mt-1">
+                                    Due: {{ $workOrder->resolution_due_at->format('M d, g:i A') }}
+                                </div>
+                                @endif
+                            </div>
+                        </div>
+                        @endif
                     </div>
 
                     <div>
