@@ -20,6 +20,11 @@ class WorkOrder extends Model
                 $workOrder->workorder_serial = static::generateSerial($workOrder->client_account_id);
             }
         });
+
+        static::created(function (WorkOrder $workOrder) {
+            // Auto-apply SLA policy after work order is created
+            app(\App\Services\SlaCalculatorService::class)->applyPolicy($workOrder);
+        });
     }
 
     /**
@@ -58,6 +63,7 @@ class WorkOrder extends Model
 
     protected $fillable = [
         'client_account_id',
+        'sla_policy_id',
         'facility_id',
         'space_id',
         'asset_id',
@@ -66,6 +72,13 @@ class WorkOrder extends Model
         'description',
         'priority',
         'status',
+        'response_due_at',
+        'resolution_due_at',
+        'responded_at',
+        'sla_response_breached',
+        'sla_resolution_breached',
+        'sla_response_breached_at',
+        'sla_resolution_breached_at',
         'reported_by',
         'reported_at',
         'approved_by',
@@ -106,12 +119,24 @@ class WorkOrder extends Model
         'completed_at' => 'datetime',
         'closed_at' => 'datetime',
         'total_cost' => 'decimal:2',
+        'response_due_at' => 'datetime',
+        'resolution_due_at' => 'datetime',
+        'responded_at' => 'datetime',
+        'sla_response_breached' => 'boolean',
+        'sla_resolution_breached' => 'boolean',
+        'sla_response_breached_at' => 'datetime',
+        'sla_resolution_breached_at' => 'datetime',
     ];
 
     // Core Relationships
     public function clientAccount(): BelongsTo
     {
         return $this->belongsTo(ClientAccount::class);
+    }
+
+    public function slaPolicy(): BelongsTo
+    {
+        return $this->belongsTo(SlaPolicy::class);
     }
 
     public function facility(): BelongsTo

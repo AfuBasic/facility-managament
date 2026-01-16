@@ -24,26 +24,26 @@ class PermissionSeeder extends Seeder
             'delete facilities',
             'manage facilities',
 
-            //Spaces
+            // Spaces
             'view spaces',
             'create spaces',
             'edit spaces',
             'delete spaces',
 
-            //Stores
+            // Stores
             'view stores',
             'create stores',
             'edit stores',
             'delete stores',
             'manage stores',
 
-            //Contacts
+            // Contacts
             'view contacts',
             'create contacts',
             'edit contacts',
             'delete contacts',
 
-            //Facility Managers
+            // Facility Managers
             'view facility_managers',
             'assign facility_managers',
             'unassign facility_managers',
@@ -69,16 +69,18 @@ class PermissionSeeder extends Seeder
             'create users',
             'edit users',
             'delete users',
-            
+
             // Roles
             'view roles',
             'create roles',
             'edit roles',
             'delete roles',
-            
+
             // SLA Policy
             'view sla policy',
+            'create sla policy',
             'edit sla policy',
+            'delete sla policy',
         ];
 
         foreach ($permissions as $permission) {

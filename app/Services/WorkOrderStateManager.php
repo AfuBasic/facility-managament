@@ -81,13 +81,20 @@ class WorkOrderStateManager
         DB::transaction(function () use ($workOrder, $assignee, $assigner, $note) {
             $previousState = $workOrder->status;
 
-            $workOrder->update([
+            $updateData = [
                 'status' => 'assigned',
                 'assigned_to' => $assignee->id,
                 'assigned_by' => $assigner->id,
                 'assigned_at' => now(),
                 'assignment_note' => $note,
-            ]);
+            ];
+
+            // Set responded_at if this is first response (for SLA tracking)
+            if (! $workOrder->responded_at) {
+                $updateData['responded_at'] = now();
+            }
+
+            $workOrder->update($updateData);
 
             // Create assignment record
             WorkOrderAssignment::create([

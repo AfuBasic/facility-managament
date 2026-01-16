@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use App\Models\ClientAccount;
 use App\Models\WorkOrder;
 use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
 use Illuminate\Support\Facades\Gate;
@@ -23,18 +22,18 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        RedirectIfAuthenticated::redirectUsing(function($request) {
+        RedirectIfAuthenticated::redirectUsing(function ($request) {
             return route('user.home');
         });
 
         Gate::before(function ($user, $ability, $arguments) {
             // For work order specific actions, let the policy decide based on status
-            if (!empty($arguments) && $arguments[0] instanceof WorkOrder) {
+            if (! empty($arguments) && $arguments[0] instanceof WorkOrder) {
                 if (in_array($ability, ['update', 'delete'])) {
                     return null; // Let the WorkOrderPolicy decide
                 }
             }
-            
+
             // Admins bypass all other checks
             return $user->hasRole('admin') ?: null;
         });
