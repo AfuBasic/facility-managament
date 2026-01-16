@@ -21,9 +21,9 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
             </svg>
         </div>
-        <input 
-            type="text" 
-            wire:model.live.debounce.300ms="search" 
+        <input
+            type="text"
+            wire:model.live.debounce.300ms="search"
             class="block border w-full rounded-lg border-slate-300 pl-10 pr-3 py-2.5 text-slate-900 placeholder:text-slate-400 focus:border-teal-500 focus:ring-teal-500 sm:text-sm transition-colors"
             placeholder="Search facilities by name, address or contact person..."
         >
@@ -92,7 +92,7 @@
 
                     {{-- Actions --}}
                     <div class="mt-6 flex items-center gap-2">
-                        <a href="{{ route('app.facilities.show', $facility) }}" class="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-teal-600 to-teal-500 px-3 py-2 text-sm font-semibold text-white hover:from-teal-700 hover:to-teal-600 transition-all">
+                        <a href="{{ route('app.facilities.show', $facility) }}" wire:navigate class="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-teal-600 to-teal-500 px-3 py-2 text-sm font-semibold text-white hover:from-teal-700 hover:to-teal-600 transition-all">
                             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -106,9 +106,9 @@
                                 </svg>
                             </button>
                         @endcan
-                        
+
                         @can('delete facilities')
-                            <button 
+                            <button
                                 @click="window.dispatchEvent(new CustomEvent('confirm-action', {
                                     detail: {
                                         title: 'Delete Facility',
@@ -199,9 +199,9 @@
                                 <label for="name" class="block text-sm font-medium text-slate-700 mb-2">
                                     Facility Name <span class="text-red-500">*</span>
                                 </label>
-                                <input 
-                                    wire:model="name" 
-                                    type="text" 
+                                <input
+                                    wire:model="name"
+                                    type="text"
                                     id="name"
                                     class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
                                     placeholder="Enter facility name"
@@ -214,8 +214,8 @@
                                 <label for="address" class="block text-sm font-medium text-slate-700 mb-2">
                                     Address
                                 </label>
-                                <textarea 
-                                    wire:model="address" 
+                                <textarea
+                                    wire:model="address"
                                     id="address"
                                     rows="2"
                                     class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 resize-none"
@@ -226,13 +226,13 @@
 
                             {{-- Actions --}}
                             <div class="flex items-center gap-3 pt-4">
-                                <button 
+                                <button
                                     type="submit"
                                     class="flex-1 inline-flex justify-center items-center gap-2 rounded-xl bg-gradient-to-r from-teal-600 to-teal-500 px-4 py-2.5 text-sm font-semibold text-white hover:from-teal-700 hover:to-teal-600 transition-all"
                                 >
                                     {{ $isEditing ? 'Update Facility' : 'Create Facility' }}
                                 </button>
-                                <button 
+                                <button
                                     type="button"
                                     wire:click="closeModal"
                                     class="px-4 py-2.5 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
