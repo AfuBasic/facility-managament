@@ -9,6 +9,8 @@
 /vendor
 .env
 .gitignore
+.editorconfig
+.DS_Store
 .env.backup
 .env.production
 .phpactor.json
@@ -25,3 +27,6 @@ yarn-error.log
 /.zed
 /.claude
 /.gemini
+GEMINI.md
+CLAUDE.md
+boost.json
