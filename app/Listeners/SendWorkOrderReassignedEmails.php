@@ -5,6 +5,7 @@ namespace App\Listeners;
 use App\Events\WorkOrderReassigned;
 use App\Mail\WorkOrderReassignedFromPreviousMail;
 use App\Mail\WorkOrderReassignedToNewMail;
+use App\Notifications\WorkOrderAssignedNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Mail;
 
@@ -12,6 +13,11 @@ class SendWorkOrderReassignedEmails implements ShouldQueue
 {
     public function handle(WorkOrderReassigned $event): void
     {
+        // Send in-app notification to new assignee
+        $event->newAssignee->notify(
+            new WorkOrderAssignedNotification($event->workOrder, isReassignment: true)
+        );
+
         // Send email to the new assignee
         Mail::to($event->newAssignee->email)
             ->queue(new WorkOrderReassignedToNewMail(

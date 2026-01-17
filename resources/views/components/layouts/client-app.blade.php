@@ -88,6 +88,9 @@
                 </div>
 
                 <div class="flex items-center gap-x-4 lg:gap-x-6">
+                    <!-- Notification Bell -->
+                    <livewire:notification-bell />
+
                     <!-- User Dropdown -->
                     <div class="relative" x-data="{ open: false }">
                         <button @click="open = !open" type="button" class="-m-1.5 flex items-center p-1.5" id="user-menu-button" aria-expanded="false" aria-haspopup="true">

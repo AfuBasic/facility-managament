@@ -4,11 +4,13 @@
         show: false,
         message: '',
         type: 'success',
+        position: 'top',
         timeout: null,
 
         open(detail) {
             this.message = detail.message;
             this.type = detail.type ?? 'success';
+            this.position = detail.position ?? 'top';
             this.show = true;
 
             clearTimeout(this.timeout);
@@ -20,13 +22,14 @@
         }
     }"
     @toast.window="open($event.detail)"
-    class="fixed top-5 right-2 md:right-5 z-[100] pointer-events-none"
+    class="fixed right-2 md:right-5 z-[100] pointer-events-none"
+    :class="position === 'bottom' ? 'bottom-5' : 'top-5'"
 >
     <div
         x-show="show"
         x-transition:enter="transition ease-out duration-300"
-        x-transition:enter-start="opacity-0 translate-y-2 scale-95"
-        x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+        x-transition:enter-start="opacity-0 scale-95"
+        x-transition:enter-end="opacity-100 scale-100"
         x-transition:leave="transition ease-in duration-200"
         x-transition:leave-start="opacity-100 scale-100"
         x-transition:leave-end="opacity-0 scale-95"

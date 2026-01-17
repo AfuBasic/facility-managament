@@ -5,6 +5,7 @@ namespace App\Listeners;
 use App\Events\SlaResolutionBreached;
 use App\Events\SlaResponseBreached;
 use App\Mail\SlaBreachedMail;
+use App\Notifications\SlaBreachedNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
@@ -22,15 +23,43 @@ class SendSlaBreachedEmail implements ShouldQueue
         $workOrder = $event->workOrder->load(['assignedTo', 'reportedBy', 'facility', 'clientAccount']);
         $breachType = $event instanceof SlaResponseBreached ? 'response' : 'resolution';
 
-        $recipients = $this->getRecipients($workOrder);
+        // Send in-app notifications
+        $this->sendInAppNotifications($workOrder, $breachType);
+
+        // Send email notifications
+        $this->sendEmailNotifications($workOrder, $breachType);
+    }
+
+    /**
+     * Send in-app notifications to relevant users.
+     */
+    protected function sendInAppNotifications($workOrder, string $breachType): void
+    {
+        $notifiedUsers = [];
+
+        // Notify assignee
+        if ($workOrder->assignedTo) {
+            $workOrder->assignedTo->notify(new SlaBreachedNotification($workOrder, $breachType));
+            $notifiedUsers[] = $workOrder->assignedTo->id;
+        }
+
+        // Notify reporter if different from assignee
+        if ($workOrder->reportedBy && ! in_array($workOrder->reportedBy->id, $notifiedUsers)) {
+            $workOrder->reportedBy->notify(new SlaBreachedNotification($workOrder, $breachType));
+        }
+    }
+
+    /**
+     * Send email notifications.
+     */
+    protected function sendEmailNotifications($workOrder, string $breachType): void
+    {
+        $recipients = $this->getEmailRecipients($workOrder);
 
         Log::info('SLA Breach Email Recipients', [
             'work_order_id' => $workOrder->id,
             'breach_type' => $breachType,
             'recipients' => $recipients,
-            'assignee' => $workOrder->assignedTo?->email,
-            'reporter' => $workOrder->reportedBy?->email,
-            'notification_email' => $workOrder->clientAccount?->notification_email,
         ]);
 
         if (empty($recipients)) {
@@ -47,23 +76,20 @@ class SendSlaBreachedEmail implements ShouldQueue
     }
 
     /**
-     * Get the recipients for the SLA breach notification.
+     * Get email recipients for the SLA breach notification.
      */
-    protected function getRecipients($workOrder): array
+    protected function getEmailRecipients($workOrder): array
     {
         $recipients = [];
 
-        // Priority 1: If work order is assigned, notify the assignee
         if ($workOrder->assignedTo) {
             $recipients[] = $workOrder->assignedTo->email;
         }
 
-        // Priority 2: If not assigned, use the client notification email
         if (! $workOrder->assignedTo && $workOrder->clientAccount?->notification_email) {
             $recipients[] = $workOrder->clientAccount->notification_email;
         }
 
-        // Priority 3: If still no recipients, notify the reporter (who created it)
         if (empty($recipients) && $workOrder->reportedBy) {
             $recipients[] = $workOrder->reportedBy->email;
         }
