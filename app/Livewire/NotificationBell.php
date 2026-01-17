@@ -14,7 +14,22 @@ class NotificationBell extends Component
         $this->refreshUnreadCount();
     }
 
-    public function refreshUnreadCount()
+    public function getListeners(): array
+    {
+        $userId = Auth::id();
+
+        return [
+            "echo-private:user.{$userId},.notification.received" => 'handleNewNotification',
+        ];
+    }
+
+    public function handleNewNotification(array $payload): void
+    {
+        $this->refreshUnreadCount();
+        $this->dispatch('notification-received', notification: $payload['notification'] ?? []);
+    }
+
+    public function refreshUnreadCount(): void
     {
         $this->unreadCount = Auth::user()->unreadNotifications()->count();
     }
@@ -45,7 +60,7 @@ class NotificationBell extends Component
         }
     }
 
-    public function markAllAsRead()
+    public function markAllAsRead(): void
     {
         Auth::user()->unreadNotifications->markAsRead();
         $this->refreshUnreadCount();

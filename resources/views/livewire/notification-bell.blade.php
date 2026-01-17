@@ -1,11 +1,16 @@
-<div class="relative" x-data="{ open: false }">
+<div class="relative"
+     x-data="{ open: false }"
+     x-on:notification-received.window="
+        $wire.$refresh();
+        $dispatch('toast', { message: $event.detail.notification.message || 'New notification received', type: 'info', position: 'bottom' });
+     ">
     <!-- Bell Icon Button -->
-    <button @click="open = !open" 
-            type="button" 
+    <button @click="open = !open"
+            type="button"
             class="relative p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
             title="Notifications">
         <x-heroicon-o-bell class="h-6 w-6" />
-        
+
         <!-- Unread Badge -->
         @if($unreadCount > 0)
         <span class="absolute -top-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-white">
@@ -15,7 +20,7 @@
     </button>
 
     <!-- Dropdown -->
-    <div x-show="open" 
+    <div x-show="open"
          @click.outside="open = false"
          x-transition:enter="transition ease-out duration-200"
          x-transition:enter-start="opacity-0 translate-y-1"
@@ -25,7 +30,7 @@
          x-transition:leave-end="opacity-0 translate-y-1"
          class="absolute right-0 z-50 mt-2 w-80 origin-top-right rounded-xl bg-white shadow-lg ring-1 ring-slate-900/5 focus:outline-none overflow-hidden"
          x-cloak>
-        
+
         <!-- Header -->
         <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100 bg-slate-50">
             <h3 class="text-sm font-semibold text-slate-900">Notifications</h3>

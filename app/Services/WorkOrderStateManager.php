@@ -18,6 +18,7 @@ use App\Models\User;
 use App\Models\WorkOrder;
 use App\Models\WorkOrderAssignment;
 use App\Models\WorkOrderHistory;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class WorkOrderStateManager
@@ -333,6 +334,8 @@ class WorkOrderStateManager
             $previousState = $workOrder->status;
 
             $workOrder->update([
+                'rejected_by' => Auth::id(),
+                'rejected_at' => now(),
                 'status' => 'in_progress',
             ]);
 
