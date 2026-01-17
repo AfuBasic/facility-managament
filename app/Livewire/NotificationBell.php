@@ -1,0 +1,60 @@
+<?php
+
+namespace App\Livewire;
+
+use Illuminate\Support\Facades\Auth;
+use Livewire\Component;
+
+class NotificationBell extends Component
+{
+    public int $unreadCount = 0;
+
+    public function mount()
+    {
+        $this->refreshUnreadCount();
+    }
+
+    public function refreshUnreadCount()
+    {
+        $this->unreadCount = Auth::user()->unreadNotifications()->count();
+    }
+
+    public function getNotificationsProperty()
+    {
+        return Auth::user()
+            ->notifications()
+            ->latest()
+            ->take(10)
+            ->get();
+    }
+
+    public function markAsRead(string $notificationId, bool $redirect = false): void
+    {
+        $notification = Auth::user()
+            ->notifications()
+            ->where('id', $notificationId)
+            ->first();
+
+        if ($notification) {
+            $notification->markAsRead();
+            $this->refreshUnreadCount();
+
+            if ($redirect && isset($notification->data['route'])) {
+                $this->redirect($notification->data['route']);
+            }
+        }
+    }
+
+    public function markAllAsRead()
+    {
+        Auth::user()->unreadNotifications->markAsRead();
+        $this->refreshUnreadCount();
+    }
+
+    public function render()
+    {
+        return view('livewire.notification-bell', [
+            'notifications' => $this->notifications,
+        ]);
+    }
+}

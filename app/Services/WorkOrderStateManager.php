@@ -7,8 +7,13 @@ use App\Events\WorkOrderAssigned;
 use App\Events\WorkOrderClosed;
 use App\Events\WorkOrderCompleted;
 use App\Events\WorkOrderCompletionRejected;
+use App\Events\WorkOrderPaused;
 use App\Events\WorkOrderReassigned;
 use App\Events\WorkOrderRejected;
+use App\Events\WorkOrderReopened;
+use App\Events\WorkOrderResumed;
+use App\Events\WorkOrderStarted;
+use App\Events\WorkOrderUpdateAdded;
 use App\Models\User;
 use App\Models\WorkOrder;
 use App\Models\WorkOrderAssignment;
@@ -189,7 +194,7 @@ class WorkOrderStateManager
         });
 
         // Dispatch event
-        \App\Events\WorkOrderStarted::dispatch($workOrder);
+        WorkOrderStarted::dispatch($workOrder);
     }
 
     /**
@@ -210,6 +215,9 @@ class WorkOrderStateManager
 
             $this->recordHistory($workOrder, $previousState, 'on_hold', $user, $reason ?? 'Work paused');
         });
+
+        // Dispatch event
+        WorkOrderPaused::dispatch($workOrder, $user, $reason);
     }
 
     /**
@@ -230,6 +238,9 @@ class WorkOrderStateManager
 
             $this->recordHistory($workOrder, $previousState, 'in_progress', $user, $note ?? 'Work resumed');
         });
+
+        // Dispatch event
+        WorkOrderResumed::dispatch($workOrder, $user);
     }
 
     /**
@@ -252,7 +263,7 @@ class WorkOrderStateManager
         });
 
         // Dispatch event for update notification
-        \App\Events\WorkOrderUpdateAdded::dispatch($workOrder, $user);
+        WorkOrderUpdateAdded::dispatch($workOrder, $user);
     }
 
     /**
@@ -376,6 +387,9 @@ class WorkOrderStateManager
 
             $this->recordHistory($workOrder, $previousState, 'in_progress', $user, $reason ? "Reopened: {$reason}" : 'Work order reopened');
         });
+
+        // Dispatch event
+        WorkOrderReopened::dispatch($workOrder, $user, $reason);
     }
 
     /**
