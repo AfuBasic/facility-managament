@@ -22,7 +22,7 @@ class NotificationBell extends Component
     public function getNotificationsProperty()
     {
         return Auth::user()
-            ->notifications()
+            ->unreadNotifications()
             ->latest()
             ->take(10)
             ->get();

@@ -31,8 +31,8 @@ class WorkOrderResumedNotification extends Notification
             'message' => "Work order {$this->workOrder->workorder_serial} has been resumed by {$this->resumedBy->name}",
             'icon' => 'play-circle',
             'color' => 'teal',
-            'route' => route('app.work-orders.show', $this->workOrder),
-            'route_name' => 'View Work Order',
+            'route' => route('app.work-orders.show', ['workOrder' => $this->workOrder, 'tab' => 'history']),
+            'route_name' => 'View History',
         ];
     }
 }

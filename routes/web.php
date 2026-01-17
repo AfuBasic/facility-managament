@@ -11,6 +11,7 @@ use App\Livewire\Client\ContactTypes;
 use App\Livewire\Client\Dashboard;
 use App\Livewire\Client\Facilities;
 use App\Livewire\Client\FacilityDetail;
+use App\Livewire\Client\Notifications;
 use App\Livewire\Client\Roles;
 use App\Livewire\Client\Settings;
 use App\Livewire\Client\SlaPolicy;
@@ -62,6 +63,9 @@ Route::middleware(['auth', IsVerified::class])->group(function () {
             Route::get('/work-orders/create', WorkOrderCreate::class)->name('work-orders.create');
             Route::get('/work-orders/{workOrder}/edit', WorkOrderEdit::class)->name('work-orders.edit');
             Route::get('/work-orders/{workOrder}', WorkOrderDetail::class)->name('work-orders.show');
+
+            // Notifications
+            Route::get('/notifications', Notifications::class)->name('notifications.index');
 
             Route::get('/sla-policy', SlaPolicy::class)->name('sla-policy');
             Route::get('/vendors', Vendors::class)->name('vendors');

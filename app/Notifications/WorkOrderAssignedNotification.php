@@ -34,8 +34,8 @@ class WorkOrderAssignedNotification extends Notification
                 : "You have been assigned work order {$this->workOrder->workorder_serial}",
             'icon' => 'clipboard-document-list',
             'color' => 'teal',
-            'route' => route('app.work-orders.show', $this->workOrder),
-            'route_name' => 'View Work Order',
+            'route' => route('app.work-orders.show', ['workOrder' => $this->workOrder, 'tab' => 'assignments']),
+            'route_name' => 'View Assignment',
         ];
     }
 }

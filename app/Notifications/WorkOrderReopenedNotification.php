@@ -38,8 +38,8 @@ class WorkOrderReopenedNotification extends Notification
             'message' => $message,
             'icon' => 'arrow-path-rounded-square',
             'color' => 'blue',
-            'route' => route('app.work-orders.show', $this->workOrder),
-            'route_name' => 'View Work Order',
+            'route' => route('app.work-orders.show', ['workOrder' => $this->workOrder, 'tab' => 'history']),
+            'route_name' => 'View History',
         ];
     }
 }

@@ -27,8 +27,8 @@ class WorkOrderClosedNotification extends Notification
             'message' => "Work order {$this->workOrder->workorder_serial} has been closed".($this->workOrder->closedBy ? " by {$this->workOrder->closedBy->name}" : ''),
             'icon' => 'archive-box',
             'color' => 'slate',
-            'route' => route('app.work-orders.show', $this->workOrder),
-            'route_name' => 'View Work Order',
+            'route' => route('app.work-orders.show', ['workOrder' => $this->workOrder, 'tab' => 'history']),
+            'route_name' => 'View History',
         ];
     }
 }

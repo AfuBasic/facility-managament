@@ -27,8 +27,8 @@ class WorkOrderCompletedNotification extends Notification
             'message' => "Work order {$this->workOrder->workorder_serial} has been marked as complete".($this->workOrder->completedBy ? " by {$this->workOrder->completedBy->name}" : ''),
             'icon' => 'check-badge',
             'color' => 'teal',
-            'route' => route('app.work-orders.show', $this->workOrder),
-            'route_name' => 'View Work Order',
+            'route' => route('app.work-orders.show', ['workOrder' => $this->workOrder, 'tab' => 'history']),
+            'route_name' => 'View History',
         ];
     }
 }

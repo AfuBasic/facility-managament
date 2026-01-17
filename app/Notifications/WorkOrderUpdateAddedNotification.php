@@ -31,8 +31,8 @@ class WorkOrderUpdateAddedNotification extends Notification
             'message' => "{$this->updatedBy->name} added an update to work order {$this->workOrder->workorder_serial}",
             'icon' => 'chat-bubble-left-ellipsis',
             'color' => 'blue',
-            'route' => route('app.work-orders.show', $this->workOrder),
-            'route_name' => 'View Work Order',
+            'route' => route('app.work-orders.show', ['workOrder' => $this->workOrder, 'tab' => 'updates']),
+            'route_name' => 'View Updates',
         ];
     }
 }

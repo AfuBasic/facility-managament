@@ -40,7 +40,7 @@
         <div class="max-h-96 overflow-y-auto divide-y divide-slate-100">
             @forelse($notifications as $notification)
                 <div wire:key="notification-{{ $notification->id }}"
-                     class="px-4 py-3 hover:bg-slate-50 transition-colors cursor-pointer {{ $notification->read_at ? 'opacity-60' : '' }}"
+                     class="px-4 py-3 hover:bg-slate-50 transition-colors cursor-pointer"
                      wire:click="markAsRead('{{ $notification->id }}', true)">
                     <div class="flex gap-3">
                         <!-- Icon -->
@@ -97,7 +97,7 @@
 
                         <!-- Content -->
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm text-slate-900 {{ $notification->read_at ? '' : 'font-medium' }}">
+                            <p class="text-sm text-slate-900 font-medium">
                                 {{ $notification->data['message'] ?? 'New notification' }}
                             </p>
                             <p class="text-xs text-slate-400 mt-0.5">
@@ -106,19 +106,25 @@
                         </div>
 
                         <!-- Unread Indicator -->
-                        @if(!$notification->read_at)
                         <div class="shrink-0 self-center">
                             <div class="h-2 w-2 rounded-full bg-teal-500"></div>
                         </div>
-                        @endif
                     </div>
                 </div>
             @empty
                 <div class="px-4 py-8 text-center">
-                    <x-heroicon-o-bell-slash class="h-8 w-8 text-slate-300 mx-auto mb-2" />
-                    <p class="text-sm text-slate-500">No notifications yet</p>
+                    <x-heroicon-o-check-circle class="h-8 w-8 text-teal-300 mx-auto mb-2" />
+                    <p class="text-sm text-slate-500">You're all caught up!</p>
                 </div>
             @endforelse
+        </div>
+
+        <!-- Footer with View All link -->
+        <div class="border-t border-slate-100 bg-slate-50 px-4 py-2">
+            <a href="{{ route('app.notifications.index') }}"
+               class="block text-center text-sm text-teal-600 hover:text-teal-700 font-medium">
+                View all notifications
+            </a>
         </div>
     </div>
 </div>
