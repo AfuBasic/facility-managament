@@ -20,7 +20,7 @@
         }
     }"
     @toast.window="open($event.detail)"
-    class="fixed top-5 right-2 md:right-5 z-50 pointer-events-none"
+    class="fixed top-5 right-2 md:right-5 z-[100] pointer-events-none"
 >
     <div
         x-show="show"

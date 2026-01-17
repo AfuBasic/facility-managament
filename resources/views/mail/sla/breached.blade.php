@@ -24,11 +24,11 @@
                     <x-mail.detail-row label="Priority" :value="ucfirst($workOrder->priority)" />
                     <x-mail.detail-row label="Status" :value="ucfirst(str_replace('_', ' ', $workOrder->status))" />
                     @if($breachType === 'response')
-                        <x-mail.detail-row label="Response Due" :value="$workOrder->response_due_at->format('M d, Y g:i A')" />
-                        <x-mail.detail-row label="Breached At" :value="$workOrder->sla_response_breached_at->format('M d, Y g:i A')" />
+                        <x-mail.detail-row label="Response Due" :value="$workOrder->response_due_at?->format('M d, Y g:i A') ?? 'N/A'" />
+                        <x-mail.detail-row label="Breached At" :value="$workOrder->sla_response_breached_at?->format('M d, Y g:i A') ?? now()->format('M d, Y g:i A')" />
                     @else
-                        <x-mail.detail-row label="Resolution Due" :value="$workOrder->resolution_due_at->format('M d, Y g:i A')" />
-                        <x-mail.detail-row label="Breached At" :value="$workOrder->sla_resolution_breached_at->format('M d, Y g:i A')" />
+                        <x-mail.detail-row label="Resolution Due" :value="$workOrder->resolution_due_at?->format('M d, Y g:i A') ?? 'N/A'" />
+                        <x-mail.detail-row label="Breached At" :value="$workOrder->sla_resolution_breached_at?->format('M d, Y g:i A') ?? now()->format('M d, Y g:i A')" />
                     @endif
                 </table>
             </td>
