@@ -38,6 +38,8 @@ class SlaPolicy extends Component
 
     public $search = '';
 
+    public $tab = 'overview';
+
     public ClientAccount $clientAccount;
 
     // SLA Rules (by priority)
@@ -237,6 +239,57 @@ class SlaPolicy extends Component
         $this->success('Default SLA Policy updated.');
     }
 
+    public function setTab(string $tab): void
+    {
+        $this->tab = $tab;
+    }
+
+    public function getSlaMetricsProperty(): array
+    {
+        $clientId = $this->clientAccount->id;
+
+        $totalWithSla = \App\Models\WorkOrder::where('client_account_id', $clientId)
+            ->whereNotNull('sla_policy_id')
+            ->count();
+
+        $breached = \App\Models\WorkOrder::where('client_account_id', $clientId)
+            ->whereNotNull('sla_policy_id')
+            ->where(fn ($q) => $q->where('sla_response_breached', true)->orWhere('sla_resolution_breached', true))
+            ->count();
+
+        $complianceRate = $totalWithSla > 0 ? round((($totalWithSla - $breached) / $totalWithSla) * 100, 1) : 100;
+
+        $activeBreaches = \App\Models\WorkOrder::where('client_account_id', $clientId)
+            ->whereNotIn('status', ['closed', 'completed'])
+            ->where(fn ($q) => $q->where('sla_response_breached', true)->orWhere('sla_resolution_breached', true))
+            ->count();
+
+        $responseBreaches = \App\Models\WorkOrder::where('client_account_id', $clientId)->where('sla_response_breached', true)->count();
+        $resolutionBreaches = \App\Models\WorkOrder::where('client_account_id', $clientId)->where('sla_resolution_breached', true)->count();
+
+        return compact('totalWithSla', 'breached', 'complianceRate', 'activeBreaches', 'responseBreaches', 'resolutionBreaches');
+    }
+
+    public function getBreachByPriorityProperty(): array
+    {
+        return \App\Models\WorkOrder::where('client_account_id', $this->clientAccount->id)
+            ->where(fn ($q) => $q->where('sla_response_breached', true)->orWhere('sla_resolution_breached', true))
+            ->select('priority', DB::raw('count(*) as count'))
+            ->groupBy('priority')
+            ->pluck('count', 'priority')
+            ->toArray();
+    }
+
+    public function getRecentBreachesProperty()
+    {
+        return \App\Models\WorkOrder::with(['facility', 'assignedTo', 'slaPolicy'])
+            ->where('client_account_id', $this->clientAccount->id)
+            ->where(fn ($q) => $q->where('sla_response_breached', true)->orWhere('sla_resolution_breached', true))
+            ->latest('updated_at')
+            ->take(10)
+            ->get();
+    }
+
     public function render()
     {
         return view('livewire.client.sla-policy.index', [
@@ -244,6 +297,9 @@ class SlaPolicy extends Component
                 $this->clientAccount->id,
                 $this->search
             ),
+            'slaMetrics' => $this->slaMetrics,
+            'breachByPriority' => $this->breachByPriority,
+            'recentBreaches' => $this->recentBreaches,
         ]);
     }
 

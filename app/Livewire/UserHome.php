@@ -15,8 +15,13 @@ class UserHome extends Component
     public function render()
     {
         $memberships = Auth::user()->clientMemberships()->with('clientAccount')->get();
-
-        $pendingInvitationsCount = ClientMembership::where('user_id', auth()->id())
+        /**
+         * I need a way to make sure only the first user
+         * within this organization can modify organization 
+         * details because I don't have access to client scoped roles yet
+         * */
+        
+        $pendingInvitationsCount = ClientMembership::where('user_id', Auth::id())
             ->where('status', ClientMembership::STATUS_PENDING)
             ->count();
 

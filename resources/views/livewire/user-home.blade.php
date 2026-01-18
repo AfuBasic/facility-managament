@@ -38,13 +38,14 @@
                             <span>Manage</span>
                             <x-heroicon-o-arrow-right class="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
                         </a>
-                        
+                        @if($membership->canModify(auth()->user()))
                         <button @click="selectedClientId = {{ $membership->clientAccount->id }}; showSettingsModal = true" 
                                 type="button" 
                                 class="p-2 text-slate-400 hover:text-teal-600 hover:bg-teal-50 rounded-lg transition-colors border border-slate-200" 
                                 title="Company Settings">
                             <x-heroicon-o-cog-6-tooth class="h-5 w-5" />
                         </button>
+                        @endif
                     </div>
 
                 </div>

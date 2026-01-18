@@ -1,152 +1,382 @@
 <div>
     <x-ui.page-header 
-        title="SLA Policies" 
-        description="Configure service level agreements for work order response and resolution times."
+        title="SLA Management" 
+        description="Monitor SLA compliance and configure policies."
     >
-        @can('create sla policy')
         <x-slot:actions>
-            <x-ui.button wire:click="create">
+            @can('create sla policy')
+            <x-ui.button wire:click="create" x-show="$wire.tab === 'policies'">
                 <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                 </svg>
                 Create SLA Policy
             </x-ui.button>
+            @endcan
         </x-slot:actions>
-        @endcan
     </x-ui.page-header>
 
-    <!-- Search Bar -->
-    <div class="mb-6">
-        <div class="relative">
-            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                </svg>
-            </div>
-            <input 
-                type="text" 
-                wire:model.live.debounce.300ms="search" 
-                class="block border w-full rounded-lg border-slate-300 pl-10 pr-3 py-2.5 text-slate-900 placeholder:text-slate-400 focus:border-teal-500 focus:ring-teal-500 sm:text-sm transition-colors"
-                placeholder="Search SLA policies..."
+    <!-- Tabs -->
+    <div class="border-b border-slate-200 mb-6">
+        <nav class="-mb-px flex gap-6" aria-label="Tabs">
+            <button 
+                wire:click="setTab('overview')" 
+                class="py-3 px-1 border-b-2 text-sm font-medium transition-colors {{ $tab === 'overview' ? 'border-teal-500 text-teal-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300' }}"
             >
-        </div>
+                <x-heroicon-o-chart-bar class="h-5 w-5 inline-block mr-1.5 -mt-0.5" />
+                Overview
+            </button>
+            <button 
+                wire:click="setTab('policies')" 
+                class="py-3 px-1 border-b-2 text-sm font-medium transition-colors {{ $tab === 'policies' ? 'border-teal-500 text-teal-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300' }}"
+            >
+                <x-heroicon-o-cog-6-tooth class="h-5 w-5 inline-block mr-1.5 -mt-0.5" />
+                Policies
+            </button>
+        </nav>
     </div>
 
-    <!-- Policies Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        @foreach($policies as $policy)
-        <x-ui.card class="{{ $policy->is_default ? 'ring-2 ring-teal-500' : '' }}">
-            <div class="flex items-start justify-between mb-4">
-                <div class="h-10 w-10 rounded-lg {{ $policy->is_active ? 'bg-teal-50 text-teal-600' : 'bg-slate-100 text-slate-400' }} flex items-center justify-center">
-                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </div>
-                <div class="flex items-center gap-2">
-                    @if($policy->is_default)
-                    <x-ui.badge variant="success">Default</x-ui.badge>
-                    @endif
-                    @if(!$policy->is_active)
-                    <x-ui.badge variant="neutral">Inactive</x-ui.badge>
-                    @endif
+    <!-- Overview Tab -->
+    @if($tab === 'overview')
+    <div class="space-y-8">
+        <!-- SLA Metrics -->
+        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <!-- Compliance Rate -->
+            <div class="bg-white rounded-xl border border-slate-200 p-6">
+                <div class="text-center">
+                    <div class="inline-flex h-16 w-16 rounded-full {{ $slaMetrics['complianceRate'] >= 90 ? 'bg-green-50' : ($slaMetrics['complianceRate'] >= 70 ? 'bg-amber-50' : 'bg-red-50') }} items-center justify-center mb-3">
+                        <span class="text-2xl font-bold {{ $slaMetrics['complianceRate'] >= 90 ? 'text-green-600' : ($slaMetrics['complianceRate'] >= 70 ? 'text-amber-600' : 'text-red-600') }}">
+                            {{ $slaMetrics['complianceRate'] }}%
+                        </span>
+                    </div>
+                    <p class="text-sm font-medium text-slate-900">Compliance Rate</p>
+                    <p class="text-xs text-slate-400">{{ $slaMetrics['totalWithSla'] - $slaMetrics['breached'] }}/{{ $slaMetrics['totalWithSla'] }} within SLA</p>
                 </div>
             </div>
-            
-            <h3 class="text-lg font-semibold text-slate-900 mb-1">
-                {{ $policy->name }}
-            </h3>
-            
-            @if($policy->description)
-            <p class="text-sm text-slate-500 mb-4">{{ Str::limit($policy->description, 80) }}</p>
-            @endif
 
-            <!-- SLA Times Table -->
-            <div class="bg-slate-50 rounded-lg p-3 mb-4">
-                <table class="w-full text-xs">
-                    <thead>
-                        <tr class="text-slate-500">
-                            <th class="text-left font-medium pb-2">Priority</th>
-                            <th class="text-center font-medium pb-2">Response</th>
-                            <th class="text-center font-medium pb-2">Resolution</th>
+            <!-- Active Breaches -->
+            <div class="bg-white rounded-xl border border-slate-200 p-6">
+                <div class="text-center">
+                    <div class="inline-flex h-16 w-16 rounded-full {{ $slaMetrics['activeBreaches'] > 0 ? 'bg-red-50' : 'bg-green-50' }} items-center justify-center mb-3">
+                        <x-heroicon-o-exclamation-triangle class="h-8 w-8 {{ $slaMetrics['activeBreaches'] > 0 ? 'text-red-600' : 'text-green-600' }}" />
+                    </div>
+                    <p class="text-2xl font-bold {{ $slaMetrics['activeBreaches'] > 0 ? 'text-red-600' : 'text-green-600' }}">{{ $slaMetrics['activeBreaches'] }}</p>
+                    <p class="text-sm font-medium text-slate-900">Active Breaches</p>
+                    <p class="text-xs text-slate-400">Needs attention</p>
+                </div>
+            </div>
+
+            <!-- Total Breached -->
+            <div class="bg-white rounded-xl border border-slate-200 p-6">
+                <div class="text-center">
+                    <div class="inline-flex h-16 w-16 rounded-full bg-slate-100 items-center justify-center mb-3">
+                        <x-heroicon-o-x-circle class="h-8 w-8 text-slate-600" />
+                    </div>
+                    <p class="text-2xl font-bold text-slate-900">{{ $slaMetrics['breached'] }}</p>
+                    <p class="text-sm font-medium text-slate-900">Total Breached</p>
+                    <p class="text-xs text-slate-400">All time</p>
+                </div>
+            </div>
+
+            <!-- Response Breaches -->
+            <div class="bg-white rounded-xl border border-slate-200 p-6">
+                <div class="text-center">
+                    <div class="inline-flex h-16 w-16 rounded-full bg-amber-50 items-center justify-center mb-3">
+                        <x-heroicon-o-clock class="h-8 w-8 text-amber-600" />
+                    </div>
+                    <p class="text-2xl font-bold text-amber-600">{{ $slaMetrics['responseBreaches'] }}</p>
+                    <p class="text-sm font-medium text-slate-900">Response Breaches</p>
+                    <p class="text-xs text-slate-400">Late first response</p>
+                </div>
+            </div>
+
+            <!-- Resolution Breaches -->
+            <div class="bg-white rounded-xl border border-slate-200 p-6">
+                <div class="text-center">
+                    <div class="inline-flex h-16 w-16 rounded-full bg-orange-50 items-center justify-center mb-3">
+                        <x-heroicon-o-wrench-screwdriver class="h-8 w-8 text-orange-600" />
+                    </div>
+                    <p class="text-2xl font-bold text-orange-600">{{ $slaMetrics['resolutionBreaches'] }}</p>
+                    <p class="text-sm font-medium text-slate-900">Resolution Breaches</p>
+                    <p class="text-xs text-slate-400">Late completion</p>
+                </div>
+            </div>
+
+            <!-- SLA Tracked -->
+            <div class="bg-white rounded-xl border border-slate-200 p-6">
+                <div class="text-center">
+                    <div class="inline-flex h-16 w-16 rounded-full bg-teal-50 items-center justify-center mb-3">
+                        <x-heroicon-o-shield-check class="h-8 w-8 text-teal-600" />
+                    </div>
+                    <p class="text-2xl font-bold text-teal-600">{{ $slaMetrics['totalWithSla'] }}</p>
+                    <p class="text-sm font-medium text-slate-900">SLA Tracked</p>
+                    <p class="text-xs text-slate-400">With SLA policy</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Breach by Priority -->
+        <div>
+            <h2 class="text-lg font-semibold text-slate-900 mb-4">Breaches by Priority</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                @php
+                    $priorityConfig = [
+                        'critical' => ['bg' => 'bg-red-500', 'light' => 'bg-red-50', 'text' => 'text-red-600', 'label' => 'Critical'],
+                        'high' => ['bg' => 'bg-orange-500', 'light' => 'bg-orange-50', 'text' => 'text-orange-600', 'label' => 'High'],
+                        'medium' => ['bg' => 'bg-amber-500', 'light' => 'bg-amber-50', 'text' => 'text-amber-600', 'label' => 'Medium'],
+                        'low' => ['bg' => 'bg-blue-500', 'light' => 'bg-blue-50', 'text' => 'text-blue-600', 'label' => 'Low'],
+                    ];
+                    $maxCount = max(array_values($breachByPriority) ?: [1]);
+                @endphp
+                @foreach(['critical', 'high', 'medium', 'low'] as $priority)
+                    @php
+                        $count = $breachByPriority[$priority] ?? 0;
+                        $config = $priorityConfig[$priority];
+                        $percentage = $maxCount > 0 ? ($count / $maxCount) * 100 : 0;
+                    @endphp
+                    <div class="bg-white rounded-xl border border-slate-200 p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-sm font-medium text-slate-700">{{ $config['label'] }}</span>
+                            <span class="text-2xl font-bold {{ $config['text'] }}">{{ $count }}</span>
+                        </div>
+                        <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                            <div class="h-full {{ $config['bg'] }} rounded-full transition-all duration-500" style="width: {{ $percentage }}%"></div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+
+        <!-- Recent Breaches Table -->
+        <div>
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-slate-900">Recent SLA Breaches</h2>
+                <a href="{{ route('app.work-orders.index') }}?filter[sla_breached]=true" class="text-sm text-teal-600 hover:text-teal-700 font-medium">
+                    View all breached →
+                </a>
+            </div>
+
+            @if($recentBreaches->count() > 0)
+            <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                <table class="min-w-full divide-y divide-slate-200">
+                    <thead class="bg-slate-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Work Order</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Facility</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Priority</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Breach Type</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Assignee</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3"></th>
                         </tr>
                     </thead>
-                    <tbody class="text-slate-700">
-                        @foreach($policy->rules->sortBy(fn($r) => ['critical' => 1, 'high' => 2, 'medium' => 3, 'low' => 4][$r->priority] ?? 5) as $rule)
-                        <tr>
-                            <td class="py-1 font-medium capitalize">{{ $rule->priority }}</td>
-                            <td class="py-1 text-center">{{ $rule->response_time_human }}</td>
-                            <td class="py-1 text-center">{{ $rule->resolution_time_human }}</td>
+                    <tbody class="divide-y divide-slate-200">
+                        @foreach($recentBreaches as $breach)
+                        <tr class="hover:bg-slate-50">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-slate-900">{{ $breach->workorder_serial }}</div>
+                                <div class="text-sm text-slate-500 truncate max-w-xs">{{ Str::limit($breach->title, 30) }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
+                                {{ $breach->facility?->name ?? '-' }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @php
+                                    $priorityColors = [
+                                        'critical' => 'bg-red-100 text-red-700',
+                                        'high' => 'bg-orange-100 text-orange-700',
+                                        'medium' => 'bg-amber-100 text-amber-700',
+                                        'low' => 'bg-blue-100 text-blue-700',
+                                    ];
+                                @endphp
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $priorityColors[$breach->priority] ?? 'bg-slate-100 text-slate-700' }}">
+                                    {{ ucfirst($breach->priority) }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @if($breach->sla_response_breached && $breach->sla_resolution_breached)
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700">Both</span>
+                                @elseif($breach->sla_response_breached)
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">Response</span>
+                                @else
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-700">Resolution</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
+                                {{ $breach->assignedTo?->name ?? 'Unassigned' }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @php
+                                    $statusColors = [
+                                        'pending' => 'bg-slate-100 text-slate-700',
+                                        'in_progress' => 'bg-blue-100 text-blue-700',
+                                        'on_hold' => 'bg-amber-100 text-amber-700',
+                                        'done' => 'bg-teal-100 text-teal-700',
+                                        'completed' => 'bg-green-100 text-green-700',
+                                        'closed' => 'bg-slate-100 text-slate-700',
+                                    ];
+                                @endphp
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $statusColors[$breach->status] ?? 'bg-slate-100 text-slate-700' }}">
+                                    {{ ucfirst(str_replace('_', ' ', $breach->status)) }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+                                <a href="{{ route('app.work-orders.show', $breach) }}" class="text-teal-600 hover:text-teal-700 font-medium">
+                                    View
+                                </a>
+                            </td>
                         </tr>
                         @endforeach
                     </tbody>
                 </table>
             </div>
-
-            <!-- Footer -->
-            <div class="flex items-center justify-between pt-3 border-t border-slate-100">
-                <span class="text-xs text-slate-400">{{ $policy->work_orders_count }} work orders</span>
-                <div class="flex items-center gap-1">
-                    @can('edit sla policy')
-                    @if(!$policy->is_default)
-                    <x-ui.button size="sm" variant="ghost" wire:click="toggleDefault({{ $policy->id }})" title="Set as default">
-                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
-                        </svg>
-                    </x-ui.button>
-                    @endif
-                    <x-ui.button size="sm" variant="ghost" wire:click="edit({{ $policy->id }})">
-                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                        </svg>
-                    </x-ui.button>
-                    @endcan
-                    @can('delete sla policy')
-                    <x-ui.button 
-                        size="sm"
-                        variant="ghost-danger" 
-                        :disabled="$policy->work_orders_count > 0"
-                        @click="window.dispatchEvent(new CustomEvent('confirm-action', {
-                            detail: {
-                                title: 'Delete SLA Policy',
-                                message: 'Are you sure you want to delete this SLA policy? This cannot be undone.',
-                                confirmText: 'Delete Policy',
-                                cancelText: 'Cancel',
-                                variant: 'danger',
-                                action: () => $wire.delete({{ $policy->id }})
-                            }
-                        }))"
-                    >
-                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                        </svg>
-                    </x-ui.button>
-                    @endcan
-                </div>
+            @else
+            <div class="bg-white rounded-xl border border-slate-200 p-12 text-center">
+                <x-heroicon-o-shield-check class="h-12 w-12 text-green-300 mx-auto mb-4" />
+                <h3 class="text-lg font-medium text-slate-900 mb-1">No SLA Breaches</h3>
+                <p class="text-slate-500">Great job! All work orders are within SLA.</p>
             </div>
-        </x-ui.card>
-        @endforeach
+            @endif
+        </div>
+    </div>
+    @endif
 
-        <!-- Empty State -->
-        @if($policies->count() === 0)
-        <div class="col-span-1 md:col-span-2 lg:col-span-3">
-            <x-ui.empty-state 
-                title="No SLA policies found" 
-                description="Create your first SLA policy to define response and resolution time requirements."
-            >
-                <x-slot:icon>
-                    <svg class="h-8 w-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+    <!-- Policies Tab -->
+    @if($tab === 'policies')
+    <div>
+        <!-- Search Bar -->
+        <div class="mb-6">
+            <div class="relative">
+                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                    <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                     </svg>
-                </x-slot:icon>
-            </x-ui.empty-state>
+                </div>
+                <input 
+                    type="text" 
+                    wire:model.live.debounce.300ms="search" 
+                    class="block border w-full rounded-lg border-slate-300 pl-10 pr-3 py-2.5 text-slate-900 placeholder:text-slate-400 focus:border-teal-500 focus:ring-teal-500 sm:text-sm transition-colors"
+                    placeholder="Search SLA policies..."
+                >
+            </div>
+        </div>
+
+        <!-- Policies Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @foreach($policies as $policy)
+            <x-ui.card class="{{ $policy->is_default ? 'ring-2 ring-teal-500' : '' }}">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="h-10 w-10 rounded-lg {{ $policy->is_active ? 'bg-teal-50 text-teal-600' : 'bg-slate-100 text-slate-400' }} flex items-center justify-center">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        @if($policy->is_default)
+                        <x-ui.badge variant="success">Default</x-ui.badge>
+                        @endif
+                        @if(!$policy->is_active)
+                        <x-ui.badge variant="neutral">Inactive</x-ui.badge>
+                        @endif
+                    </div>
+                </div>
+                
+                <h3 class="text-lg font-semibold text-slate-900 mb-1">
+                    {{ $policy->name }}
+                </h3>
+                
+                @if($policy->description)
+                <p class="text-sm text-slate-500 mb-4">{{ Str::limit($policy->description, 80) }}</p>
+                @endif
+
+                <!-- SLA Times Table -->
+                <div class="bg-slate-50 rounded-lg p-3 mb-4">
+                    <table class="w-full text-xs">
+                        <thead>
+                            <tr class="text-slate-500">
+                                <th class="text-left font-medium pb-2">Priority</th>
+                                <th class="text-center font-medium pb-2">Response</th>
+                                <th class="text-center font-medium pb-2">Resolution</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-slate-700">
+                            @foreach($policy->rules->sortBy(fn($r) => ['critical' => 1, 'high' => 2, 'medium' => 3, 'low' => 4][$r->priority] ?? 5) as $rule)
+                            <tr>
+                                <td class="py-1 font-medium capitalize">{{ $rule->priority }}</td>
+                                <td class="py-1 text-center">{{ $rule->response_time_human }}</td>
+                                <td class="py-1 text-center">{{ $rule->resolution_time_human }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Footer -->
+                <div class="flex items-center justify-between pt-3 border-t border-slate-100">
+                    <span class="text-xs text-slate-400">{{ $policy->work_orders_count }} work orders</span>
+                    <div class="flex items-center gap-1">
+                        @can('edit sla policy')
+                        @if(!$policy->is_default)
+                        <x-ui.button size="sm" variant="ghost" wire:click="toggleDefault({{ $policy->id }})" title="Set as default">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+                            </svg>
+                        </x-ui.button>
+                        @endif
+                        <x-ui.button size="sm" variant="ghost" wire:click="edit({{ $policy->id }})">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                            </svg>
+                        </x-ui.button>
+                        @endcan
+                        @can('delete sla policy')
+                        <x-ui.button 
+                            size="sm"
+                            variant="ghost-danger" 
+                            :disabled="$policy->work_orders_count > 0"
+                            @click="window.dispatchEvent(new CustomEvent('confirm-action', {
+                                detail: {
+                                    title: 'Delete SLA Policy',
+                                    message: 'Are you sure you want to delete this SLA policy? This cannot be undone.',
+                                    confirmText: 'Delete Policy',
+                                    cancelText: 'Cancel',
+                                    variant: 'danger',
+                                    action: () => $wire.delete({{ $policy->id }})
+                                }
+                            }))"
+                        >
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                            </svg>
+                        </x-ui.button>
+                        @endcan
+                    </div>
+                </div>
+            </x-ui.card>
+            @endforeach
+
+            <!-- Empty State -->
+            @if($policies->count() === 0)
+            <div class="col-span-1 md:col-span-2 lg:col-span-3">
+                <x-ui.empty-state 
+                    title="No SLA policies found" 
+                    description="Create your first SLA policy to define response and resolution time requirements."
+                >
+                    <x-slot:icon>
+                        <svg class="h-8 w-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </x-slot:icon>
+                </x-ui.empty-state>
+            </div>
+            @endif
+        </div>
+
+        <!-- Pagination -->
+        @if($policies->hasPages())
+        <div class="mt-6">
+            {{ $policies->links() }}
         </div>
         @endif
-    </div>
-
-    <!-- Pagination -->
-    @if($policies->hasPages())
-    <div class="mt-6">
-        {{ $policies->links() }}
     </div>
     @endif
 

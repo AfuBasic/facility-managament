@@ -31,4 +31,12 @@ class ClientMembership extends Model
     {
         return $this->belongsTo(User::class);
     }
+    public function owner(): User
+    {
+        return $this->orderBy('created_at')->first()?->user;
+    }
+    public function canModify(User $user)
+    {
+        return $this->owner()?->is($user);
+    }
 }
