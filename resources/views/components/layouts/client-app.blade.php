@@ -88,6 +88,9 @@
                 </div>
 
                 <div class="flex items-center gap-x-4 lg:gap-x-6">
+                    <!-- Message Icon -->
+                    <livewire:message-icon />
+
                     <!-- Notification Bell -->
                     <livewire:notification-bell />
 
