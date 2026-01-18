@@ -11,6 +11,7 @@ use App\Livewire\Client\ContactTypes;
 use App\Livewire\Client\Dashboard;
 use App\Livewire\Client\Facilities;
 use App\Livewire\Client\FacilityDetail;
+use App\Livewire\Client\MessagesIndex;
 use App\Livewire\Client\Notifications;
 use App\Livewire\Client\Roles;
 use App\Livewire\Client\Settings;
@@ -66,6 +67,10 @@ Route::middleware(['auth', IsVerified::class])->group(function () {
 
             // Notifications
             Route::get('/notifications', Notifications::class)->name('notifications.index');
+
+            // Messages
+            Route::get('/messages', MessagesIndex::class)->name('messages.index');
+            Route::get('/messages/{conversation}', MessagesIndex::class)->name('messages.show');
 
             Route::get('/sla-policy', SlaPolicy::class)->name('sla-policy');
             Route::get('/vendors', Vendors::class)->name('vendors');
