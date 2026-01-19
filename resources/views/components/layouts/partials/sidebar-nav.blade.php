@@ -36,6 +36,30 @@
         </li>
         @endcanany
 
+        <li>
+            <div class="text-xs font-semibold leading-6 text-slate-500 uppercase tracking-widest mb-4 px-2">Communication</div>
+            <ul role="list" class="-mx-2 space-y-2">
+                <li>
+                    <a href="{{ route('app.events.index') }}" wire:navigate class="group flex gap-x-3 rounded-xl p-2.5 text-sm leading-6 font-semibold transition-all duration-300 {{ request()->routeIs('app.events.*') ? 'bg-gradient-to-r from-teal-500/10 to-transparent text-teal-400 border-l-4 border-teal-500 shadow-[0_0_20px_rgba(45,212,191,0.1)]' : 'text-slate-400 hover:text-white hover:bg-slate-800/50 border-l-4 border-transparent' }}">
+                        <x-heroicon-o-calendar-days class="h-6 w-6 shrink-0 {{ request()->routeIs('app.events.*') ? 'text-teal-400' : 'text-slate-500 group-hover:text-teal-400 transition-colors' }}" />
+                        Events
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('app.messages.index') }}" wire:navigate class="group flex gap-x-3 rounded-xl p-2.5 text-sm leading-6 font-semibold transition-all duration-300 {{ request()->routeIs('app.messages.*') ? 'bg-gradient-to-r from-teal-500/10 to-transparent text-teal-400 border-l-4 border-teal-500 shadow-[0_0_20px_rgba(45,212,191,0.1)]' : 'text-slate-400 hover:text-white hover:bg-slate-800/50 border-l-4 border-transparent' }}">
+                        <x-heroicon-o-chat-bubble-left-right class="h-6 w-6 shrink-0 {{ request()->routeIs('app.messages.*') ? 'text-teal-400' : 'text-slate-500 group-hover:text-teal-400 transition-colors' }}" />
+                        Messages
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('app.notifications.index') }}" wire:navigate class="group flex gap-x-3 rounded-xl p-2.5 text-sm leading-6 font-semibold transition-all duration-300 {{ request()->routeIs('app.notifications.*') ? 'bg-gradient-to-r from-teal-500/10 to-transparent text-teal-400 border-l-4 border-teal-500 shadow-[0_0_20px_rgba(45,212,191,0.1)]' : 'text-slate-400 hover:text-white hover:bg-slate-800/50 border-l-4 border-transparent' }}">
+                        <x-heroicon-o-bell class="h-6 w-6 shrink-0 {{ request()->routeIs('app.notifications.*') ? 'text-teal-400' : 'text-slate-500 group-hover:text-teal-400 transition-colors' }}" />
+                        Notifications
+                    </a>
+                </li>
+            </ul>
+        </li>
+
         @canany(['view contacts', 'view sla policy', 'view users', 'view roles'])
         <li>
             <div class="text-xs font-semibold leading-6 text-slate-500 uppercase tracking-widest mb-4 px-2">Compliance & People</div>
