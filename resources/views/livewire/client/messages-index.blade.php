@@ -1,38 +1,39 @@
 <div class="flex h-[calc(100vh-12rem)] bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm"
      x-data="{ mobileShowChat: false }"
      x-on:url-changed.window="history.pushState({}, '', $event.detail.url)">
-    
+
     <!-- Conversations Sidebar -->
     <div class="w-full md:w-80 lg:w-96 border-r border-slate-200 flex flex-col bg-slate-50"
          :class="{ 'hidden md:flex': mobileShowChat }">
-        
+
         <!-- Sidebar Header -->
         <div class="p-4 border-b border-slate-200 bg-white">
             <div class="flex items-center justify-between mb-3">
                 <h1 class="text-lg font-bold text-slate-900">Messages</h1>
-                <button wire:click="openNewMessage" 
+                <button wire:click="openNewMessage"
                         class="p-2 rounded-full bg-teal-500 text-white hover:bg-teal-600 transition-all hover:scale-105 shadow-md">
                     <x-heroicon-s-plus class="h-5 w-5" />
                 </button>
             </div>
-            
+
             <!-- Search -->
             <div class="relative">
                 <x-heroicon-o-magnifying-glass class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                <input type="text" 
-                       wire:model.live.debounce.300ms="search" 
+                <input type="text"
+                       wire:model.live.debounce.300ms="search"
                        placeholder="Search conversations..."
                        class="w-full pl-9 pr-4 py-2 text-sm rounded-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-teal-400 focus:ring-2 focus:ring-teal-100 transition-all">
             </div>
         </div>
-        
+
         <!-- Conversations List -->
         <div class="flex-1 overflow-y-auto">
             @forelse($this->conversations as $conversation)
                 <button wire:click="selectConversation('{{ $conversation->hashid }}')"
+                        wire:key="conversation-{{ $conversation->id }}"
                         @click="mobileShowChat = true"
                         class="w-full flex items-center gap-3 p-4 hover:bg-white border-b border-slate-100 transition-all text-left {{ $activeConversationId === $conversation->id ? 'bg-white border-l-4 border-l-teal-500' : '' }}">
-                    
+
                     <!-- Avatar -->
                     <div class="relative shrink-0">
                         <div class="h-12 w-12 rounded-full bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center text-white font-bold text-lg shadow-sm">
@@ -44,7 +45,7 @@
                             </span>
                         @endif
                     </div>
-                    
+
                     <!-- Info -->
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center justify-between mb-0.5">
@@ -80,11 +81,11 @@
             @endforelse
         </div>
     </div>
-    
+
     <!-- Chat Panel -->
     <div class="flex-1 flex flex-col bg-white"
          :class="{ 'hidden md:flex': !mobileShowChat && !{{ $activeConversationId ? 'true' : 'false' }} }">
-        
+
         @if($this->activeConversation)
             <!-- Chat Header -->
             <div class="px-6 py-4 border-b border-slate-200 flex items-center gap-4 bg-white">
@@ -99,20 +100,19 @@
                     <p class="text-xs text-slate-500">{{ $this->otherUser->email }}</p>
                 </div>
             </div>
-            
+
             <!-- Messages -->
-            <div class="flex-1 overflow-y-auto p-6 space-y-4 bg-gradient-to-b from-slate-50 to-white" 
+            <div class="flex-1 overflow-y-auto p-6 space-y-4 bg-gradient-to-b from-slate-50 to-white"
                  id="messages-container"
-                 x-data="{ 
-                     scrollToBottom() { 
-                         this.$el.scrollTop = this.$el.scrollHeight; 
-                     } 
+                 x-data="{
+                     scrollToBottom() {
+                         this.$el.scrollTop = this.$el.scrollHeight;
+                     }
                  }"
                  x-init="$nextTick(() => scrollToBottom())"
-                 @scroll-to-bottom.window="$nextTick(() => scrollToBottom())"
-                 wire:poll.3s="refreshMessages"
+                 x-on:scroll-to-bottom.window="$nextTick(() => scrollToBottom())"
                  wire:key="messages-{{ $activeConversationId }}">
-                
+
                 @forelse($this->activeMessages as $date => $dateMessages)
                     <!-- Date Divider -->
                     <div class="flex items-center gap-3 my-6">
@@ -128,13 +128,13 @@
                         </span>
                         <div class="flex-1 h-px bg-slate-200"></div>
                     </div>
-                    
+
                     @foreach($dateMessages as $message)
                         @php $isMine = $message->sender_id === auth()->id(); @endphp
-                        <div class="flex {{ $isMine ? 'justify-end' : 'justify-start' }}">
+                        <div wire:key="message-{{ $message->id }}" class="flex {{ $isMine ? 'justify-end' : 'justify-start' }}">
                             <div class="max-w-[75%] group">
-                                <div class="{{ $isMine 
-                                    ? 'bg-gradient-to-br from-teal-500 to-emerald-500 text-white rounded-2xl rounded-br-md shadow-md' 
+                                <div class="{{ $isMine
+                                    ? 'bg-gradient-to-br from-teal-500 to-emerald-500 text-white rounded-2xl rounded-br-md shadow-md'
                                     : 'bg-white text-slate-900 rounded-2xl rounded-bl-md shadow-sm border border-slate-100' }} px-4 py-2.5">
                                     <p class="text-sm whitespace-pre-wrap leading-relaxed">{{ $message->body }}</p>
                                 </div>
@@ -163,16 +163,16 @@
                     </div>
                 @endforelse
             </div>
-            
+
             <!-- Message Input -->
             <div class="p-4 border-t border-slate-200 bg-white">
                 <form wire:submit="sendMessage" class="flex items-center gap-3">
-                    <input type="text" 
+                    <input type="text"
                            wire:model="newMessage"
                            placeholder="Type a message..."
                            autocomplete="off"
                            class="flex-1 px-5 py-3 rounded-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-teal-400 focus:ring-2 focus:ring-teal-100 transition-all text-sm">
-                    <button type="submit" 
+                    <button type="submit"
                             class="h-11 w-11 rounded-full bg-gradient-to-br from-teal-500 to-emerald-500 text-white flex items-center justify-center hover:shadow-lg hover:scale-105 transition-all disabled:opacity-50 disabled:hover:scale-100">
                         <x-heroicon-s-paper-airplane class="h-5 w-5" />
                     </button>
@@ -187,7 +187,7 @@
                     </div>
                     <h2 class="text-xl font-bold text-slate-900 mb-2">Select a conversation</h2>
                     <p class="text-slate-500 mb-6">Choose from your existing conversations or start a new one.</p>
-                    <button wire:click="openNewMessage" 
+                    <button wire:click="openNewMessage"
                             class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-medium hover:shadow-lg hover:scale-105 transition-all">
                         <x-heroicon-s-plus class="h-5 w-5" />
                         New Message
@@ -196,21 +196,22 @@
             </div>
         @endif
     </div>
-    
+
     <!-- New Message Modal -->
     <x-ui.modal show="showNewMessageModal" title="New Message" maxWidth="md">
         <div class="space-y-4">
             <div class="relative">
                 <x-heroicon-o-magnifying-glass class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                <input type="text" 
-                       wire:model.live.debounce.300ms="userSearch" 
+                <input type="text"
+                       wire:model.live.debounce.300ms="userSearch"
                        placeholder="Search by name..."
                        class="w-full pl-9 pr-4 py-2.5 rounded-lg border border-slate-200 focus:border-teal-400 focus:ring-2 focus:ring-teal-100 text-sm">
             </div>
-            
+
             <div class="max-h-72 overflow-y-auto divide-y divide-slate-100 rounded-lg border border-slate-200">
                 @forelse($this->availableUsers as $user)
                     <button wire:click="startConversation({{ $user->id }})"
+                            wire:key="user-{{ $user->id }}"
                             class="w-full flex items-center gap-3 p-3 hover:bg-teal-50 transition-colors text-left">
                         <div class="h-10 w-10 rounded-full bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center text-white font-bold shadow-sm">
                             {{ substr($user->name, 0, 1) }}
@@ -227,7 +228,7 @@
                 @endforelse
             </div>
         </div>
-        
+
         <x-slot:footer>
             <x-ui.button variant="secondary" @click="show = false">Cancel</x-ui.button>
         </x-slot:footer>
