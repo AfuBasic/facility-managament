@@ -10,25 +10,65 @@
         </button>
     </div>
 
-    <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
-        {{-- Search and Filters --}}
-        <div class="p-4 border-b border-slate-200">
-            <div class="flex flex-col md:flex-row gap-4">
-                <input
-                    wire:model.live.debounce.300ms="search"
-                    type="text"
-                    placeholder="Search events..."
-                    class="flex-1 rounded-lg border border-slate-300 px-4 py-2 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
-                />
-                <x-forms.searchable-select
-                    wire:model.live="filter"
-                    :options="['upcoming' => 'Upcoming', 'past' => 'Past', 'all' => 'All Events']"
-                    :selected="$filter"
-                    placeholder="Filter events..."
-                />
+    {{-- Empty contacts alert --}}
+    @if($this->availableContacts->isEmpty())
+        <div class="p-4 bg-amber-50 border-b border-amber-100 flex items-start gap-3">
+            <x-heroicon-o-exclamation-triangle class="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
+            <div class="flex-1">
+                <h3 class="text-sm font-medium text-amber-800">No contacts available</h3>
+                <p class="text-sm text-amber-700 mt-1">
+                    You need to add contacts to your directory before you can invite people to events.
+                    <a href="{{ route('app.contacts') }}" class="font-medium underline hover:text-amber-900">Add your first contact &rarr;</a>
+                </p>
             </div>
         </div>
+    @endif
 
+    <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+        {{-- Search and Filters --}}
+        {{-- View Toggles and Toolbar --}}
+        <div class="px-4 py-3 border-b border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            {{-- Tabs --}}
+            <div class="flex p-1 bg-slate-100 rounded-lg self-start md:self-auto">
+                <button
+                    wire:click="switchView('list')"
+                    class="px-4 py-1.5 text-sm font-medium rounded-md transition-all {{ $view === 'list' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700' }}"
+                >
+                    List
+                </button>
+                <button
+                    wire:click="switchView('calendar')"
+                    class="px-4 py-1.5 text-sm font-medium rounded-md transition-all {{ $view === 'calendar' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700' }}"
+                >
+                    Calendar
+                </button>
+            </div>
+
+            {{-- List View Filters (only show in list view) --}}
+            @if($view === 'list')
+                <div class="flex flex-col md:flex-row gap-3 flex-1 md:justify-end">
+                    <div class="relative flex-1 md:max-w-xs">
+                        <x-heroicon-o-magnifying-glass class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                        <input
+                            wire:model.live.debounce.300ms="search"
+                            type="text"
+                            placeholder="Search events..."
+                            class="w-full pl-9 pr-4 py-1.5 rounded-lg border border-slate-300 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                        />
+                    </div>
+                    <div class="w-full md:w-40">
+                        <x-forms.searchable-select
+                            wire:model.live="filter"
+                            :options="['upcoming' => 'Upcoming', 'past' => 'Past', 'all' => 'All Events']"
+                            :selected="$filter"
+                            placeholder="Filter..."
+                        />
+                    </div>
+                </div>
+            @endif
+        </div>
+
+        @if($view === 'list')
         {{-- Events List --}}
         <div class="divide-y divide-slate-200">
             @forelse($this->events as $event)
@@ -190,6 +230,74 @@
         @if($this->events->hasPages())
             <div class="px-6 py-4 border-t border-slate-200">
                 {{ $this->events->links() }}
+            </div>
+        @endif
+        @endif
+
+        @if($view === 'calendar')
+            <div class="p-6">
+                <!-- Calendar Header -->
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-lg font-semibold text-slate-900">
+                        {{ \Carbon\Carbon::createFromDate($currentYear, $currentMonth, 1)->format('F Y') }}
+                    </h2>
+                    <div class="flex items-center rounded-lg border border-slate-300 overflow-hidden">
+                        <button wire:click="prevMonth" class="p-2 hover:bg-slate-50 border-r border-slate-300">
+                            <x-heroicon-o-chevron-left class="h-5 w-5 text-slate-600" />
+                        </button>
+                        <button wire:click="nextMonth" class="p-2 hover:bg-slate-50">
+                            <x-heroicon-o-chevron-right class="h-5 w-5 text-slate-600" />
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Calendar Grid -->
+                <div class="border border-slate-200 rounded-lg overflow-hidden">
+                    <!-- Days Header -->
+                    <div class="grid grid-cols-7 bg-slate-50 border-b border-slate-200">
+                        @foreach(['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as $day)
+                            <div class="py-2 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                {{ $day }}
+                            </div>
+                        @endforeach
+                    </div>
+
+                    <!-- Days Grid -->
+                    <div class="grid grid-cols-7 bg-slate-200 gap-px">
+                        @php
+                            $startOfCalendar = \Carbon\Carbon::createFromDate($currentYear, $currentMonth, 1)->startOfMonth()->startOfWeek();
+                            $endOfCalendar = \Carbon\Carbon::createFromDate($currentYear, $currentMonth, 1)->endOfMonth()->endOfWeek();
+                        @endphp
+
+                        @for($date = $startOfCalendar->copy(); $date->lte($endOfCalendar); $date->addDay())
+                            @php
+                                $isCurrentMonth = $date->month === $currentMonth;
+                                $isToday = $date->isToday();
+                                $dayEvents = $this->calendarEvents->filter(function($event) use ($date) {
+                                    return $event->starts_at->isSameDay($date);
+                                });
+                            @endphp
+                            <div class="min-h-[120px] bg-white p-2 {{ !$isCurrentMonth ? 'bg-slate-50/50' : '' }}">
+                                <div class="flex justify-between items-start mb-1">
+                                    <span class="text-sm font-medium {{ $isToday ? 'bg-teal-600 text-white w-6 h-6 rounded-full flex items-center justify-center' : ($isCurrentMonth ? 'text-slate-900' : 'text-slate-400') }}">
+                                        {{ $date->day }}
+                                    </span>
+                                </div>
+                                <div class="space-y-1">
+                                    @foreach($dayEvents as $event)
+                                        <button
+                                            wire:click="viewEvent({{ $event->id }})"
+                                            class="w-full text-left px-2 py-1 rounded text-xs font-medium truncate mb-1
+                                                {{ $event->type === 'virtual' ? 'bg-indigo-50 text-indigo-700 border-l-2 border-indigo-500' : 'bg-teal-50 text-teal-700 border-l-2 border-teal-500' }}"
+                                        >
+                                            {{ $event->starts_at->format('H:i') }} {{ $event->title }}
+                                        </button>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endfor
+                    </div>
+                </div>
             </div>
         @endif
     </div>
@@ -357,6 +465,98 @@
                 </button>
             </div>
         </form>
+    </x-ui.modal>
+
+    {{-- View Event Modal --}}
+    <x-ui.modal show="showViewModal" title="Event Details" maxWidth="lg">
+        @if($viewingEvent)
+            <div class="space-y-4">
+                {{-- Header --}}
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {{ $viewingEvent->type === 'virtual' ? 'bg-indigo-100 text-indigo-800' : 'bg-teal-100 text-teal-800' }}">
+                            {{ ucfirst($viewingEvent->type) }}
+                        </span>
+                        <h3 class="text-lg font-bold text-slate-900">{{ $viewingEvent->title }}</h3>
+                    </div>
+                    <div class="text-sm text-slate-500 font-medium">
+                        {{ $viewingEvent->formatted_date }} • {{ $viewingEvent->formatted_time }}
+                    </div>
+                </div>
+
+                {{-- Location / Link --}}
+                @if($viewingEvent->type === 'virtual' && $viewingEvent->meeting_link)
+                    <div class="p-3 bg-indigo-50 rounded-lg flex items-start gap-3">
+                        <x-heroicon-o-video-camera class="h-5 w-5 text-indigo-600 mt-0.5" />
+                        <div class="overflow-hidden">
+                            <p class="text-xs font-semibold text-indigo-900 uppercase tracking-wide">Join Meeting</p>
+                            <a href="{{ $viewingEvent->meeting_link }}" target="_blank" class="text-sm text-indigo-700 underline truncate block">
+                                {{ $viewingEvent->meeting_link }}
+                            </a>
+                        </div>
+                    </div>
+                @elseif($viewingEvent->type === 'physical' && $viewingEvent->location)
+                    <div class="p-3 bg-slate-50 rounded-lg flex items-start gap-3">
+                        <x-heroicon-o-map-pin class="h-5 w-5 text-slate-500 mt-0.5" />
+                        <div>
+                            <p class="text-xs font-semibold text-slate-900 uppercase tracking-wide">Location</p>
+                            <p class="text-sm text-slate-700">{{ $viewingEvent->location }}</p>
+                        </div>
+                    </div>
+                @endif
+
+                {{-- Description --}}
+                @if($viewingEvent->description)
+                    <div>
+                        <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Description</h4>
+                        <p class="text-sm text-slate-700 whitespace-pre-wrap">{{ $viewingEvent->description }}</p>
+                    </div>
+                @endif
+
+                {{-- Attendees --}}
+                <div>
+                    <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                        Attendees ({{ $viewingEvent->attendees->count() }})
+                    </h4>
+                    <div class="flex flex-wrap gap-2">
+                        @foreach($viewingEvent->attendees as $attendee)
+                            <div class="flex items-center gap-1.5 bg-slate-100 rounded-full pl-1.5 pr-3 py-0.5">
+                                <div class="h-5 w-5 rounded-full bg-slate-300 flex items-center justify-center text-[10px] font-bold text-slate-600">
+                                    {{ substr($attendee->firstname, 0, 1) }}{{ substr($attendee->lastname, 0, 1) }}
+                                </div>
+                                <span class="text-xs font-medium text-slate-700">{{ $attendee->full_name }}</span>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                {{-- Actions --}}
+                <div class="flex items-center gap-3 pt-4 border-t border-slate-200 mt-6">
+                    <button
+                        wire:click="edit({{ $viewingEvent->id }})"
+                        class="flex-1 inline-flex justify-center items-center gap-2 rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-700 transition-colors"
+                    >
+                        <x-heroicon-o-pencil-square class="h-4 w-4" />
+                        Edit Event
+                    </button>
+                    <button
+                        @click="window.dispatchEvent(new CustomEvent('confirm-action', {
+                            detail: {
+                                title: 'Delete Event',
+                                message: 'Are you sure you want to delete this event?',
+                                confirmText: 'Delete',
+                                cancelText: 'Cancel',
+                                variant: 'danger',
+                                action: () => $wire.deleteEvent({{ $viewingEvent->id }})
+                            }
+                        }))"
+                        class="px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                    >
+                        Delete
+                    </button>
+                </div>
+            </div>
+        @endif
     </x-ui.modal>
 
     <x-ui.confirm-modal />

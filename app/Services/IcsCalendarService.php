@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Event;
 use App\Models\User;
+use App\Models\Contact;
 use Carbon\Carbon;
 
 class IcsCalendarService
@@ -11,7 +12,7 @@ class IcsCalendarService
     /**
      * Generate ICS file content for an event.
      */
-    public function generate(Event $event, ?User $attendee = null): string
+    public function generate(Event $event, ?Contact $attendee = null): string
     {
         $uid = uniqid('optima-', true).'@optimafm.com';
         $dtstamp = Carbon::now()->format('Ymd\THis\Z');

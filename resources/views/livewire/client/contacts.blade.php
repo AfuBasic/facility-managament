@@ -182,7 +182,7 @@
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label for="email" class="block text-sm font-medium text-slate-700 mb-2">
-                        Email
+                        Email <span class="text-red-500">*</span>
                     </label>
                     <input
                         wire:model="email"
@@ -228,54 +228,88 @@
                     <label for="gender" class="block text-sm font-medium text-slate-700 mb-2">
                         Gender <span class="text-red-500">*</span>
                     </label>
-                    <select
+                    <x-forms.searchable-select
                         wire:model="gender"
                         id="gender"
-                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
-                    >
-                        <option value="">Select...</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                        <option value="other">Other</option>
-                    </select>
-                    @error('gender') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                        :options="['male' => 'Male', 'female' => 'Female', 'other' => 'Other']"
+                        placeholder="Select..."
+                        :error="$errors->first('gender')"
+                    />
                 </div>
             </div>
 
             {{-- Categorization --}}
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label for="contact_type_id" class="block text-sm font-medium text-slate-700 mb-2">
-                        Contact Type <span class="text-red-500">*</span>
-                    </label>
-                    <select
-                        wire:model="contact_type_id"
-                        id="contact_type_id"
-                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
-                    >
-                        <option value="">Select...</option>
-                        @foreach($types as $type)
-                            <option value="{{ $type->id }}">{{ $type->name }}</option>
-                        @endforeach
-                    </select>
-                    @error('contact_type_id') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                    <div class="flex items-center justify-between mb-2">
+                        <label for="contact_type_id" class="block text-sm font-medium text-slate-700">
+                            Contact Type <span class="text-red-500">*</span>
+                        </label>
+                        <button type="button" wire:click="toggleCreateType" class="text-xs text-teal-600 hover:text-teal-700 font-medium">
+                            {{ $isCreatingType ? 'Select Existing' : '+ Create New' }}
+                        </button>
+                    </div>
+                    
+                    @if($isCreatingType)
+                        <div class="flex gap-2">
+                            <div class="flex-1">
+                                <input
+                                    wire:model="newTypeName"
+                                    type="text"
+                                    placeholder="Enter type name"
+                                    class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                                />
+                                @error('newTypeName') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                            </div>
+                            <button type="button" wire:click="saveType" class="px-3 py-2 bg-teal-600 text-white rounded-lg text-sm hover:bg-teal-700">
+                                Save
+                            </button>
+                        </div>
+                    @else
+                        <x-forms.searchable-select
+                            wire:model="contact_type_id"
+                            id="contact_type_id"
+                            :options="$types->pluck('name', 'id')->toArray()"
+                            placeholder="Select..."
+                            :error="$errors->first('contact_type_id')"
+                        />
+                    @endif
                 </div>
 
                 <div>
-                    <label for="contact_group_id" class="block text-sm font-medium text-slate-700 mb-2">
-                        Contact Group <span class="text-red-500">*</span>
-                    </label>
-                    <select
-                        wire:model="contact_group_id"
-                        id="contact_group_id"
-                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
-                    >
-                        <option value="">Select...</option>
-                        @foreach($groups as $group)
-                            <option value="{{ $group->id }}">{{ $group->name }}</option>
-                        @endforeach
-                    </select>
-                    @error('contact_group_id') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                    <div class="flex items-center justify-between mb-2">
+                        <label for="contact_group_id" class="block text-sm font-medium text-slate-700">
+                            Contact Group <span class="text-red-500">*</span>
+                        </label>
+                        <button type="button" wire:click="toggleCreateGroup" class="text-xs text-teal-600 hover:text-teal-700 font-medium">
+                            {{ $isCreatingGroup ? 'Select Existing' : '+ Create New' }}
+                        </button>
+                    </div>
+
+                    @if($isCreatingGroup)
+                        <div class="flex gap-2">
+                            <div class="flex-1">
+                                <input
+                                    wire:model="newGroupName"
+                                    type="text"
+                                    placeholder="Enter group name"
+                                    class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                                />
+                                @error('newGroupName') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                            </div>
+                            <button type="button" wire:click="saveGroup" class="px-3 py-2 bg-teal-600 text-white rounded-lg text-sm hover:bg-teal-700">
+                                Save
+                            </button>
+                        </div>
+                    @else
+                        <x-forms.searchable-select
+                            wire:model="contact_group_id"
+                            id="contact_group_id"
+                            :options="$groups->pluck('name', 'id')->toArray()"
+                            placeholder="Select..."
+                            :error="$errors->first('contact_group_id')"
+                        />
+                    @endif
                 </div>
             </div>
 

@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Str;
+use App\Models\Contact;
 
 class Event extends Model
 {
@@ -59,7 +60,7 @@ class Event extends Model
      */
     public function attendees(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'event_attendees')
+        return $this->belongsToMany(Contact::class, 'event_attendees')
             ->withPivot(['status', 'responded_at'])
             ->withTimestamps();
     }

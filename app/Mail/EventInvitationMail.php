@@ -4,6 +4,7 @@ namespace App\Mail;
 
 use App\Models\Event;
 use App\Models\User;
+use App\Models\Contact;
 use App\Services\IcsCalendarService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Attachment;
@@ -18,7 +19,7 @@ class EventInvitationMail extends Mailable
 
     public function __construct(
         public Event $event,
-        public User $attendee
+        public Contact $attendee
     ) {}
 
     public function envelope(): Envelope
@@ -46,7 +47,7 @@ class EventInvitationMail extends Mailable
 
         return [
             Attachment::fromData(fn () => $icsContent, $filename)
-                ->withMime('text/calendar'),
+                ->withMime('text/calendar; charset=UTF-8; method=REQUEST'),
         ];
     }
 }
