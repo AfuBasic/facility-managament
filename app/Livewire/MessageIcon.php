@@ -51,13 +51,20 @@ class MessageIcon extends Component
     public function handleNewMessage(array $event): void
     {
         // If user is viewing this conversation, don't update the badge
-        // (the message is already being marked as read in MessagesIndex)
         if ($this->focusedConversationId === $event['conversation_id']) {
             return;
         }
 
         // Increment the badge count
         $this->unreadCount++;
+
+        // Show toast notification for new message
+        $this->dispatch(
+            'toast',
+            message: "{$event['sender_name']}: ".\Illuminate\Support\Str::limit($event['body'], 50),
+            type: 'info',
+            position: 'bottom'
+        );
     }
 
     public function refreshUnreadCount(): void

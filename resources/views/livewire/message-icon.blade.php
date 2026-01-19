@@ -6,7 +6,7 @@
         <x-heroicon-o-envelope class="h-6 w-6" />
         
         @if($unreadCount > 0)
-        <span class="absolute -top-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-teal-500 text-[10px] font-bold text-white ring-2 ring-white animate-pulse">
+        <span class="absolute -top-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-white">
             {{ $unreadCount > 99 ? '99+' : $unreadCount }}
         </span>
         @endif

@@ -5,17 +5,39 @@ namespace App\Events;
 use App\Models\Message;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class MessageSent implements ShouldBroadcast
+class MessageSent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public function __construct(
-        public Message $message
-    ) {}
+    public int $conversationId;
+
+    public int $senderId;
+
+    public int $recipientId;
+
+    public string $senderName;
+
+    public string $body;
+
+    public string $messageId;
+
+    public string $createdAt;
+
+    public function __construct(Message $message, int $recipientId)
+    {
+        // Store primitive values to avoid serialization issues
+        $this->conversationId = $message->conversation_id;
+        $this->senderId = $message->sender_id;
+        $this->recipientId = $recipientId;
+        $this->senderName = $message->sender->name;
+        $this->body = $message->body;
+        $this->messageId = (string) $message->id;
+        $this->createdAt = $message->created_at->toIso8601String();
+    }
 
     /**
      * Get the channels the event should broadcast on.
@@ -24,10 +46,10 @@ class MessageSent implements ShouldBroadcast
     {
         return [
             // Broadcast to the conversation channel (for real-time chat)
-            new PrivateChannel('conversation.'.$this->message->conversation_id),
+            new PrivateChannel('conversation.'.$this->conversationId),
 
             // Also broadcast to recipient's personal channel (for badge updates)
-            new PrivateChannel('user.'.$this->message->conversation->getOtherUser($this->message->sender_id)->id),
+            new PrivateChannel('user.'.$this->recipientId),
         ];
     }
 
@@ -37,12 +59,12 @@ class MessageSent implements ShouldBroadcast
     public function broadcastWith(): array
     {
         return [
-            'id' => $this->message->id,
-            'conversation_id' => $this->message->conversation_id,
-            'sender_id' => $this->message->sender_id,
-            'sender_name' => $this->message->sender->name,
-            'body' => $this->message->body,
-            'created_at' => $this->message->created_at->toIso8601String(),
+            'id' => $this->messageId,
+            'conversation_id' => $this->conversationId,
+            'sender_id' => $this->senderId,
+            'sender_name' => $this->senderName,
+            'body' => $this->body,
+            'created_at' => $this->createdAt,
         ];
     }
 
