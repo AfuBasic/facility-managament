@@ -1,4 +1,4 @@
-<div class="flex items-center" wire:poll.5s="refreshUnreadCount">
+<div class="flex items-center">
     <a href="{{ route('app.messages.index') }}" 
        wire:navigate
        class="relative inline-flex items-center justify-center p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"

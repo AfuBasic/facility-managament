@@ -110,7 +110,6 @@
                  }"
                  x-init="$nextTick(() => scrollToBottom())"
                  @scroll-to-bottom.window="$nextTick(() => scrollToBottom())"
-                 wire:poll.3s="refreshMessages"
                  wire:key="messages-{{ $activeConversationId }}">
                 
                 @forelse($this->activeMessages as $date => $dateMessages)

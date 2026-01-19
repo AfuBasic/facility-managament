@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Client;
 
+use App\Events\MessageSent;
 use App\Models\ClientAccount;
 use App\Models\Conversation;
 use App\Models\Message;
@@ -10,6 +11,7 @@ use App\Services\HashidService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
@@ -39,8 +41,46 @@ class MessagesIndex extends Component
             if ($id) {
                 $this->activeConversationId = $id;
                 $this->markMessagesAsRead();
+
+                // Notify other components which conversation is focused (for badge optimization)
+                $this->dispatch('conversation-focused', conversationId: $id);
             }
         }
+    }
+
+    /**
+     * Get the Echo listeners for real-time updates.
+     */
+    public function getListeners(): array
+    {
+        $listeners = [];
+
+        if ($this->activeConversationId) {
+            $listeners["echo-private:conversation.{$this->activeConversationId},.message.sent"] = 'handleIncomingMessage';
+        }
+
+        return $listeners;
+    }
+
+    /**
+     * Handle incoming message from WebSocket.
+     */
+    #[On('echo-private:conversation.{activeConversationId},.message.sent')]
+    public function handleIncomingMessage(array $event): void
+    {
+        // If the message is from us, ignore (we already have it)
+        if ($event['sender_id'] === Auth::id()) {
+            return;
+        }
+
+        // Mark as read immediately since user is viewing this conversation
+        Message::where('id', $event['id'])->update(['read_at' => now()]);
+
+        // Refresh messages
+        unset($this->activeMessages, $this->conversations);
+
+        // Scroll to bottom
+        $this->dispatch('scroll-to-bottom');
     }
 
     #[Computed]
@@ -126,6 +166,9 @@ class MessagesIndex extends Component
             $this->markMessagesAsRead();
             unset($this->activeConversation, $this->activeMessages, $this->otherUser);
 
+            // Notify other components which conversation is focused (for badge optimization)
+            $this->dispatch('conversation-focused', conversationId: $id);
+
             // Update URL without full page reload
             $this->dispatch('urlChanged', url: route('app.messages.show', $hashid));
         }
@@ -169,7 +212,7 @@ class MessagesIndex extends Component
             'newMessage' => 'required|string|max:5000',
         ]);
 
-        Message::create([
+        $message = Message::create([
             'conversation_id' => $this->activeConversationId,
             'sender_id' => Auth::id(),
             'body' => $this->newMessage,
@@ -177,6 +220,9 @@ class MessagesIndex extends Component
 
         // Update conversation timestamp
         $this->activeConversation->touch();
+
+        // Broadcast the message via WebSocket
+        broadcast(new MessageSent($message->load(['sender', 'conversation.userOne', 'conversation.userTwo'])));
 
         $this->newMessage = '';
         unset($this->activeMessages, $this->conversations);
