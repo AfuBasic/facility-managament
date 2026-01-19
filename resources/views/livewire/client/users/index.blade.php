@@ -195,7 +195,7 @@
 @endif
 
 <!-- Invite User Modal -->
-<x-ui.modal show="showInviteModal" title="Invite New User">
+<x-ui.modal show="showInviteModal" maxWidth="lg" title="Invite New User">
     <div class="space-y-4">
         <div>
             <label class="block text-sm font-medium text-slate-700 mb-1">Email Address</label>

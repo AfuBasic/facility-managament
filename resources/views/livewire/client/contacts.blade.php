@@ -16,14 +16,14 @@
         {{-- Search and Filters --}}
         <div class="p-4 border-b border-slate-200 space-y-4">
             <div class="flex flex-col md:flex-row gap-4">
-                <input 
-                    wire:model.live.debounce.300ms="search" 
-                    type="text" 
-                    placeholder="Search by name, email, or phone..." 
+                <input
+                    wire:model.live.debounce.300ms="search"
+                    type="text"
+                    placeholder="Search by name, email, or phone..."
                     class="flex-1 rounded-lg border border-slate-300 px-4 py-2 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
                 />
-                <select 
-                    wire:model.live="filterType" 
+                <select
+                    wire:model.live="filterType"
                     class="rounded-lg border border-slate-300 px-4 py-2 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
                 >
                     <option value="">All Types</option>
@@ -31,8 +31,8 @@
                         <option value="{{ $type->id }}">{{ $type->name }}</option>
                     @endforeach
                 </select>
-                <select 
-                    wire:model.live="filterGroup" 
+                <select
+                    wire:model.live="filterGroup"
                     class="rounded-lg border border-slate-300 px-4 py-2 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
                 >
                     <option value="">All Groups</option>
@@ -105,7 +105,7 @@
                                         </button>
                                     @endcan
                                     @can('delete contacts')
-                                        <button 
+                                        <button
                                             @click="window.dispatchEvent(new CustomEvent('confirm-action', {
                                                 detail: {
                                                     title: 'Delete Contact',
@@ -144,218 +144,200 @@
     </div>
 
     {{-- Modal --}}
-    @if($showModal)
-        <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-            <div class="flex min-h-screen items-end justify-center px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-                <div class="fixed inset-0 bg-slate-950/75 backdrop-blur-sm transition-opacity" wire:click="closeModal"></div>
+    {{-- Modal --}}
+    <x-ui.modal show="showModal" title="{{ $isEditing ? 'Edit Contact' : 'Create New Contact' }}" maxWidth="3xl">
+        <form wire:submit="save" class="space-y-5">
+            {{-- Personal Information --}}
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label for="firstname" class="block text-sm font-medium text-slate-700 mb-2">
+                        First Name <span class="text-red-500">*</span>
+                    </label>
+                    <input
+                        wire:model="firstname"
+                        type="text"
+                        id="firstname"
+                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                        placeholder="John"
+                    />
+                    @error('firstname') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                </div>
 
-                <div class="relative inline-block align-bottom bg-white rounded-2xl border border-slate-200 px-6 pt-5 pb-6 text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full sm:p-8">
-                    <div class="space-y-6">
-                        <div class="flex items-center justify-between">
-                            <h3 class="text-xl font-semibold text-slate-900">
-                                {{ $isEditing ? 'Edit Contact' : 'Create New Contact' }}
-                            </h3>
-                            <button wire:click="closeModal" class="text-slate-400 hover:text-slate-600 transition-colors">
-                                <x-heroicon-o-x-mark class="h-6 w-6" />
-                            </button>
-                        </div>
-
-                        <form wire:submit="save" class="space-y-5">
-                            {{-- Personal Information --}}
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label for="firstname" class="block text-sm font-medium text-slate-700 mb-2">
-                                        First Name <span class="text-red-500">*</span>
-                                    </label>
-                                    <input 
-                                        wire:model="firstname" 
-                                        type="text" 
-                                        id="firstname"
-                                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
-                                        placeholder="John"
-                                    />
-                                    @error('firstname') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-                                </div>
-
-                                <div>
-                                    <label for="lastname" class="block text-sm font-medium text-slate-700 mb-2">
-                                        Last Name <span class="text-red-500">*</span>
-                                    </label>
-                                    <input 
-                                        wire:model="lastname" 
-                                        type="text" 
-                                        id="lastname"
-                                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
-                                        placeholder="Doe"
-                                    />
-                                    @error('lastname') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-                                </div>
-                            </div>
-
-                            {{-- Contact Information --}}
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label for="email" class="block text-sm font-medium text-slate-700 mb-2">
-                                        Email
-                                    </label>
-                                    <input 
-                                        wire:model="email" 
-                                        type="email" 
-                                        id="email"
-                                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
-                                        placeholder="john@example.com"
-                                    />
-                                    @error('email') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-                                </div>
-
-                                <div>
-                                    <label for="phone" class="block text-sm font-medium text-slate-700 mb-2">
-                                        Phone <span class="text-red-500">*</span>
-                                    </label>
-                                    <input 
-                                        wire:model="phone" 
-                                        type="text" 
-                                        id="phone"
-                                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
-                                        placeholder="+1234567890"
-                                    />
-                                    @error('phone') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-                                </div>
-                            </div>
-
-                            {{-- Additional Details --}}
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label for="birthday" class="block text-sm font-medium text-slate-700 mb-2">
-                                        Birthday
-                                    </label>
-                                    <input 
-                                        wire:model="birthday" 
-                                        type="date" 
-                                        id="birthday"
-                                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
-                                    />
-                                    @error('birthday') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-                                </div>
-
-                                <div>
-                                    <label for="gender" class="block text-sm font-medium text-slate-700 mb-2">
-                                        Gender <span class="text-red-500">*</span>
-                                    </label>
-                                    <select 
-                                        wire:model="gender" 
-                                        id="gender"
-                                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
-                                    >
-                                        <option value="">Select...</option>
-                                        <option value="male">Male</option>
-                                        <option value="female">Female</option>
-                                        <option value="other">Other</option>
-                                    </select>
-                                    @error('gender') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-                                </div>
-                            </div>
-
-                            {{-- Categorization --}}
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label for="contact_type_id" class="block text-sm font-medium text-slate-700 mb-2">
-                                        Contact Type <span class="text-red-500">*</span>
-                                    </label>
-                                    <select 
-                                        wire:model="contact_type_id" 
-                                        id="contact_type_id"
-                                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
-                                    >
-                                        <option value="">Select...</option>
-                                        @foreach($types as $type)
-                                            <option value="{{ $type->id }}">{{ $type->name }}</option>
-                                        @endforeach
-                                    </select>
-                                    @error('contact_type_id') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-                                </div>
-
-                                <div>
-                                    <label for="contact_group_id" class="block text-sm font-medium text-slate-700 mb-2">
-                                        Contact Group <span class="text-red-500">*</span>
-                                    </label>
-                                    <select 
-                                        wire:model="contact_group_id" 
-                                        id="contact_group_id"
-                                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
-                                    >
-                                        <option value="">Select...</option>
-                                        @foreach($groups as $group)
-                                            <option value="{{ $group->id }}">{{ $group->name }}</option>
-                                        @endforeach
-                                    </select>
-                                    @error('contact_group_id') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-                                </div>
-                            </div>
-
-                            {{-- Contact Person --}}
-                            <div>
-                                <label for="contact_person_id" class="block text-sm font-medium text-slate-700 mb-2">
-                                    Contact Person
-                                </label>
-                                <x-forms.searchable-select
-                                    wire:model="contact_person_id"
-                                    :options="$availableContacts->pluck('full_name', 'id')->toArray()"
-                                    :selected="$contact_person_id"
-                                    placeholder="Select a contact person..."
-                                    :error="$errors->first('contact_person_id')"
-                                />
-                            </div>
-
-                            {{-- Address --}}
-                            <div>
-                                <label for="address" class="block text-sm font-medium text-slate-700 mb-2">
-                                    Address
-                                </label>
-                                <textarea 
-                                    wire:model="address" 
-                                    id="address"
-                                    rows="2"
-                                    class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 resize-none"
-                                    placeholder="Enter address..."
-                                ></textarea>
-                                @error('address') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-                            </div>
-
-                            {{-- Notes --}}
-                            <div>
-                                <label for="notes" class="block text-sm font-medium text-slate-700 mb-2">
-                                    Notes
-                                </label>
-                                <textarea 
-                                    wire:model="notes" 
-                                    id="notes"
-                                    rows="3"
-                                    class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 resize-none"
-                                    placeholder="Additional notes..."
-                                ></textarea>
-                                @error('notes') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-                            </div>
-
-                            <div class="flex items-center gap-3 pt-4">
-                                <button 
-                                    type="submit"
-                                    class="flex-1 inline-flex justify-center items-center gap-2 rounded-xl bg-gradient-to-r from-teal-600 to-teal-500 px-4 py-2.5 text-sm font-semibold text-white hover:from-teal-700 hover:to-teal-600 transition-all"
-                                >
-                                    {{ $isEditing ? 'Update Contact' : 'Create Contact' }}
-                                </button>
-                                <button 
-                                    type="button"
-                                    wire:click="closeModal"
-                                    class="px-4 py-2.5 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
-                                >
-                                    Cancel
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                <div>
+                    <label for="lastname" class="block text-sm font-medium text-slate-700 mb-2">
+                        Last Name <span class="text-red-500">*</span>
+                    </label>
+                    <input
+                        wire:model="lastname"
+                        type="text"
+                        id="lastname"
+                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                        placeholder="Doe"
+                    />
+                    @error('lastname') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
                 </div>
             </div>
-        </div>
-    @endif
+
+            {{-- Contact Information --}}
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label for="email" class="block text-sm font-medium text-slate-700 mb-2">
+                        Email
+                    </label>
+                    <input
+                        wire:model="email"
+                        type="email"
+                        id="email"
+                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                        placeholder="john@example.com"
+                    />
+                    @error('email') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
+                    <label for="phone" class="block text-sm font-medium text-slate-700 mb-2">
+                        Phone <span class="text-red-500">*</span>
+                    </label>
+                    <input
+                        wire:model="phone"
+                        type="text"
+                        id="phone"
+                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                        placeholder="+1234567890"
+                    />
+                    @error('phone') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                </div>
+            </div>
+
+            {{-- Additional Details --}}
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label for="birthday" class="block text-sm font-medium text-slate-700 mb-2">
+                        Birthday
+                    </label>
+                    <input
+                        wire:model="birthday"
+                        type="date"
+                        id="birthday"
+                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                    />
+                    @error('birthday') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
+                    <label for="gender" class="block text-sm font-medium text-slate-700 mb-2">
+                        Gender <span class="text-red-500">*</span>
+                    </label>
+                    <select
+                        wire:model="gender"
+                        id="gender"
+                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                    >
+                        <option value="">Select...</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                    </select>
+                    @error('gender') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                </div>
+            </div>
+
+            {{-- Categorization --}}
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label for="contact_type_id" class="block text-sm font-medium text-slate-700 mb-2">
+                        Contact Type <span class="text-red-500">*</span>
+                    </label>
+                    <select
+                        wire:model="contact_type_id"
+                        id="contact_type_id"
+                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                    >
+                        <option value="">Select...</option>
+                        @foreach($types as $type)
+                            <option value="{{ $type->id }}">{{ $type->name }}</option>
+                        @endforeach
+                    </select>
+                    @error('contact_type_id') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
+                    <label for="contact_group_id" class="block text-sm font-medium text-slate-700 mb-2">
+                        Contact Group <span class="text-red-500">*</span>
+                    </label>
+                    <select
+                        wire:model="contact_group_id"
+                        id="contact_group_id"
+                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                    >
+                        <option value="">Select...</option>
+                        @foreach($groups as $group)
+                            <option value="{{ $group->id }}">{{ $group->name }}</option>
+                        @endforeach
+                    </select>
+                    @error('contact_group_id') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                </div>
+            </div>
+
+            {{-- Contact Person --}}
+            <div>
+                <label for="contact_person_id" class="block text-sm font-medium text-slate-700 mb-2">
+                    Contact Person
+                </label>
+                <x-forms.searchable-select
+                    wire:model="contact_person_id"
+                    :options="$availableContacts->pluck('full_name', 'id')->toArray()"
+                    :selected="$contact_person_id"
+                    placeholder="Select a contact person..."
+                    :error="$errors->first('contact_person_id')"
+                />
+            </div>
+
+            {{-- Address --}}
+            <div>
+                <label for="address" class="block text-sm font-medium text-slate-700 mb-2">
+                    Address
+                </label>
+                <textarea
+                    wire:model="address"
+                    id="address"
+                    rows="2"
+                    class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 resize-none"
+                    placeholder="Enter address..."
+                ></textarea>
+                @error('address') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+            </div>
+
+            {{-- Notes --}}
+            <div>
+                <label for="notes" class="block text-sm font-medium text-slate-700 mb-2">
+                    Notes
+                </label>
+                <textarea
+                    wire:model="notes"
+                    id="notes"
+                    rows="3"
+                    class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 resize-none"
+                    placeholder="Additional notes..."
+                ></textarea>
+                @error('notes') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+            </div>
+
+            <div class="flex items-center gap-3 pt-4">
+                <button
+                    type="submit"
+                    class="flex-1 inline-flex justify-center items-center gap-2 rounded-xl bg-gradient-to-r from-teal-600 to-teal-500 px-4 py-2.5 text-sm font-semibold text-white hover:from-teal-700 hover:to-teal-600 transition-all"
+                >
+                    {{ $isEditing ? 'Update Contact' : 'Create Contact' }}
+                </button>
+                <button
+                    type="button"
+                    @click="show = false"
+                    class="px-4 py-2.5 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
+                >
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </x-ui.modal>
 </div>

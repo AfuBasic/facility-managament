@@ -64,44 +64,19 @@
     @endif
 
     <!-- Settings Modal (Outside loop, single instance) -->
-    <div x-show="showSettingsModal" 
-         x-cloak 
-         x-transition:enter="ease-out duration-300"
-         x-transition:enter-start="opacity-0"
-         x-transition:enter-end="opacity-100"
-         x-transition:leave="ease-in duration-200"
-         x-transition:leave-start="opacity-100"
-         x-transition:leave-end="opacity-0"
-         class="fixed inset-0 z-50 flex items-center justify-center p-4" 
-         aria-labelledby="modal-title" 
-         role="dialog" 
-         aria-modal="true">
-        
-        <!-- Backdrop with blur -->
-        <div class="fixed inset-0 bg-slate-900/30 backdrop-blur-sm" @click="showSettingsModal = false"></div>
-        
-        <!-- Modal Content -->
-        <div x-show="showSettingsModal"
-             x-transition:enter="ease-out duration-300"
-             x-transition:enter-start="opacity-0 scale-95"
-             x-transition:enter-end="opacity-100 scale-100"
-             x-transition:leave="ease-in duration-200"
-             x-transition:leave-start="opacity-100 scale-100"
-             x-transition:leave-end="opacity-0 scale-95"
-             class="relative bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden">
-            
-            <template x-if="selectedClientId">
-                <div wire:ignore>
-                    @foreach($memberships as $membership)
-                        <div x-show="selectedClientId === {{ $membership->clientAccount->id }}">
-                            <livewire:client.settings 
-                                :client-account-id="$membership->clientAccount->id" 
-                                :key="'settings-'.$membership->clientAccount->id"
-                                @saved="showSettingsModal = false" />
-                        </div>
-                    @endforeach
-                </div>
-            </template>
-        </div>
-    </div>
+    <!-- Settings Modal -->
+    <x-ui.modal x-model="showSettingsModal" title="Company Settings" maxWidth="lg">
+        <template x-if="selectedClientId">
+            <div wire:ignore>
+                @foreach($memberships as $membership)
+                    <div x-show="selectedClientId === {{ $membership->clientAccount->id }}">
+                        <livewire:client.settings 
+                            :client-account-id="$membership->clientAccount->id" 
+                            :key="'settings-'.$membership->clientAccount->id"
+                            @saved="showSettingsModal = false" />
+                    </div>
+                @endforeach
+            </div>
+        </template>
+    </x-ui.modal>
 </div>

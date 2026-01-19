@@ -233,97 +233,75 @@
 </div>
 
 {{-- Add/Edit Manager Modal --}}
-@if($showManagerModal)
-    <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="flex min-h-screen items-end justify-center px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 bg-slate-950/75 backdrop-blur-sm transition-opacity" wire:click="closeManagerModal"></div>
-
-            <div class="relative inline-block align-bottom bg-white rounded-2xl border border-slate-200 px-6 pt-5 pb-6 text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-8">
-                <div class="space-y-6">
-                    {{-- Header --}}
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-xl font-semibold text-slate-900">
-                            {{ $isEditingManager ? 'Edit Manager Designation' : 'Assign Manager' }}
-                        </h3>
-                        <button wire:click="closeManagerModal" class="text-slate-400 hover:text-slate-600 transition-colors">
-                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
+{{-- Add/Edit Manager Modal --}}
+<x-ui.modal show="showManagerModal" title="{{ $isEditingManager ? 'Edit Manager Designation' : 'Assign Manager' }}" maxWidth="lg">
+    <form wire:submit="saveManager" class="space-y-5">
+        {{-- User Selection --}}
+        @if(!$isEditingManager)
+            <div>
+                <label for="selectedUserId" class="block text-sm font-medium text-slate-700 mb-2">
+                    Select User <span class="text-red-500">*</span>
+                </label>
+                <div class="relative">
+                    <select 
+                        wire:model="selectedUserId" 
+                        id="selectedUserId"
+                        class="w-full appearance-none border rounded-lg border-slate-300 bg-white px-4 py-2.5 pr-10 text-sm text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all cursor-pointer hover:border-slate-400"
+                    >
+                        <option value="" class="text-slate-400">Select a user...</option>
+                        @foreach($this->availableUsers as $membership)
+                            <option value="{{ $membership->user->id }}" class="text-slate-900">
+                                {{ $membership->user->name ?? 'New User' }} • {{ $membership->user->email }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
+                        </svg>
                     </div>
-
-                    {{-- Form --}}
-                    <form wire:submit="saveManager" class="space-y-5">
-                        {{-- User Selection --}}
-                        @if(!$isEditingManager)
-                            <div>
-                                <label for="selectedUserId" class="block text-sm font-medium text-slate-700 mb-2">
-                                    Select User <span class="text-red-500">*</span>
-                                </label>
-                                <div class="relative">
-                                    <select 
-                                        wire:model="selectedUserId" 
-                                        id="selectedUserId"
-                                        class="w-full appearance-none border rounded-lg border-slate-300 bg-white px-4 py-2.5 pr-10 text-sm text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all cursor-pointer hover:border-slate-400"
-                                    >
-                                        <option value="" class="text-slate-400">Select a user...</option>
-                                        @foreach($this->availableUsers as $membership)
-                                            <option value="{{ $membership->user->id }}" class="text-slate-900">
-                                                {{ $membership->user->name ?? 'New User' }} • {{ $membership->user->email }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
-                                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
-                                        </svg>
-                                    </div>
-                                </div>
-                                @error('selectedUserId') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-                                
-                                <p class="mt-2 text-sm text-slate-500">
-                                    Can't find a user? 
-                                    <a href="{{ route('app.users', ['invite' => 'true']) }}" class="font-medium text-teal-600 hover:text-teal-700 transition-colors">
-                                        Invite user
-                                    </a>
-                                </p>
-                            </div>
-                        @endif
-
-                        {{-- Designation --}}
-                        <div>
-                            <label for="managerDesignation" class="block text-sm font-medium text-slate-700 mb-2">
-                                Designation <span class="text-red-500">*</span>
-                            </label>
-                            <input 
-                                wire:model="managerDesignation" 
-                                type="text" 
-                                id="managerDesignation"
-                                class="w-full border rounded-lg border-slate-300 px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-teal-500 focus:ring-teal-500 transition-all"
-                                placeholder="e.g., Facility Manager, Supervisor"
-                            />
-                            @error('managerDesignation') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-                        </div>
-
-                        {{-- Actions --}}
-                        <div class="flex items-center gap-3 pt-4">
-                            <button 
-                                type="submit"
-                                class="flex-1 inline-flex justify-center items-center gap-2 rounded-lg bg-gradient-to-r from-teal-600 to-teal-500 px-4 py-2.5 text-sm font-semibold text-white hover:from-teal-700 hover:to-teal-600 transition-all"
-                            >
-                                {{ $isEditingManager ? 'Update Designation' : 'Assign Manager' }}
-                            </button>
-                            <button 
-                                type="button"
-                                wire:click="closeManagerModal"
-                                class="px-4 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
-                            >
-                                Cancel
-                            </button>
-                        </div>
-                    </form>
                 </div>
+                @error('selectedUserId') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                
+                <p class="mt-2 text-sm text-slate-500">
+                    Can't find a user? 
+                    <a href="{{ route('app.users', ['invite' => 'true']) }}" class="font-medium text-teal-600 hover:text-teal-700 transition-colors">
+                        Invite user
+                    </a>
+                </p>
             </div>
+        @endif
+
+        {{-- Designation --}}
+        <div>
+            <label for="managerDesignation" class="block text-sm font-medium text-slate-700 mb-2">
+                Designation <span class="text-red-500">*</span>
+            </label>
+            <input 
+                wire:model="managerDesignation" 
+                type="text" 
+                id="managerDesignation"
+                class="w-full border rounded-lg border-slate-300 px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-teal-500 focus:ring-teal-500 transition-all"
+                placeholder="e.g., Facility Manager, Supervisor"
+            />
+            @error('managerDesignation') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
         </div>
-    </div>
-@endif
+
+        {{-- Actions --}}
+        <div class="flex items-center gap-3 pt-4">
+            <button 
+                type="submit"
+                class="flex-1 inline-flex justify-center items-center gap-2 rounded-lg bg-gradient-to-r from-teal-600 to-teal-500 px-4 py-2.5 text-sm font-semibold text-white hover:from-teal-700 hover:to-teal-600 transition-all"
+            >
+                {{ $isEditingManager ? 'Update Designation' : 'Assign Manager' }}
+            </button>
+            <button 
+                type="button"
+                @click="show = false"
+                class="px-4 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+            >
+                Cancel
+            </button>
+        </div>
+    </form>
+</x-ui.modal>

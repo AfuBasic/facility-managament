@@ -195,216 +195,169 @@
     </div>
 
     {{-- Create/Edit Modal --}}
-    <template x-teleport="body">
-        <div
-            x-data="{ show: $wire.entangle('showModal') }"
-            x-show="show"
-            x-cloak
-            class="fixed inset-0 z-50 overflow-y-auto"
-            aria-labelledby="modal-title"
-            role="dialog"
-            aria-modal="true"
-        >
-            <div class="flex min-h-screen items-end justify-center px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-                {{-- Backdrop --}}
-                <div
-                    x-show="show"
-                    x-transition:enter="ease-out duration-300"
-                    x-transition:enter-start="opacity-0"
-                    x-transition:enter-end="opacity-100"
-                    x-transition:leave="ease-in duration-200"
-                    x-transition:leave-start="opacity-100"
-                    x-transition:leave-end="opacity-0"
-                    class="fixed inset-0 bg-slate-950/75 backdrop-blur-sm"
-                    @click="show = false"
-                ></div>
+    {{-- Create/Edit Modal --}}
+    <x-ui.modal show="showModal" maxWidth="2xl" title="{{ $isEditing ? 'Edit Event' : 'Create New Event' }}">
+        <form wire:submit="save" class="space-y-5" x-data="{ eventType: $wire.entangle('type') }">
+            {{-- Title --}}
+            <div>
+                <label for="title" class="block text-sm font-medium text-slate-700 mb-2">
+                    Event Title <span class="text-red-500">*</span>
+                </label>
+                <input
+                    wire:model="title"
+                    type="text"
+                    id="title"
+                    class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                    placeholder="e.g., Site Inspection Meeting"
+                />
+                @error('title') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+            </div>
 
-                {{-- Modal Panel --}}
-                <div
-                    x-show="show"
-                    x-transition:enter="ease-out duration-300"
-                    x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                    x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-                    x-transition:leave="ease-in duration-200"
-                    x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-                    x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                    class="relative inline-block align-bottom bg-white rounded-2xl border border-slate-200 px-6 pt-5 pb-6 text-left overflow-hidden shadow-2xl transform sm:my-8 sm:align-middle sm:max-w-xl sm:w-full sm:p-8"
-                >
-                    <div class="space-y-6">
-                        <div class="flex items-center justify-between">
-                            <h3 class="text-xl font-semibold text-slate-900">
-                                {{ $isEditing ? 'Edit Event' : 'Create New Event' }}
-                            </h3>
-                            <button @click="show = false" class="text-slate-400 hover:text-slate-600 transition-colors">
-                                <x-heroicon-o-x-mark class="h-6 w-6" />
-                            </button>
+            {{-- Attendees (Multiple Select) --}}
+            <x-forms.multi-select
+                wire:model="attendeeIds"
+                :options="$this->availableContacts->pluck('name', 'id')->toArray()"
+                :selected="$attendeeIds"
+                label="Invite Attendees"
+                placeholder="Select attendees..."
+                :required="true"
+                :error="$errors->first('attendeeIds')"
+            />
+
+            {{-- Event Type --}}
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">
+                    Event Type <span class="text-red-500">*</span>
+                </label>
+                <div class="grid grid-cols-2 gap-3">
+                    <label class="relative flex items-center justify-center p-4 rounded-lg border-2 cursor-pointer transition-all {{ $type === 'virtual' ? 'border-teal-500 bg-teal-50' : 'border-slate-200 hover:border-slate-300' }}">
+                        <input type="radio" wire:model.live="type" value="virtual" class="sr-only">
+                        <div class="text-center">
+                            <x-heroicon-o-video-camera class="h-6 w-6 mx-auto mb-1 {{ $type === 'virtual' ? 'text-teal-600' : 'text-slate-400' }}" />
+                            <span class="text-sm font-medium {{ $type === 'virtual' ? 'text-teal-700' : 'text-slate-700' }}">Virtual</span>
+                            <p class="text-xs text-slate-500 mt-0.5">Jitsi Meeting Link</p>
                         </div>
-
-                        <form wire:submit="save" class="space-y-5" x-data="{ eventType: $wire.entangle('type') }">
-                            {{-- Title --}}
-                            <div>
-                                <label for="title" class="block text-sm font-medium text-slate-700 mb-2">
-                                    Event Title <span class="text-red-500">*</span>
-                                </label>
-                                <input
-                                    wire:model="title"
-                                    type="text"
-                                    id="title"
-                                    class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
-                                    placeholder="e.g., Site Inspection Meeting"
-                                />
-                                @error('title') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-                            </div>
-
-                            {{-- Attendees (Multiple Select) --}}
-                            <x-forms.multi-select
-                                wire:model="attendeeIds"
-                                :options="$this->availableContacts->pluck('name', 'id')->toArray()"
-                                :selected="$attendeeIds"
-                                label="Invite Attendees"
-                                placeholder="Select attendees..."
-                                :required="true"
-                                :error="$errors->first('attendeeIds')"
-                            />
-
-                            {{-- Event Type --}}
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-2">
-                                    Event Type <span class="text-red-500">*</span>
-                                </label>
-                                <div class="grid grid-cols-2 gap-3">
-                                    <label class="relative flex items-center justify-center p-4 rounded-lg border-2 cursor-pointer transition-all {{ $type === 'virtual' ? 'border-teal-500 bg-teal-50' : 'border-slate-200 hover:border-slate-300' }}">
-                                        <input type="radio" wire:model.live="type" value="virtual" class="sr-only">
-                                        <div class="text-center">
-                                            <x-heroicon-o-video-camera class="h-6 w-6 mx-auto mb-1 {{ $type === 'virtual' ? 'text-teal-600' : 'text-slate-400' }}" />
-                                            <span class="text-sm font-medium {{ $type === 'virtual' ? 'text-teal-700' : 'text-slate-700' }}">Virtual</span>
-                                            <p class="text-xs text-slate-500 mt-0.5">Jitsi Meeting Link</p>
-                                        </div>
-                                    </label>
-                                    <label class="relative flex items-center justify-center p-4 rounded-lg border-2 cursor-pointer transition-all {{ $type === 'physical' ? 'border-teal-500 bg-teal-50' : 'border-slate-200 hover:border-slate-300' }}">
-                                        <input type="radio" wire:model.live="type" value="physical" class="sr-only">
-                                        <div class="text-center">
-                                            <x-heroicon-o-map-pin class="h-6 w-6 mx-auto mb-1 {{ $type === 'physical' ? 'text-teal-600' : 'text-slate-400' }}" />
-                                            <span class="text-sm font-medium {{ $type === 'physical' ? 'text-teal-700' : 'text-slate-700' }}">Physical</span>
-                                            <p class="text-xs text-slate-500 mt-0.5">In-person Location</p>
-                                        </div>
-                                    </label>
-                                </div>
-                            </div>
-
-                            {{-- Location (only for physical) --}}
-                            <div
-                                x-show="eventType === 'physical'"
-                                x-collapse
-                                x-cloak
-                            >
-                                <div>
-                                    <label for="location" class="block text-sm font-medium text-slate-700 mb-2">
-                                        Location <span class="text-red-500">*</span>
-                                    </label>
-                                    <input
-                                        wire:model="location"
-                                        type="text"
-                                        id="location"
-                                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
-                                        placeholder="e.g., 123 Main Street, Lagos"
-                                    />
-                                    @error('location') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-                                </div>
-                            </div>
-
-                            {{-- Date and Time --}}
-                            <div class="grid grid-cols-3 gap-4">
-                                <div>
-                                    <label for="eventDate" class="block text-sm font-medium text-slate-700 mb-2">
-                                        Date <span class="text-red-500">*</span>
-                                    </label>
-                                    <input
-                                        wire:model="eventDate"
-                                        type="date"
-                                        id="eventDate"
-                                        min="{{ now()->format('Y-m-d') }}"
-                                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
-                                    />
-                                    @error('eventDate') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-                                </div>
-                                <div>
-                                    <label for="eventTime" class="block text-sm font-medium text-slate-700 mb-2">
-                                        Start Time <span class="text-red-500">*</span>
-                                    </label>
-                                    <input
-                                        wire:model="eventTime"
-                                        type="time"
-                                        id="eventTime"
-                                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
-                                    />
-                                    @error('eventTime') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-                                </div>
-                                <div>
-                                    <label for="endTime" class="block text-sm font-medium text-slate-700 mb-2">
-                                        End Time
-                                    </label>
-                                    <input
-                                        wire:model="endTime"
-                                        type="time"
-                                        id="endTime"
-                                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
-                                    />
-                                    @error('endTime') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-                                </div>
-                            </div>
-
-                            {{-- Description --}}
-                            <div>
-                                <label for="description" class="block text-sm font-medium text-slate-700 mb-2">
-                                    Description
-                                </label>
-                                <textarea
-                                    wire:model="description"
-                                    id="description"
-                                    rows="3"
-                                    class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 resize-none"
-                                    placeholder="Add event details..."
-                                ></textarea>
-                                @error('description') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-                            </div>
-
-                            {{-- Info Note --}}
-                            <div
-                                x-show="eventType === 'virtual' && !{{ $isEditing ? 'true' : 'false' }}"
-                                x-collapse
-                                x-cloak
-                            >
-                                <div class="flex items-start gap-3 p-3 rounded-lg bg-teal-50 border border-teal-100">
-                                    <x-heroicon-o-information-circle class="h-5 w-5 text-teal-600 flex-shrink-0 mt-0.5" />
-                                    <p class="text-sm text-teal-700">
-                                        A Jitsi meeting link will be automatically generated and included in the invitation email.
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="flex items-center gap-3 pt-4">
-                                <button
-                                    type="submit"
-                                    class="flex-1 inline-flex justify-center items-center gap-2 rounded-xl bg-gradient-to-r from-teal-600 to-teal-500 px-4 py-2.5 text-sm font-semibold text-white hover:from-teal-700 hover:to-teal-600 transition-all"
-                                >
-                                    <x-heroicon-o-calendar class="h-4 w-4" />
-                                    {{ $isEditing ? 'Update Event' : 'Create & Send Invitations' }}
-                                </button>
-                                <button
-                                    type="button"
-                                    @click="show = false"
-                                    class="px-4 py-2.5 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
-                                >
-                                    Cancel
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                    </label>
+                    <label class="relative flex items-center justify-center p-4 rounded-lg border-2 cursor-pointer transition-all {{ $type === 'physical' ? 'border-teal-500 bg-teal-50' : 'border-slate-200 hover:border-slate-300' }}">
+                        <input type="radio" wire:model.live="type" value="physical" class="sr-only">
+                        <div class="text-center">
+                            <x-heroicon-o-map-pin class="h-6 w-6 mx-auto mb-1 {{ $type === 'physical' ? 'text-teal-600' : 'text-slate-400' }}" />
+                            <span class="text-sm font-medium {{ $type === 'physical' ? 'text-teal-700' : 'text-slate-700' }}">Physical</span>
+                            <p class="text-xs text-slate-500 mt-0.5">In-person Location</p>
+                        </div>
+                    </label>
                 </div>
             </div>
-        </div>
-    </template>
+
+            {{-- Location (only for physical) --}}
+            <div
+                x-show="eventType === 'physical'"
+                x-collapse
+                x-cloak
+            >
+                <div>
+                    <label for="location" class="block text-sm font-medium text-slate-700 mb-2">
+                        Location <span class="text-red-500">*</span>
+                    </label>
+                    <input
+                        wire:model="location"
+                        type="text"
+                        id="location"
+                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                        placeholder="e.g., 123 Main Street, Lagos"
+                    />
+                    @error('location') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                </div>
+            </div>
+
+            {{-- Date and Time --}}
+            <div class="grid grid-cols-3 gap-4">
+                <div>
+                    <label for="eventDate" class="block text-sm font-medium text-slate-700 mb-2">
+                        Date <span class="text-red-500">*</span>
+                    </label>
+                    <input
+                        wire:model="eventDate"
+                        type="date"
+                        id="eventDate"
+                        min="{{ now()->format('Y-m-d') }}"
+                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                    />
+                    @error('eventDate') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label for="eventTime" class="block text-sm font-medium text-slate-700 mb-2">
+                        Start Time <span class="text-red-500">*</span>
+                    </label>
+                    <input
+                        wire:model="eventTime"
+                        type="time"
+                        id="eventTime"
+                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                    />
+                    @error('eventTime') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label for="endTime" class="block text-sm font-medium text-slate-700 mb-2">
+                        End Time
+                    </label>
+                    <input
+                        wire:model="endTime"
+                        type="time"
+                        id="endTime"
+                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                    />
+                    @error('endTime') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                </div>
+            </div>
+
+            {{-- Description --}}
+            <div>
+                <label for="description" class="block text-sm font-medium text-slate-700 mb-2">
+                    Description
+                </label>
+                <textarea
+                    wire:model="description"
+                    id="description"
+                    rows="3"
+                    class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 resize-none"
+                    placeholder="Add event details..."
+                ></textarea>
+                @error('description') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+            </div>
+
+            {{-- Info Note --}}
+            <div
+                x-show="eventType === 'virtual' && !{{ $isEditing ? 'true' : 'false' }}"
+                x-collapse
+                x-cloak
+            >
+                <div class="flex items-start gap-3 p-3 rounded-lg bg-teal-50 border border-teal-100">
+                    <x-heroicon-o-information-circle class="h-5 w-5 text-teal-600 flex-shrink-0 mt-0.5" />
+                    <p class="text-sm text-teal-700">
+                        A Jitsi meeting link will be automatically generated and included in the invitation email.
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 pt-4">
+                <button
+                    type="submit"
+                    class="flex-1 inline-flex justify-center items-center gap-2 rounded-xl bg-gradient-to-r from-teal-600 to-teal-500 px-4 py-2.5 text-sm font-semibold text-white hover:from-teal-700 hover:to-teal-600 transition-all"
+                >
+                    <x-heroicon-o-calendar class="h-4 w-4" />
+                    {{ $isEditing ? 'Update Event' : 'Create & Send Invitations' }}
+                </button>
+                <button
+                    type="button"
+                    @click="show = false"
+                    class="px-4 py-2.5 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
+                >
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </x-ui.modal>
 
     <x-ui.confirm-modal />
 </div>
