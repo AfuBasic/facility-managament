@@ -60,10 +60,7 @@ Route::middleware(['auth', IsVerified::class])->group(function () {
             Route::get('/stores/{store}', StoreDetail::class)->name('store.detail');
             Route::get('/assets/{asset}', AssetDetail::class)->name('asset.detail');
 
-            // Work Orders
             Route::get('/work-orders', WorkOrderList::class)->name('work-orders.index');
-            Route::get('/work-orders/create', WorkOrderCreate::class)->name('work-orders.create');
-            Route::get('/work-orders/{workOrder}/edit', WorkOrderEdit::class)->name('work-orders.edit');
             Route::get('/work-orders/{workOrder}', WorkOrderDetail::class)->name('work-orders.show');
 
             // Notifications

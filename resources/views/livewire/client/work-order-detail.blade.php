@@ -6,13 +6,13 @@
         <x-slot:actions>
             <div class="flex gap-3">
                 @can('update', $workOrder)
-                    <a href="{{ route('app.work-orders.edit', $workOrder) }}" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors border border-transparent text-white bg-teal-600 hover:bg-teal-700 focus:ring-teal-500">
+                    <button wire:click="openEditModal" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors border border-transparent text-white bg-teal-600 hover:bg-teal-700 focus:ring-teal-500">
                         <x-heroicon-o-pencil class="h-5 w-5 mr-2" />
                         Edit
-                    </a>
+                    </button>
                 @endcan
                 @can('delete', $workOrder)
-                    <button wire:click="delete" wire:confirm="Are you sure you want to delete this work order? This action cannot be undone." class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors border border-transparent text-white bg-red-600 hover:bg-red-700 focus:ring-red-500">
+                    <button wire:click="$set('showDeleteModal', true)" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors border border-transparent text-white bg-red-600 hover:bg-red-700 focus:ring-red-500">
                         <x-heroicon-o-trash class="h-5 w-5 mr-2" />
                         Delete
                     </button>
@@ -763,5 +763,103 @@
                 <span wire:loading wire:target="reassign">Reassigning...</span>
             </x-ui.button>
         </x-slot:footer>
+    </x-ui.modal>
+    {{-- Edit Work Order Modal --}}
+    <x-ui.modal show="showEditModal" title="Edit Work Order" maxWidth="2xl">
+        <form wire:submit="updateWorkOrder" class="space-y-6">
+            {{-- Title --}}
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Title <span class="text-red-500">*</span></label>
+                <input wire:model="editTitle" type="text" 
+                    class="p-2 border w-full rounded-lg border-slate-200 focus:border-teal-500 focus:ring-teal-500"
+                    placeholder="Brief description of the issue">
+                @error('editTitle') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
+            </div>
+
+            {{-- Description --}}
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Description <span class="text-red-500">*</span></label>
+                <textarea wire:model="editDescription" rows="4"
+                    class="p-2 border w-full rounded-lg border-slate-200 focus:border-teal-500 focus:ring-teal-500"
+                    placeholder="Detailed description of the problem"></textarea>
+                @error('editDescription') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
+            </div>
+
+            {{-- Priority --}}
+            <div>
+                <x-forms.searchable-select
+                    wire:model="editPriority"
+                    :options="[
+                        'low' => 'Low',
+                        'medium' => 'Medium',
+                        'high' => 'High',
+                        'critical' => 'Critical'
+                    ]"
+                    :selected="$editPriority"
+                    label="Priority *"
+                    placeholder="Select priority..."
+                />
+                @error('editPriority') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
+            </div>
+
+            {{-- Facility --}}
+            <div>
+                <x-forms.searchable-select
+                    wire:model.live="editFacilityId"
+                    :options="$this->facilities"
+                    :selected="$editFacilityId"
+                    label="Facility *"
+                    placeholder="Select facility..."
+                />
+                @error('editFacilityId') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
+            </div>
+
+            {{-- Space (Optional) --}}
+            @if($editFacilityId && $this->spaces->isNotEmpty())
+                <div>
+                    <x-forms.searchable-select
+                        wire:model="editSpaceId"
+                        :options="$this->spaces"
+                        :selected="$editSpaceId"
+                        label="Space (Optional)"
+                        placeholder="Select space..."
+                    />
+                    @error('editSpaceId') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
+                </div>
+            @endif
+
+            {{-- Actions --}}
+            <div class="flex justify-end gap-3 pt-4 border-t border-slate-200">
+                <button type="button" @click="show = false" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 focus:ring-teal-500">
+                    Cancel
+                </button>
+                <x-ui.button type="submit" wire:loading.attr="disabled">
+                    <span wire:loading.remove wire:target="updateWorkOrder">Update Work Order</span>
+                    <span wire:loading wire:target="updateWorkOrder">Updating...</span>
+                </x-ui.button>
+                {{-- Delete Confirmation Modal --}}
+    <x-ui.modal show="showDeleteModal" title="Delete Work Order" maxWidth="md">
+        <div class="space-y-4">
+            <div class="flex items-center justify-center bg-red-100 rounded-full h-12 w-12 mx-auto mb-4">
+                <x-heroicon-o-exclamation-triangle class="h-6 w-6 text-red-600" />
+            </div>
+            <p class="text-center text-slate-900 font-medium text-lg">Are you sure?</p>
+            <p class="text-center text-slate-500 text-sm">
+                This action cannot be undone. This work order will be permanently deleted.
+            </p>
+        </div>
+
+        <x-slot:footer>
+            <div class="flex justify-center w-full gap-3">
+                <x-ui.button variant="secondary" @click="$wire.showDeleteModal = false" class="w-full">Cancel</x-ui.button>
+                <x-ui.button variant="danger" wire:click="delete" wire:loading.attr="disabled" class="w-full">
+                    <span wire:loading.remove wire:target="delete">Delete</span>
+                    <span wire:loading wire:target="delete">Deleting...</span>
+                </x-ui.button>
+            </div>
+        </x-slot:footer>
+    </x-ui.modal>
+</div>
+        </form>
     </x-ui.modal>
 </div>

@@ -198,7 +198,7 @@
     </div>
 
     <!-- New Message Modal -->
-    <x-ui.modal show="showNewMessageModal" title="New Message" maxWidth="md">
+    <x-ui.modal show="showNewMessageModal" maxWidth="xl" title="New Message">
         <div class="space-y-4">
             <div class="relative">
                 <x-heroicon-o-magnifying-glass class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />

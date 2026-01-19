@@ -7,6 +7,8 @@ use App\Models\ClientAccount;
 use App\Models\User;
 use App\Models\WorkOrder;
 use App\Models\WorkOrderAsset;
+use App\Models\Facility;
+use App\Models\Space;
 use App\Services\SlaCalculatorService;
 use App\Services\WorkOrderStateManager;
 use Illuminate\Support\Facades\Auth;
@@ -42,6 +44,8 @@ class WorkOrderDetail extends Component
     public $showReopenModal = false;
 
     public $showReassignModal = false;
+
+    public $showDeleteModal = false;
 
     // Form fields
     public $approval_note = '';
@@ -362,6 +366,73 @@ class WorkOrderDetail extends Component
         $this->reopen_reason = '';
 
         session()->flash('success', 'Work order reopened.');
+    }
+
+    public $showEditModal = false;
+    public $editTitle = '';
+    public $editDescription = '';
+    public $editPriority = '';
+    public $editFacilityId = '';
+    public $editSpaceId = '';
+
+    public function openEditModal()
+    {
+        if ($this->workOrder->status !== 'reported') {
+            session()->flash('error', 'Cannot edit work order unless status is reported.');
+            return;
+        }
+        $this->editTitle = $this->workOrder->title;
+        $this->editDescription = $this->workOrder->description;
+        $this->editPriority = $this->workOrder->priority;
+        $this->editFacilityId = $this->workOrder->facility_id;
+        $this->editSpaceId = $this->workOrder->space_id;
+        $this->showEditModal = true;
+    }
+
+    public function updateWorkOrder()
+    {
+         // Assuming policy has 'update'
+         $this->authorize('update', $this->workOrder);
+         
+         $this->validate([
+            'editTitle' => 'required|string|max:255',
+            'editDescription' => 'required|string',
+            'editPriority' => 'required|in:low,medium,high,critical',
+            'editFacilityId' => 'required|exists:facilities,id',
+            'editSpaceId' => 'nullable|exists:spaces,id',
+         ]);
+
+         $this->workOrder->update([
+            'title' => $this->editTitle,
+            'description' => $this->editDescription,
+            'priority' => $this->editPriority,
+            'facility_id' => $this->editFacilityId,
+            'space_id' => $this->editSpaceId ?: null,
+         ]);
+
+         $this->showEditModal = false;
+         $this->workOrder->refresh();
+         session()->flash('success', 'Work order updated successfully.');
+    }
+
+    public function getFacilitiesProperty()
+    {
+        $clientId = $this->clientAccount->id ?? session('current_client_account_id');
+
+        return Facility::where('client_account_id', $clientId)
+            ->orderBy('name')
+            ->pluck('name', 'id');
+    }
+
+    public function getSpacesProperty()
+    {
+        if (! $this->editFacilityId) {
+            return collect();
+        }
+
+        return Space::where('facility_id', $this->editFacilityId)
+            ->orderBy('name')
+            ->pluck('name', 'id');
     }
 
     public function render()

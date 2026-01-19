@@ -4,6 +4,8 @@ namespace App\Livewire\Client;
 
 use App\Models\ClientAccount;
 use App\Models\WorkOrder;
+use App\Models\Facility;
+use App\Models\Space;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
@@ -63,5 +65,75 @@ class WorkOrderList extends Component
         return view('livewire.client.work-order-list', [
             'workOrders' => $workOrders,
         ]);
+    }
+    public $showCreateModal = false;
+
+    public $newTitle = '';
+    public $newDescription = '';
+    public $newPriority = 'medium';
+    public $newFacilityId = '';
+    public $newSpaceId = '';
+
+    public function getFacilitiesProperty()
+    {
+        $clientAccount = app(ClientAccount::class);
+        $clientId = $clientAccount->id ?? session('current_client_account_id');
+
+        return Facility::where('client_account_id', $clientId)
+            ->orderBy('name')
+            ->pluck('name', 'id');
+    }
+
+    public function getSpacesProperty()
+    {
+        if (! $this->newFacilityId) {
+            return collect();
+        }
+
+        return Space::where('facility_id', $this->newFacilityId)
+            ->orderBy('name')
+            ->pluck('name', 'id');
+    }
+
+    public function openCreateModal()
+    {
+        $this->resetCreateForm();
+        $this->showCreateModal = true;
+    }
+
+    public function resetCreateForm()
+    {
+        $this->newTitle = '';
+        $this->newDescription = '';
+        $this->newPriority = 'medium';
+        $this->newFacilityId = '';
+        $this->newSpaceId = '';
+        $this->resetValidation();
+    }
+
+    public function saveWorkOrder()
+    {
+        $this->validate([
+            'newTitle' => 'required|string|max:255',
+            'newDescription' => 'required|string',
+            'newPriority' => 'required|in:low,medium,high,critical',
+            'newFacilityId' => 'required|exists:facilities,id',
+            'newSpaceId' => 'nullable|exists:spaces,id',
+        ]);
+
+        WorkOrder::create([
+            'facility_id' => $this->newFacilityId,
+            'space_id' => $this->newSpaceId ?: null,
+            'title' => $this->newTitle,
+            'description' => $this->newDescription,
+            'priority' => $this->newPriority,
+            'status' => 'reported',
+            'reported_by' => Auth::id(),
+            'reported_at' => now(),
+        ]);
+
+        $this->showCreateModal = false;
+        $this->resetCreateForm();
+        session()->flash('success', 'Work order created successfully.');
     }
 }
