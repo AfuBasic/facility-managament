@@ -6,6 +6,7 @@ use App\Models\Event;
 use App\Models\User;
 use App\Models\Contact;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 class IcsCalendarService
 {
@@ -131,8 +132,8 @@ class IcsCalendarService
      */
     public function getFilename(Event $event): string
     {
-        $slug = \Illuminate\Support\Str::slug($event->title);
+        $slug = Str::slug($event->title);
 
-        return "event-{$slug}.ics";
+        return "event-{$slug}.txt";
     }
 }

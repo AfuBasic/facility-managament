@@ -3,17 +3,17 @@
 namespace App\Mail;
 
 use App\Models\Event;
-use App\Models\User;
 use App\Models\Contact;
 use App\Services\IcsCalendarService;
 use Illuminate\Bus\Queueable;
-use Illuminate\Mail\Attachment;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class EventInvitationMail extends Mailable
+class EventInvitationMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
@@ -36,9 +36,6 @@ class EventInvitationMail extends Mailable
         );
     }
 
-    /**
-     * @return array<int, Attachment>
-     */
     public function attachments(): array
     {
         $icsService = app(IcsCalendarService::class);
@@ -47,7 +44,7 @@ class EventInvitationMail extends Mailable
 
         return [
             Attachment::fromData(fn () => $icsContent, $filename)
-                ->withMime('text/calendar; charset=UTF-8; method=REQUEST'),
+                ->withMime('text/plain'),
         ];
     }
 }

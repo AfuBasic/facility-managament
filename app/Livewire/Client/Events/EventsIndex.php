@@ -249,7 +249,7 @@ class EventsIndex extends Component
             // Attach attendees with pending status
             $event->attendees()->attach($this->attendeeIds);
 
-            // Send invitation emails to all attendees
+            // queue invitation emails to all attendees
             foreach ($event->attendees as $attendee) {
                 Mail::to($attendee->email)->queue(new EventInvitationMail($event, $attendee));
             }
