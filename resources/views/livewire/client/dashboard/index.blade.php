@@ -47,22 +47,26 @@
                         value="{{ $stats['total_assets'] }}" 
                         icon="cube" 
                         color="indigo"
+                        link="#"
                     />
                     <x-dashboard.stat-card 
                         label="Active Sites" 
                         value="{{ $stats['active_facilities'] }}" 
                         icon="building-office" 
                         color="emerald"
+                        :link="route('app.facilities')"
                     />
                     <x-dashboard.stat-card 
                         label="Open Orders" 
                         value="{{ $stats['open_orders'] }}" 
                         trend="12"
+                        :link="route('app.work-orders.index', ['status' => 'in_progress'])"
                     />
                     <x-dashboard.stat-card 
                         label="Pending" 
                         value="{{ $stats['pending_approval'] }}" 
                         color="amber"
+                        :link="route('app.work-orders.index', ['status' => 'pending'])"
                     />
                 </div>
             </div>
