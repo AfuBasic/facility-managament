@@ -25,13 +25,13 @@
                         <p class="text-sm text-slate-600">
                             @if($activity->new_state)
                                 Changed status of 
-                                <a href="{{ route('client.work-orders.index') }}" class="font-medium text-indigo-600 hover:underline">
+                                <a href="{{ route('app.work-orders.index') }}" class="font-medium text-indigo-600 hover:underline">
                                     {{ $activity->workOrder->workorder_serial ?? 'Work Order' }}
                                 </a>
                                 to <span class="font-medium text-slate-900">{{ ucfirst(str_replace('_', ' ', $activity->new_state)) }}</span>
                             @else
                                 Updated 
-                                <a href="{{ route('client.work-orders.index') }}" class="font-medium text-indigo-600 hover:underline">
+                                <a href="{{ route('app.work-orders.index') }}" class="font-medium text-indigo-600 hover:underline">
                                     {{ $activity->workOrder->workorder_serial ?? 'Work Order' }}
                                 </a>
                             @endif

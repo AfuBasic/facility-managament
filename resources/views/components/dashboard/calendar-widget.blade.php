@@ -5,10 +5,10 @@
     <div class="p-6 border-b border-slate-50 flex justify-between items-center">
         <h3 class="font-semibold text-slate-900">{{ now()->format('F Y') }}</h3>
         <div class="flex space-x-2">
-            <button class="p-1 hover:bg-slate-50 rounded-full text-slate-400 hover:text-slate-600 transition">
+            <button type="button" class="p-1 hover:bg-slate-50 rounded-full text-slate-400 hover:text-slate-600 transition">
                 <x-heroicon-o-chevron-left class="w-4 h-4" />
             </button>
-            <button class="p-1 hover:bg-slate-50 rounded-full text-slate-400 hover:text-slate-600 transition">
+            <button type="button" class="p-1 hover:bg-slate-50 rounded-full text-slate-400 hover:text-slate-600 transition">
                 <x-heroicon-o-chevron-right class="w-4 h-4" />
             </button>
         </div>
@@ -60,12 +60,12 @@
             @forelse($events as $event)
                 <div class="flex items-start group">
                     <div class="flex-shrink-0 w-12 text-center">
-                        <span class="block text-xs text-slate-500 font-medium">{{ $event->start_time->format('M') }}</span>
-                        <span class="block text-lg font-bold text-slate-900">{{ $event->start_time->format('d') }}</span>
+                        <span class="block text-xs text-slate-500 font-medium">{{ $event->starts_at->format('M') }}</span>
+                        <span class="block text-lg font-bold text-slate-900">{{ $event->starts_at->format('d') }}</span>
                     </div>
                     <div class="ml-3 pl-3 border-l-2 border-transparent group-hover:border-indigo-500 transition-colors duration-200">
                         <p class="text-sm font-semibold text-slate-900 truncate">{{ $event->title }}</p>
-                        <p class="text-xs text-slate-500 mt-0.5">{{ $event->start_time->format('h:i A') }} • {{ $event->isVirtual() ? 'Virtual' : 'Physical' }}</p>
+                        <p class="text-xs text-slate-500 mt-0.5">{{ $event->starts_at->format('h:i A') }} • {{ $event->isVirtual() ? 'Virtual' : 'Physical' }}</p>
                     </div>
                 </div>
             @empty

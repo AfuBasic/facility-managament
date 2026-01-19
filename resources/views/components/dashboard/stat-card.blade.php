@@ -1,13 +1,13 @@
-@props(['label', 'value', 'icon' => null, 'trend' => null, 'color' => 'slate'])
+@props(['label', 'value', 'icon' => null, 'trend' => null, 'color' => 'slate', 'link' => '#'])
 
-<div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm flex flex-col justify-between h-full">
+<a href="{{ $link }}" {{ $link !== '#' ? 'wire:navigate' : '' }} class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm flex flex-col justify-between h-full hover:border-indigo-100 hover:shadow-md transition-all duration-200 group">
     <div class="flex justify-between items-start">
         <div>
-            <p class="text-slate-500 text-sm font-medium uppercase tracking-wide">{{ $label }}</p>
+            <p class="text-slate-500 text-sm font-medium uppercase tracking-wide group-hover:text-indigo-600 transition-colors">{{ $label }}</p>
             <h3 class="text-3xl font-bold text-slate-900 mt-2">{{ $value }}</h3>
         </div>
         @if($icon)
-            <div class="p-3 rounded-xl bg-{{ $color }}-50 text-{{ $color }}-600">
+            <div class="p-3 rounded-xl bg-{{ $color }}-50 text-{{ $color }}-600 group-hover:bg-{{ $color }}-100 transition-colors">
                 <x-dynamic-component :component="'heroicon-o-'.$icon" class="w-6 h-6" />
             </div>
         @endif
@@ -26,4 +26,4 @@
             <span class="text-slate-400 ml-2">from last month</span>
         </div>
     @endif
-</div>
+</a>
