@@ -6,7 +6,9 @@ use App\Models\Concerns\BelongsToClient;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Event;
 
 class Contact extends Model
 {
@@ -75,8 +77,29 @@ class Contact extends Model
     /**
      * Get the full name attribute
      */
+    /**
+     * Get the full name attribute
+     */
     public function getFullNameAttribute(): string
     {
         return "{$this->firstname} {$this->lastname}";
+    }
+
+    /**
+     * Get the name attribute (alias for full name for compatibility)
+     */
+    public function getNameAttribute(): string
+    {
+        return $this->full_name;
+    }
+
+    /**
+     * Get the events for this contact.
+     */
+    public function events(): BelongsToMany
+    {
+        return $this->belongsToMany(Event::class, 'event_attendees')
+            ->withPivot(['status', 'responded_at'])
+            ->withTimestamps();
     }
 }

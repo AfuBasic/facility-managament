@@ -4,10 +4,10 @@
         description="Manage facility maintenance requests and track their progress."
     >
         <x-slot:actions>
-            <a href="{{ route('app.work-orders.create') }}" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors border border-transparent text-white bg-teal-600 hover:bg-teal-700 focus:ring-teal-500">
+            <button wire:click="openCreateModal" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors border border-transparent text-white bg-teal-600 hover:bg-teal-700 focus:ring-teal-500">
                 <x-heroicon-o-plus class="h-5 w-5 mr-2" />
                 New Work Order
-            </a>
+            </button>
         </x-slot:actions>
     </x-ui.page-header>
 
@@ -141,7 +141,7 @@
                         <tr>
                             <td colspan="8" class="px-6 py-10 text-center text-slate-500">
                                 No work orders found. 
-                                <a href="{{ route('app.work-orders.create') }}" class="text-teal-600 hover:text-teal-700 font-medium">Create your first work order</a>
+                                <button wire:click="openCreateModal" class="text-teal-600 hover:text-teal-700 font-medium">Create your first work order</button>
                             </td>
                         </tr>
                     @endforelse
@@ -156,4 +156,81 @@
         {{ $workOrders->links() }}
     </div>
     @endif
+
+    {{-- Create Work Order Modal --}}
+    <x-ui.modal show="showCreateModal" title="Create Work Order" maxWidth="2xl">
+        <form wire:submit="saveWorkOrder" class="space-y-6">
+            {{-- Title --}}
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Title <span class="text-red-500">*</span></label>
+                <input wire:model="newTitle" type="text" 
+                    class="p-2 border w-full rounded-lg border-slate-200 focus:border-teal-500 focus:ring-teal-500"
+                    placeholder="Brief description of the issue">
+                @error('newTitle') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
+            </div>
+
+            {{-- Description --}}
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Description <span class="text-red-500">*</span></label>
+                <textarea wire:model="newDescription" rows="4"
+                    class="p-2 border w-full rounded-lg border-slate-200 focus:border-teal-500 focus:ring-teal-500"
+                    placeholder="Detailed description of the problem"></textarea>
+                @error('newDescription') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
+            </div>
+
+            {{-- Priority --}}
+            <div>
+                <x-forms.searchable-select
+                    wire:model="newPriority"
+                    :options="[
+                        'low' => 'Low',
+                        'medium' => 'Medium',
+                        'high' => 'High',
+                        'critical' => 'Critical'
+                    ]"
+                    :selected="$newPriority"
+                    label="Priority *"
+                    placeholder="Select priority..."
+                />
+                @error('newPriority') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
+            </div>
+
+            {{-- Facility --}}
+            <div>
+                <x-forms.searchable-select
+                    wire:model.live="newFacilityId"
+                    :options="$this->facilities"
+                    :selected="$newFacilityId"
+                    label="Facility *"
+                    placeholder="Select facility..."
+                />
+                @error('newFacilityId') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
+            </div>
+
+            {{-- Space (Optional) --}}
+            @if($newFacilityId && $this->spaces->isNotEmpty())
+                <div>
+                    <x-forms.searchable-select
+                        wire:model="newSpaceId"
+                        :options="$this->spaces"
+                        :selected="$newSpaceId"
+                        label="Space (Optional)"
+                        placeholder="Select space..."
+                    />
+                    @error('newSpaceId') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
+                </div>
+            @endif
+
+            {{-- Actions --}}
+            <div class="flex justify-end gap-3 pt-4 border-t border-slate-200">
+                <button type="button" @click="show = false" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 focus:ring-teal-500">
+                    Cancel
+                </button>
+                <x-ui.button type="submit" wire:loading.attr="disabled">
+                    <span wire:loading.remove wire:target="saveWorkOrder">Submit Work Order</span>
+                    <span wire:loading wire:target="saveWorkOrder">Submitting...</span>
+                </x-ui.button>
+            </div>
+        </form>
+    </x-ui.modal>
 </div>

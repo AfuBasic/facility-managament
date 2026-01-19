@@ -45,6 +45,20 @@
                     controlClass: 'ts-control',
                     dropdownClass: 'ts-dropdown'
                 });
+
+                // Watch for changes from Livewire and update TomSelect
+                $wire.$watch('{{ $wireModel }}', (value) => {
+                    if (!this.tomSelect) return;
+
+                    // Ensure value is an array, handle null/undefined, and cast to strings
+                    const newValues = (Array.isArray(value) ? value : (value ? [value] : [])).map(String);
+                    const currentValues = (Array.isArray(this.tomSelect.getValue()) ? this.tomSelect.getValue() : [this.tomSelect.getValue()]).map(String);
+                    
+                    // Only update if different to avoid infinite loops
+                    if (JSON.stringify(newValues.sort()) !== JSON.stringify(currentValues.sort())) {
+                        this.tomSelect.setValue(newValues, true); // true = silent update
+                    }
+                });
             }
         }"
     >

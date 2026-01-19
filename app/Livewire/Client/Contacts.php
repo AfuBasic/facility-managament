@@ -56,11 +56,17 @@ class Contacts extends Component
 
     public $clientAccountId;
 
+    // Quick Create States
+    public $isCreatingType = false;
+    public $newTypeName = '';
+    public $isCreatingGroup = false;
+    public $newGroupName = '';
+
     protected $rules = [
         'firstname' => 'required|string|max:255',
         'lastname' => 'required|string|max:255',
-        'email' => 'nullable|email|max:255',
-        'phone' => 'required|string|max:255',
+        'email' => 'required|email|max:255',
+        'phone' => 'required|string|max:255|unique:contacts',
         'birthday' => 'nullable|date',
         'gender' => 'required|in:male,female,other',
         'address' => 'nullable|string',
@@ -170,6 +176,62 @@ class Contacts extends Component
         $this->success('Contact deleted successfully.');
     }
 
+    // Quick Create Methods for Types
+    public function toggleCreateType()
+    {
+        $this->isCreatingType = !$this->isCreatingType;
+        $this->newTypeName = '';
+        if ($this->isCreatingType) {
+            $this->contact_type_id = '';
+        }
+    }
+
+    public function saveType()
+    {
+        $this->validate([
+            'newTypeName' => 'required|string|max:255|unique:contact_types,name,NULL,id,client_account_id,' . $this->clientAccountId
+        ]);
+
+        $type = ContactType::create([
+            'client_account_id' => $this->clientAccountId,
+            'name' => $this->newTypeName,
+            'status' => 'active',
+        ]);
+
+        $this->contact_type_id = $type->id;
+        $this->isCreatingType = false;
+        $this->newTypeName = '';
+        $this->success('Contact type created successfully.');
+    }
+
+    // Quick Create Methods for Groups
+    public function toggleCreateGroup()
+    {
+        $this->isCreatingGroup = !$this->isCreatingGroup;
+        $this->newGroupName = '';
+        if ($this->isCreatingGroup) {
+            $this->contact_group_id = '';
+        }
+    }
+
+    public function saveGroup()
+    {
+        $this->validate([
+            'newGroupName' => 'required|string|max:255|unique:contact_groups,name,NULL,id,client_account_id,' . $this->clientAccountId
+        ]);
+
+        $group = ContactGroup::create([
+            'client_account_id' => $this->clientAccountId,
+            'name' => $this->newGroupName,
+            'status' => 'active',
+        ]);
+
+        $this->contact_group_id = $group->id;
+        $this->isCreatingGroup = false;
+        $this->newGroupName = '';
+        $this->success('Contact group created successfully.');
+    }
+
     public function closeModal()
     {
         $this->showModal = false;
@@ -182,6 +244,7 @@ class Contacts extends Component
             'firstname', 'lastname', 'email', 'phone', 'birthday',
             'gender', 'address', 'notes', 'contact_type_id',
             'contact_group_id', 'contact_person_id', 'isEditing', 'editingContactId',
+            'isCreatingType', 'newTypeName', 'isCreatingGroup', 'newGroupName',
         ]);
     }
 

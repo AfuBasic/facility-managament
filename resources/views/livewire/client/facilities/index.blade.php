@@ -171,79 +171,55 @@
     @endif
 
     {{-- Create/Edit Modal --}}
-    @if($showModal)
-        <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-            <div class="flex min-h-screen items-end justify-center px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-                {{-- Background overlay --}}
-                <div class="fixed inset-0 bg-slate-950/75 backdrop-blur-sm transition-opacity -z-10" wire:click="closeModal"></div>
-
-                {{-- Modal panel --}}
-                <div class="relative inline-block align-bottom bg-white rounded-2xl border border-slate-200 px-6 pt-5 pb-6 text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-8">
-                    <div class="space-y-6">
-                        {{-- Header --}}
-                        <div class="flex items-center justify-between">
-                            <h3 class="text-xl font-semibold text-slate-900">
-                                {{ $isEditing ? 'Edit Facility' : 'Create New Facility' }}
-                            </h3>
-                            <button wire:click="closeModal" class="text-slate-400 hover:text-slate-600 transition-colors">
-                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
-                        </div>
-
-                        {{-- Form --}}
-                        <form wire:submit="save" class="space-y-5">
-                            {{-- Name --}}
-                            <div>
-                                <label for="name" class="block text-sm font-medium text-slate-700 mb-2">
-                                    Facility Name <span class="text-red-500">*</span>
-                                </label>
-                                <input
-                                    wire:model="name"
-                                    type="text"
-                                    id="name"
-                                    class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
-                                    placeholder="Enter facility name"
-                                />
-                                @error('name') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-                            </div>
-
-                            {{-- Address --}}
-                            <div>
-                                <label for="address" class="block text-sm font-medium text-slate-700 mb-2">
-                                    Address
-                                </label>
-                                <textarea
-                                    wire:model="address"
-                                    id="address"
-                                    rows="2"
-                                    class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 resize-none"
-                                    placeholder="Enter facility address"
-                                ></textarea>
-                                @error('address') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-                            </div>
-
-                            {{-- Actions --}}
-                            <div class="flex items-center gap-3 pt-4">
-                                <button
-                                    type="submit"
-                                    class="flex-1 inline-flex justify-center items-center gap-2 rounded-xl bg-gradient-to-r from-teal-600 to-teal-500 px-4 py-2.5 text-sm font-semibold text-white hover:from-teal-700 hover:to-teal-600 transition-all"
-                                >
-                                    {{ $isEditing ? 'Update Facility' : 'Create Facility' }}
-                                </button>
-                                <button
-                                    type="button"
-                                    wire:click="closeModal"
-                                    class="px-4 py-2.5 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
-                                >
-                                    Cancel
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+    {{-- Create/Edit Modal --}}
+    <x-ui.modal show="showModal" maxWidth="lg" title="{{ $isEditing ? 'Edit Facility' : 'Create New Facility' }}">
+        <form wire:submit="save" class="space-y-5">
+            {{-- Name --}}
+            <div>
+                <label for="name" class="block text-sm font-medium text-slate-700 mb-2">
+                    Facility Name <span class="text-red-500">*</span>
+                </label>
+                <input
+                    wire:model="name"
+                    type="text"
+                    id="name"
+                    class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                    placeholder="Enter facility name"
+                />
+                @error('name') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
             </div>
-        </div>
-    @endif
+
+            {{-- Address --}}
+            <div>
+                <label for="address" class="block text-sm font-medium text-slate-700 mb-2">
+                    Address
+                </label>
+                <textarea
+                    wire:model="address"
+                    id="address"
+                    rows="2"
+                    class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 resize-none"
+                    placeholder="Enter facility address"
+                ></textarea>
+                @error('address') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+            </div>
+
+            {{-- Actions --}}
+            <div class="flex items-center gap-3 pt-4">
+                <button
+                    type="submit"
+                    class="flex-1 inline-flex justify-center items-center gap-2 rounded-xl bg-gradient-to-r from-teal-600 to-teal-500 px-4 py-2.5 text-sm font-semibold text-white hover:from-teal-700 hover:to-teal-600 transition-all"
+                >
+                    {{ $isEditing ? 'Update Facility' : 'Create Facility' }}
+                </button>
+                <button
+                    type="button"
+                    @click="show = false"
+                    class="px-4 py-2.5 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
+                >
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </x-ui.modal>
 </div>

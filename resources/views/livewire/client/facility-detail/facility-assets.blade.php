@@ -202,353 +202,332 @@
 
 
     {{-- Asset Modal --}}
-    @if($showAssetModal)
-        <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-            <div class="flex min-h-screen items-end justify-center px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-                <div class="fixed inset-0 bg-slate-950/75 backdrop-blur-sm transition-opacity" wire:click="closeAssetModal"></div>
+    <x-ui.modal show="showAssetModal" title="{{ $isEditingAsset ? 'Edit Asset' : 'Create New Asset' }}" maxWidth="4xl">
+        <form wire:submit="saveAsset" class="space-y-5">
+            {{-- Basic Info --}}
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label for="assetName" class="block text-sm font-medium text-slate-700 mb-2">
+                        Asset Name <span class="text-red-500">*</span>
+                    </label>
+                    <input 
+                        wire:model="assetName" 
+                        type="text" 
+                        id="assetName"
+                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                        placeholder="e.g., Laptop Dell XPS 15"
+                    />
+                    @error('assetName') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                </div>
 
-                <div class="relative inline-block align-bottom bg-white rounded-2xl border border-slate-200 px-6 pt-5 pb-6 text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full sm:p-8">
-                    <div class="space-y-6">
-                        <div class="flex items-center justify-between">
-                            <h3 class="text-xl font-semibold text-slate-900">
-                                {{ $isEditingAsset ? 'Edit Asset' : 'Create New Asset' }}
-                            </h3>
-                            <button wire:click="closeAssetModal" class="text-slate-400 hover:text-slate-600 transition-colors">
-                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
-                        </div>
-
-                        <form wire:submit="saveAsset" class="space-y-5">
-                            {{-- Basic Info --}}
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label for="assetName" class="block text-sm font-medium text-slate-700 mb-2">
-                                        Asset Name <span class="text-red-500">*</span>
-                                    </label>
-                                    <input 
-                                        wire:model="assetName" 
-                                        type="text" 
-                                        id="assetName"
-                                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
-                                        placeholder="e.g., Laptop Dell XPS 15"
-                                    />
-                                    @error('assetName') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-                                </div>
-
-                                <div>
-                                    <label for="assetSerial" class="block text-sm font-medium text-slate-700 mb-2">
-                                        Serial Number <span class="text-red-500">*</span>
-                                    </label>
-                                    <input 
-                                        wire:model="assetSerial" 
-                                        type="text" 
-                                        id="assetSerial"
-                                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
-                                        placeholder="e.g., SN123456789"
-                                    />
-                                    @error('assetSerial') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-                                </div>
-                            </div>
-
-                            {{-- Type and Units --}}
-                            <div class="grid grid-cols-4 gap-4">
-                                <div>
-                                    <label for="assetType" class="block text-sm font-medium text-slate-700 mb-2">
-                                        Type <span class="text-red-500">*</span>
-                                    </label>
-                                    <select 
-                                        wire:model="assetType" 
-                                        id="assetType"
-                                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
-                                    >
-                                        <option value="fixed">Fixed Asset</option>
-                                        <option value="tools">Tools</option>
-                                        <option value="consumable">Consumable</option>
-                                    </select>
-                                    @error('assetType') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-                                </div>
-
-                                <div>
-                                    <label for="assetUnits" class="block text-sm font-medium text-slate-700 mb-2">
-                                        Units <span class="text-red-500">*</span>
-                                    </label>
-                                    <input 
-                                        wire:model="assetUnits" 
-                                        type="number" 
-                                        id="assetUnits"
-                                        min="0"
-                                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
-                                    />
-                                    @error('assetUnits') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-                                </div>
-
-                                <div>
-                                    <label for="assetMinimum" class="block text-sm font-medium text-slate-700 mb-2">
-                                        Minimum <span class="text-red-500">*</span>
-                                    </label>
-                                    <input 
-                                        wire:model="assetMinimum" 
-                                        type="number" 
-                                        id="assetMinimum"
-                                        min="0"
-                                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
-                                    />
-                                    @error('assetMinimum') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-                                </div>
-
-                                <div>
-                                    <label for="assetMaximum" class="block text-sm font-medium text-slate-700 mb-2">
-                                        Maximum <span class="text-red-500">*</span>
-                                    </label>
-                                    <input 
-                                        wire:model="assetMaximum" 
-                                        type="number" 
-                                        id="assetMaximum"
-                                        min="0"
-                                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
-                                    />
-                                    @error('assetMaximum') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-                                </div>
-                            </div>
-
-                            {{-- Assignments --}}
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    @php
-                                        $storeOptions = [];
-                                        foreach($this->availableStores as $store) {
-                                            $storeOptions[$store->id] = $store->name;
-                                        }
-                                    @endphp
-                                    
-                                    <x-forms.searchable-select
-                                        wire:model="assetStoreId"
-                                        :options="$storeOptions"
-                                        :selected="$assetStoreId"
-                                        label="Store"
-                                        placeholder="Select a store..."
-                                        :error="$errors->first('assetStoreId')"
-                                    />
-                                </div>
-
-                                <div>
-                                    @php
-                                        $userOptions = [];
-                                        foreach($this->availableUsers as $membership) {
-                                            $userOptions[$membership->user->id] = ($membership->user->name ?? 'New User') . ' • ' . $membership->user->email;
-                                        }
-                                    @endphp
-                                    
-                                    <x-forms.searchable-select
-                                        wire:model="assetUserId"
-                                        :options="$userOptions"
-                                        :selected="$assetUserId"
-                                        label="Assigned User"
-                                        placeholder="Select a user..."
-                                        :error="$errors->first('assetUserId')"
-                                    />
-                                </div>
-                            </div>
-
-                            {{-- More Details --}}
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    @php
-                                        $contactOptions = [];
-                                        foreach($this->availableContacts as $contact) {
-                                            $contactOptions[$contact->id] = $contact->name . ' • ' . $contact->email;
-                                        }
-                                    @endphp
-                                    
-                                    <x-forms.searchable-select
-                                        wire:model="assetSupplierContactId"
-                                        :options="$contactOptions"
-                                        :selected="$assetSupplierContactId"
-                                        label="Supplier Contact"
-                                        placeholder="Select a supplier..."
-                                        :error="$errors->first('assetSupplierContactId')"
-                                    />
-                                </div>
-
-                                <div>
-                                    @php
-                                        $spaceOptions = [];
-                                        foreach($this->availableSpaces as $space) {
-                                            $spaceOptions[$space->id] = $space->name;
-                                        }
-                                    @endphp
-                                    
-                                    <x-forms.searchable-select
-                                        wire:model="assetSpaceId"
-                                        :options="$spaceOptions"
-                                        :selected="$assetSpaceId"
-                                        label="Space/Location"
-                                        placeholder="Select a space..."
-                                        :error="$errors->first('assetSpaceId')"
-                                    />
-                                </div>
-                            </div>
-
-                            {{-- Purchase Date --}}
-                            <div>
-                                <label for="assetPurchasedAt" class="block text-sm font-medium text-slate-700 mb-2">
-                                    Purchase Date
-                                </label>
-                                <input 
-                                    wire:model="assetPurchasedAt" 
-                                    type="date" 
-                                    id="assetPurchasedAt"
-                                    class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
-                                />
-                                @error('assetPurchasedAt') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-                            </div>
-
-                            {{-- Description --}}
-                            <div>
-                                <label for="assetDescription" class="block text-sm font-medium text-slate-700 mb-2">
-                                    Description
-                                </label>
-                                <textarea 
-                                    wire:model="assetDescription" 
-                                    id="assetDescription"
-                                    rows="2"
-                                    class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 resize-none"
-                                    placeholder="Enter asset description..."
-                                ></textarea>
-                                @error('assetDescription') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-                            </div>
-
-                            {{-- Notes --}}
-                            <div>
-                                <label for="assetNotes" class="block text-sm font-medium text-slate-700 mb-2">
-                                    Notes
-                                </label>
-                                <textarea 
-                                    wire:model="assetNotes" 
-                                    id="assetNotes"
-                                    rows="2"
-                                    class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 resize-none"
-                                    placeholder="Enter additional notes..."
-                                ></textarea>
-                                @error('assetNotes') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-                            </div>
-
-                            {{-- Image Upload --}}
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-2">
-                                    Images (Max 5)
-                                </label>
-                                
-                                {{-- Existing Images --}}
-                                @if(count($existingImages) > 0)
-                                    <div class="grid grid-cols-5 gap-2 mb-3">
-                                        @foreach($existingImages as $index => $image)
-                                            <div class="relative group">
-                                                <img src="{{ $image['url'] }}" class="w-full h-24 object-cover rounded-lg border border-slate-200">
-                                                <button 
-                                                    type="button"
-                                                    wire:click="deleteExistingImage({{ $image['id'] }})"
-                                                    class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                                                >
-                                                    <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                                    </svg>
-                                                </button>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                @endif
-
-                                {{-- Upload Progress --}}
-                                @if(count($uploadedImages) > 0)
-                                    <div class="grid grid-cols-5 gap-2 mb-3">
-                                        @foreach($uploadedImages as $index => $image)
-                                            <div class="relative group">
-                                                <img src="{{ $image['url'] }}" class="w-full h-24 object-cover rounded-lg border border-slate-200">
-                                                <button 
-                                                    type="button"
-                                                    wire:click="removeUploadedImage({{ $index }})"
-                                                    class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                                                >
-                                                    <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                                    </svg>
-                                                </button>
-                                                @if($image['cached'] ?? false)
-                                                    <span class="absolute bottom-1 left-1 bg-green-500 text-white text-xs px-1.5 py-0.5 rounded">Cached</span>
-                                                @endif
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                @endif
-
-                                {{-- Upload Input --}}
-                                @if(count($existingImages) + count($uploadedImages) < 5)
-                                    <div class="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center hover:border-teal-400 transition-colors">
-                                        <input 
-                                            type="file" 
-                                            wire:model="photos" 
-                                            multiple 
-                                            accept="image/jpeg,image/jpg,image/png"
-                                            class="hidden" 
-                                            id="photoInput"
-                                        />
-                                        <label for="photoInput" class="cursor-pointer">
-                                            <svg class="mx-auto h-12 w-12 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-                                            </svg>
-                                            <p class="mt-2 text-sm text-slate-600">
-                                                <span class="font-semibold text-teal-600">Click to upload</span> or drag and drop
-                                            </p>
-                                            <p class="text-xs text-slate-500">PNG, JPG up to 2MB each</p>
-                                        </label>
-                                    </div>
-                                @endif
-
-                                @if($isUploading)
-                                    <div class="mt-2 flex items-center gap-2 text-sm text-teal-600">
-                                        <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                                        Uploading images...
-                                    </div>
-                                @endif
-
-                                @error('photos.*') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-                            </div>
-
-                            {{-- Form Actions --}}
-                            <div class="flex items-center gap-3 pt-4">
-                                <button 
-                                    type="submit"
-                                    @if($isUploading) disabled @endif
-                                    class="flex-1 inline-flex justify-center items-center gap-2 rounded-xl bg-gradient-to-r from-teal-600 to-teal-500 px-4 py-2.5 text-sm font-semibold text-white hover:from-teal-700 hover:to-teal-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    @if($isUploading)
-                                        <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                                        Uploading...
-                                    @else
-                                        {{ $isEditingAsset ? 'Update Asset' : 'Create Asset' }}
-                                    @endif
-                                </button>
-                                <button 
-                                    type="button"
-                                    wire:click="closeAssetModal"
-                                    class="px-4 py-2.5 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
-                                >
-                                    Cancel
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                <div>
+                    <label for="assetSerial" class="block text-sm font-medium text-slate-700 mb-2">
+                        Serial Number <span class="text-red-500">*</span>
+                    </label>
+                    <input 
+                        wire:model="assetSerial" 
+                        type="text" 
+                        id="assetSerial"
+                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                        placeholder="e.g., SN123456789"
+                    />
+                    @error('assetSerial') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
                 </div>
             </div>
-        </div>
-    @endif
+
+            {{-- Type and Units --}}
+            <div class="grid grid-cols-4 gap-4">
+                <div>
+                    <label for="assetType" class="block text-sm font-medium text-slate-700 mb-2">
+                        Type <span class="text-red-500">*</span>
+                    </label>
+                    <select 
+                        wire:model="assetType" 
+                        id="assetType"
+                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                    >
+                        <option value="fixed">Fixed Asset</option>
+                        <option value="tools">Tools</option>
+                        <option value="consumable">Consumable</option>
+                    </select>
+                    @error('assetType') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
+                    <label for="assetUnits" class="block text-sm font-medium text-slate-700 mb-2">
+                        Units <span class="text-red-500">*</span>
+                    </label>
+                    <input 
+                        wire:model="assetUnits" 
+                        type="number" 
+                        id="assetUnits"
+                        min="0"
+                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                    />
+                    @error('assetUnits') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
+                    <label for="assetMinimum" class="block text-sm font-medium text-slate-700 mb-2">
+                        Minimum <span class="text-red-500">*</span>
+                    </label>
+                    <input 
+                        wire:model="assetMinimum" 
+                        type="number" 
+                        id="assetMinimum"
+                        min="0"
+                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                    />
+                    @error('assetMinimum') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
+                    <label for="assetMaximum" class="block text-sm font-medium text-slate-700 mb-2">
+                        Maximum <span class="text-red-500">*</span>
+                    </label>
+                    <input 
+                        wire:model="assetMaximum" 
+                        type="number" 
+                        id="assetMaximum"
+                        min="0"
+                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                    />
+                    @error('assetMaximum') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                </div>
+            </div>
+
+            {{-- Assignments --}}
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    @php
+                        $storeOptions = [];
+                        foreach($this->availableStores as $store) {
+                            $storeOptions[$store->id] = $store->name;
+                        }
+                    @endphp
+                    
+                    <x-forms.searchable-select
+                        wire:model="assetStoreId"
+                        :options="$storeOptions"
+                        :selected="$assetStoreId"
+                        label="Store"
+                        placeholder="Select a store..."
+                        :error="$errors->first('assetStoreId')"
+                    />
+                </div>
+
+                <div>
+                    @php
+                        $userOptions = [];
+                        foreach($this->availableUsers as $membership) {
+                            $userOptions[$membership->user->id] = ($membership->user->name ?? 'New User') . ' • ' . $membership->user->email;
+                        }
+                    @endphp
+                    
+                    <x-forms.searchable-select
+                        wire:model="assetUserId"
+                        :options="$userOptions"
+                        :selected="$assetUserId"
+                        label="Assigned User"
+                        placeholder="Select a user..."
+                        :error="$errors->first('assetUserId')"
+                    />
+                </div>
+            </div>
+
+            {{-- More Details --}}
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    @php
+                        $contactOptions = [];
+                        foreach($this->availableContacts as $contact) {
+                            $contactOptions[$contact->id] = $contact->name . ' • ' . $contact->email;
+                        }
+                    @endphp
+                    
+                    <x-forms.searchable-select
+                        wire:model="assetSupplierContactId"
+                        :options="$contactOptions"
+                        :selected="$assetSupplierContactId"
+                        label="Supplier Contact"
+                        placeholder="Select a supplier..."
+                        :error="$errors->first('assetSupplierContactId')"
+                    />
+                </div>
+
+                <div>
+                    @php
+                        $spaceOptions = [];
+                        foreach($this->availableSpaces as $space) {
+                            $spaceOptions[$space->id] = $space->name;
+                        }
+                    @endphp
+                    
+                    <x-forms.searchable-select
+                        wire:model="assetSpaceId"
+                        :options="$spaceOptions"
+                        :selected="$assetSpaceId"
+                        label="Space/Location"
+                        placeholder="Select a space..."
+                        :error="$errors->first('assetSpaceId')"
+                    />
+                </div>
+            </div>
+
+            {{-- Purchase Date --}}
+            <div>
+                <label for="assetPurchasedAt" class="block text-sm font-medium text-slate-700 mb-2">
+                    Purchase Date
+                </label>
+                <input 
+                    wire:model="assetPurchasedAt" 
+                    type="date" 
+                    id="assetPurchasedAt"
+                    class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                />
+                @error('assetPurchasedAt') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+            </div>
+
+            {{-- Description --}}
+            <div>
+                <label for="assetDescription" class="block text-sm font-medium text-slate-700 mb-2">
+                    Description
+                </label>
+                <textarea 
+                    wire:model="assetDescription" 
+                    id="assetDescription"
+                    rows="2"
+                    class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 resize-none"
+                    placeholder="Enter asset description..."
+                ></textarea>
+                @error('assetDescription') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+            </div>
+
+            {{-- Notes --}}
+            <div>
+                <label for="assetNotes" class="block text-sm font-medium text-slate-700 mb-2">
+                    Notes
+                </label>
+                <textarea 
+                    wire:model="assetNotes" 
+                    id="assetNotes"
+                    rows="2"
+                    class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 resize-none"
+                    placeholder="Enter additional notes..."
+                ></textarea>
+                @error('assetNotes') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+            </div>
+
+            {{-- Image Upload --}}
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">
+                    Images (Max 5)
+                </label>
+                
+                {{-- Existing Images --}}
+                @if(count($existingImages) > 0)
+                    <div class="grid grid-cols-5 gap-2 mb-3">
+                        @foreach($existingImages as $index => $image)
+                            <div class="relative group">
+                                <img src="{{ $image['url'] }}" class="w-full h-24 object-cover rounded-lg border border-slate-200">
+                                <button 
+                                    type="button"
+                                    wire:click="deleteExistingImage({{ $image['id'] }})"
+                                    class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                    <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+
+                {{-- Upload Progress --}}
+                @if(count($uploadedImages) > 0)
+                    <div class="grid grid-cols-5 gap-2 mb-3">
+                        @foreach($uploadedImages as $index => $image)
+                            <div class="relative group">
+                                <img src="{{ $image['url'] }}" class="w-full h-24 object-cover rounded-lg border border-slate-200">
+                                <button 
+                                    type="button"
+                                    wire:click="removeUploadedImage({{ $index }})"
+                                    class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                    <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                                @if($image['cached'] ?? false)
+                                    <span class="absolute bottom-1 left-1 bg-green-500 text-white text-xs px-1.5 py-0.5 rounded">Cached</span>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+
+                {{-- Upload Input --}}
+                @if(count($existingImages) + count($uploadedImages) < 5)
+                    <div class="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center hover:border-teal-400 transition-colors">
+                        <input 
+                            type="file" 
+                            wire:model="photos" 
+                            multiple 
+                            accept="image/jpeg,image/jpg,image/png"
+                            class="hidden" 
+                            id="photoInput"
+                        />
+                        <label for="photoInput" class="cursor-pointer">
+                            <svg class="mx-auto h-12 w-12 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                            </svg>
+                            <p class="mt-2 text-sm text-slate-600">
+                                <span class="font-semibold text-teal-600">Click to upload</span> or drag and drop
+                            </p>
+                            <p class="text-xs text-slate-500">PNG, JPG up to 2MB each</p>
+                        </label>
+                    </div>
+                @endif
+
+                @if($isUploading)
+                    <div class="mt-2 flex items-center gap-2 text-sm text-teal-600">
+                        <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Uploading images...
+                    </div>
+                @endif
+
+                @error('photos.*') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+            </div>
+
+            {{-- Form Actions --}}
+            <div class="flex items-center gap-3 pt-4">
+                <button 
+                    type="submit"
+                    @if($isUploading) disabled @endif
+                    class="flex-1 inline-flex justify-center items-center gap-2 rounded-xl bg-gradient-to-r from-teal-600 to-teal-500 px-4 py-2.5 text-sm font-semibold text-white hover:from-teal-700 hover:to-teal-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    @if($isUploading)
+                        <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Uploading...
+                    @else
+                        {{ $isEditingAsset ? 'Update Asset' : 'Create Asset' }}
+                    @endif
+                </button>
+                <button 
+                    type="button"
+                    @click="show = false"
+                    class="px-4 py-2.5 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
+                >
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </x-ui.modal>
 </div>

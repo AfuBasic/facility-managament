@@ -98,107 +98,87 @@
     @endif
 
     {{-- Store Modal --}}
-    @if($showStoreModal)
-        <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-            <div class="flex min-h-screen items-end justify-center px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-                <div class="fixed inset-0 bg-slate-950/75 backdrop-blur-sm transition-opacity" wire:click="closeStoreModal"></div>
+    {{-- Store Modal --}}
+    <x-ui.modal show="showStoreModal" title="{{ $isEditingStore ? 'Edit Store' : 'Create New Store' }}" maxWidth="2xl">
+        <form wire:submit="saveStore" class="space-y-5">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label for="storeName" class="block text-sm font-medium text-slate-700 mb-2">
+                        Store Name <span class="text-red-500">*</span>
+                    </label>
+                    <input 
+                        wire:model="storeName" 
+                        type="text" 
+                        id="storeName"
+                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                        placeholder="e.g., Main Store"
+                    />
+                    @error('storeName') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                </div>
 
-                <div class="relative inline-block align-bottom bg-white rounded-2xl border border-slate-200 px-6 pt-5 pb-6 text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full sm:p-8">
-                    <div class="space-y-6">
-                        <div class="flex items-center justify-between">
-                            <h3 class="text-xl font-semibold text-slate-900">
-                                {{ $isEditingStore ? 'Edit Store' : 'Create New Store' }}
-                            </h3>
-                            <button wire:click="closeStoreModal" class="text-slate-400 hover:text-slate-600 transition-colors">
-                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
-                        </div>
-
-                        <form wire:submit="saveStore" class="space-y-5">
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label for="storeName" class="block text-sm font-medium text-slate-700 mb-2">
-                                        Store Name <span class="text-red-500">*</span>
-                                    </label>
-                                    <input 
-                                        wire:model="storeName" 
-                                        type="text" 
-                                        id="storeName"
-                                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
-                                        placeholder="e.g., Main Store"
-                                    />
-                                    @error('storeName') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-                                </div>
-
-                                <div>
-                                    <label for="storeStatus" class="block text-sm font-medium text-slate-700 mb-2">
-                                        Status <span class="text-red-500">*</span>
-                                    </label>
-                                    <select 
-                                        wire:model="storeStatus" 
-                                        id="storeStatus"
-                                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
-                                    >
-                                        <option value="active">Active</option>
-                                        <option value="inactive">Inactive</option>
-                                    </select>
-                                    @error('storeStatus') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-                                </div>
-                            </div>
-
-                            <div>
-                                @php
-                                    $managerOptions = [];
-                                    foreach($this->availableManagers as $membership) {
-                                        $managerOptions[$membership->user->id] = ($membership->user->name ?? 'New User') . ' • ' . $membership->user->email;
-                                    }
-                                @endphp
-                                
-                                <x-forms.searchable-select
-                                    wire:model="storeManagerId"
-                                    :options="$managerOptions"
-                                    :selected="$storeManagerId"
-                                    label="Store Manager"
-                                    placeholder="Select a manager..."
-                                    :error="$errors->first('storeManagerId')"
-                                />
-                            </div>
-
-                            <div>
-                                <label for="storeDescription" class="block text-sm font-medium text-slate-700 mb-2">
-                                    Description
-                                </label>
-                                <textarea 
-                                    wire:model="storeDescription" 
-                                    id="storeDescription"
-                                    rows="3"
-                                    class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 resize-none"
-                                    placeholder="Enter store description..."
-                                ></textarea>
-                                @error('storeDescription') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-                            </div>
-
-                            <div class="flex items-center gap-3 pt-4">
-                                <button 
-                                    type="submit"
-                                    class="flex-1 inline-flex justify-center items-center gap-2 rounded-xl bg-gradient-to-r from-teal-600 to-teal-500 px-4 py-2.5 text-sm font-semibold text-white hover:from-teal-700 hover:to-teal-600 transition-all"
-                                >
-                                    {{ $isEditingStore ? 'Update Store' : 'Create Store' }}
-                                </button>
-                                <button 
-                                    type="button"
-                                    wire:click="closeStoreModal"
-                                    class="px-4 py-2.5 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
-                                >
-                                    Cancel
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                <div>
+                    <label for="storeStatus" class="block text-sm font-medium text-slate-700 mb-2">
+                        Status <span class="text-red-500">*</span>
+                    </label>
+                    <select 
+                        wire:model="storeStatus" 
+                        id="storeStatus"
+                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                    >
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                    @error('storeStatus') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
                 </div>
             </div>
-        </div>
-    @endif
+
+            <div>
+                @php
+                    $managerOptions = [];
+                    foreach($this->availableManagers as $membership) {
+                        $managerOptions[$membership->user->id] = ($membership->user->name ?? 'New User') . ' • ' . $membership->user->email;
+                    }
+                @endphp
+                
+                <x-forms.searchable-select
+                    wire:model="storeManagerId"
+                    :options="$managerOptions"
+                    :selected="$storeManagerId"
+                    label="Store Manager"
+                    placeholder="Select a manager..."
+                    :error="$errors->first('storeManagerId')"
+                />
+            </div>
+
+            <div>
+                <label for="storeDescription" class="block text-sm font-medium text-slate-700 mb-2">
+                    Description
+                </label>
+                <textarea 
+                    wire:model="storeDescription" 
+                    id="storeDescription"
+                    rows="3"
+                    class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 resize-none"
+                    placeholder="Enter store description..."
+                ></textarea>
+                @error('storeDescription') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+            </div>
+
+            <div class="flex items-center gap-3 pt-4">
+                <button 
+                    type="submit"
+                    class="flex-1 inline-flex justify-center items-center gap-2 rounded-xl bg-gradient-to-r from-teal-600 to-teal-500 px-4 py-2.5 text-sm font-semibold text-white hover:from-teal-700 hover:to-teal-600 transition-all"
+                >
+                    {{ $isEditingStore ? 'Update Store' : 'Create Store' }}
+                </button>
+                <button 
+                    type="button"
+                    @click="show = false"
+                    class="px-4 py-2.5 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
+                >
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </x-ui.modal>
 </div>

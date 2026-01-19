@@ -81,6 +81,12 @@ class PermissionSeeder extends Seeder
             'create sla policy',
             'edit sla policy',
             'delete sla policy',
+
+            // Events
+            'view events',
+            'create events',
+            'edit events',
+            'delete events',
         ];
 
         foreach ($permissions as $permission) {

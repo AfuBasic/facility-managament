@@ -135,49 +135,38 @@
     </div>
 
     <!-- OTP Modal -->
-    @if($showOtpModal)
-    <div class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden p-4 sm:p-6" role="dialog" aria-modal="true">
-        
-        <!-- Backdrop -->
-        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"></div>
+    <x-ui.modal show="showOtpModal" title="Verify Email" maxWidth="md">
+        <div class="text-center mb-6">
+            <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-teal-100 mb-4">
+                <svg class="h-8 w-8 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+            </div>
+            <p class="text-sm text-slate-500">
+                We've sent a 6-digit verification code to <br/> <strong class="text-slate-900">{{ $new_email }}</strong>
+            </p>
+        </div>
 
-        <!-- Modal Panel -->
-        <div class="relative w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-8 text-left shadow-2xl transition-all border border-white/20">
-            
-            <div class="text-center mb-6">
-                <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-teal-100 mb-4">
-                    <svg class="h-8 w-8 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                </div>
-                <h3 class="text-2xl font-bold leading-6 text-slate-900">Verify Email</h3>
-                <p class="mt-2 text-sm text-slate-500">
-                    We've sent a 6-digit verification code to <br/> <strong class="text-slate-900">{{ $new_email }}</strong>
-                </p>
+        <form wire:submit="verifyOtpAndSave">
+            <div class="mb-6">
+                <label for="otp_code" class="block text-sm font-medium text-slate-700 mb-2 text-center">Enter Verification Code</label>
+                <input wire:model="otp_code" type="text" id="otp_code" maxlength="6"
+                        class="block w-full px-4 py-3 text-center text-2xl tracking-[0.5em] font-bold bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 focus:bg-white transition-all duration-300 shadow-sm"
+                        placeholder="000000">
+                @error('otp_code') <span class="text-red-500 text-sm mt-2 block text-center">{{ $message }}</span> @enderror
             </div>
 
-            <form wire:submit="verifyOtpAndSave">
-                <div class="mb-6">
-                    <label for="otp_code" class="block text-sm font-medium text-slate-700 mb-2 text-center">Enter Verification Code</label>
-                    <input wire:model="otp_code" type="text" id="otp_code" maxlength="6"
-                           class="block w-full px-4 py-3 text-center text-2xl tracking-[0.5em] font-bold bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 focus:bg-white transition-all duration-300 shadow-sm"
-                           placeholder="000000">
-                    @error('otp_code') <span class="text-red-500 text-sm mt-2 block text-center">{{ $message }}</span> @enderror
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <button type="button" wire:click="cancelEmailUpdate"
-                            class="w-full justify-center rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 hover:bg-slate-50 transition-colors">
-                        Cancel
-                    </button>
-                    <button type="submit" wire:loading.attr="disabled" wire:target="verifyOtpAndSave"
-                            class="w-full justify-center rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-slate-800 transition-colors flex items-center">
-                        <span wire:loading.remove wire:target="verifyOtpAndSave">Verify</span>
-                        <span wire:loading wire:target="verifyOtpAndSave">Verifying...</span>
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-    @endif
+            <div class="grid grid-cols-2 gap-4">
+                <button type="button" wire:click="cancelEmailUpdate"
+                        class="w-full justify-center rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 hover:bg-slate-50 transition-colors">
+                    Cancel
+                </button>
+                <button type="submit" wire:loading.attr="disabled" wire:target="verifyOtpAndSave"
+                        class="w-full justify-center rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-slate-800 transition-colors flex items-center">
+                    <span wire:loading.remove wire:target="verifyOtpAndSave">Verify</span>
+                    <span wire:loading wire:target="verifyOtpAndSave">Verifying...</span>
+                </button>
+            </div>
+        </form>
+    </x-ui.modal>
 </div>

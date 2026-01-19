@@ -9,6 +9,7 @@ use App\Livewire\Client\ContactGroups;
 use App\Livewire\Client\Contacts;
 use App\Livewire\Client\ContactTypes;
 use App\Livewire\Client\Dashboard;
+use App\Livewire\Client\Events\EventsIndex;
 use App\Livewire\Client\Facilities;
 use App\Livewire\Client\FacilityDetail;
 use App\Livewire\Client\MessagesIndex;
@@ -59,10 +60,7 @@ Route::middleware(['auth', IsVerified::class])->group(function () {
             Route::get('/stores/{store}', StoreDetail::class)->name('store.detail');
             Route::get('/assets/{asset}', AssetDetail::class)->name('asset.detail');
 
-            // Work Orders
             Route::get('/work-orders', WorkOrderList::class)->name('work-orders.index');
-            Route::get('/work-orders/create', WorkOrderCreate::class)->name('work-orders.create');
-            Route::get('/work-orders/{workOrder}/edit', WorkOrderEdit::class)->name('work-orders.edit');
             Route::get('/work-orders/{workOrder}', WorkOrderDetail::class)->name('work-orders.show');
 
             // Notifications
@@ -71,6 +69,9 @@ Route::middleware(['auth', IsVerified::class])->group(function () {
             // Messages
             Route::get('/messages', MessagesIndex::class)->name('messages.index');
             Route::get('/messages/{conversation}', MessagesIndex::class)->name('messages.show');
+
+            // Events
+            Route::get('/events', EventsIndex::class)->name('events.index');
 
             Route::get('/sla-policy', SlaPolicy::class)->name('sla-policy');
             Route::get('/vendors', Vendors::class)->name('vendors');
