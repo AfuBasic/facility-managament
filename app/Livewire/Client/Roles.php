@@ -11,6 +11,7 @@ use App\Repositories\RoleRepository;
 use Illuminate\Support\Facades\Artisan;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Spatie\Permission\Models\Permission;
@@ -21,6 +22,7 @@ class Roles extends Component
 {
     use WithNotifications, WithPagination;
 
+    #[Url(as: 'create', history: true)]
     public $showModal = false;
 
     public $isEditing = false;
@@ -33,6 +35,7 @@ class Roles extends Component
 
     public $clientAccountId;
 
+    #[Url]
     public $search = '';
 
     protected $rules = [
@@ -52,6 +55,11 @@ class Roles extends Component
         $this->authorize('view roles');
         $this->seedPermissionsIfNeeded();
         $this->clientAccountId = app(ClientAccount::class)->id;
+
+        // If modal is opened via URL, initialize form for creating
+        if ($this->showModal && ! $this->isEditing) {
+            $this->reset(['name', 'selectedPermissions', 'isEditing', 'editingRoleId']);
+        }
     }
 
     public function updatingSearch()

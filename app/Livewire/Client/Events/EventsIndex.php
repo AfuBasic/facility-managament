@@ -264,7 +264,7 @@ class EventsIndex extends Component
             }
 
             $this->success('Event created and invitations sent!');
-            return redirect(route('app.events.index'));
+            $this->showModal = false;
         }
 
         $this->showModal = false;

@@ -7,6 +7,7 @@ use App\Models\ClientAccount;
 use App\Models\ContactGroup;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -16,6 +17,7 @@ class ContactGroups extends Component
 {
     use WithNotifications, WithPagination;
 
+    #[Url(as: 'create', history: true)]
     public $showModal = false;
 
     public $isEditing = false;
@@ -28,6 +30,7 @@ class ContactGroups extends Component
 
     public $clientAccountId;
 
+    #[Url]
     public $search = '';
 
     protected $rules = [
@@ -46,6 +49,12 @@ class ContactGroups extends Component
     {
         $this->authorize('view contacts');
         $this->clientAccountId = app(ClientAccount::class)->id;
+
+        // If modal is opened via URL, initialize form for creating
+        if ($this->showModal && ! $this->isEditing) {
+            $this->reset(['name', 'isEditing', 'editingGroupId']);
+            $this->status = 'active';
+        }
     }
 
     public function updatingSearch()

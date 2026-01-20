@@ -21,7 +21,7 @@
 
         <!-- Quick Actions -->
         <div class="flex flex-wrap gap-2">
-            <a href="{{ route('app.work-orders.index') }}" wire:navigate class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-sm font-medium text-slate-700 hover:border-teal-300 hover:text-teal-700 hover:shadow-sm transition-all">
+            <a href="{{ route('app.work-orders.index', ['create' => 'true']) }}" wire:navigate class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-sm font-medium text-slate-700 hover:border-teal-300 hover:text-teal-700 hover:shadow-sm transition-all">
                 <x-heroicon-o-plus class="h-4 w-4" />
                 New Work Order
             </a>
@@ -219,7 +219,7 @@
                         <div class="px-6 py-12 text-center">
                             <x-heroicon-o-clipboard-document-list class="h-10 w-10 mx-auto text-slate-300" />
                             <p class="text-sm text-slate-500 mt-3">No work orders yet</p>
-                            <a href="{{ route('app.work-orders.index') }}" wire:navigate class="inline-flex items-center gap-1 text-sm font-medium text-teal-600 hover:text-teal-700 mt-2">
+                            <a href="{{ route('app.work-orders.index', ['create' => 'true']) }}" wire:navigate class="inline-flex items-center gap-1 text-sm font-medium text-teal-600 hover:text-teal-700 mt-2">
                                 <x-heroicon-o-plus class="h-4 w-4" />
                                 Create your first work order
                             </a>

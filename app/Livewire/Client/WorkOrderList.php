@@ -3,9 +3,9 @@
 namespace App\Livewire\Client;
 
 use App\Models\ClientAccount;
-use App\Models\WorkOrder;
 use App\Models\Facility;
 use App\Models\Space;
+use App\Models\WorkOrder;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
@@ -29,6 +29,11 @@ class WorkOrderList extends Component
     public function mount()
     {
         $this->authorize('viewAny', WorkOrder::class);
+
+        // If modal is opened via URL, initialize form for creating
+        if ($this->showCreateModal) {
+            $this->resetCreateForm();
+        }
     }
 
     public function render()
@@ -42,10 +47,10 @@ class WorkOrderList extends Component
             ->with(['facility', 'reportedBy', 'assignedTo']);
 
         // If user doesn't have general permission, only show their work orders
-        if (!$user->can('view workorders')) {
+        if (! $user->can('view workorders')) {
             $query->where(function ($q) use ($user) {
                 $q->where('reported_by', $user->id)
-                  ->orWhere('assigned_to', $user->id);
+                    ->orWhere('assigned_to', $user->id);
             });
         }
 
@@ -66,12 +71,18 @@ class WorkOrderList extends Component
             'workOrders' => $workOrders,
         ]);
     }
+
+    #[Url(as: 'create', history: true)]
     public $showCreateModal = false;
 
     public $newTitle = '';
+
     public $newDescription = '';
+
     public $newPriority = 'medium';
+
     public $newFacilityId = '';
+
     public $newSpaceId = '';
 
     public function getFacilitiesProperty()
@@ -109,6 +120,7 @@ class WorkOrderList extends Component
         $this->newFacilityId = '';
         $this->newSpaceId = '';
         $this->resetValidation();
+        $this->showCreateModal = false;
     }
 
     public function saveWorkOrder()

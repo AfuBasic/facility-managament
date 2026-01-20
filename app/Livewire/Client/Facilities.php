@@ -11,6 +11,7 @@ use App\Repositories\FacilityRepository;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -21,9 +22,11 @@ class Facilities extends Component
     use WithNotifications, WithPagination;
 
     // Search
+    #[Url]
     public $search = '';
 
     // Modal state
+    #[Url(as: 'create', history: true)]
     public $showModal = false;
 
     public $isEditing = false;
@@ -53,6 +56,11 @@ class Facilities extends Component
     {
         $this->authorize('view facilities');
         $this->clientAccount = app(ClientAccount::class);
+
+        // If modal is opened via URL, initialize form for creating
+        if ($this->showModal && ! $this->isEditing) {
+            $this->reset(['name', 'address', 'isEditing', 'editingFacilityId']);
+        }
     }
 
     public function updatingSearch()

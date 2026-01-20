@@ -9,6 +9,7 @@ use App\Models\ContactGroup;
 use App\Models\ContactType;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -18,6 +19,7 @@ class Contacts extends Component
 {
     use WithNotifications, WithPagination;
 
+    #[Url(as: 'create', history: true)]
     public $showModal = false;
 
     public $isEditing = false;
@@ -48,18 +50,24 @@ class Contacts extends Component
     public $contact_person_id = '';
 
     // Filters
+    #[Url]
     public $search = '';
 
+    #[Url]
     public $filterType = '';
 
+    #[Url]
     public $filterGroup = '';
 
     public $clientAccountId;
 
     // Quick Create States
     public $isCreatingType = false;
+
     public $newTypeName = '';
+
     public $isCreatingGroup = false;
+
     public $newGroupName = '';
 
     protected $rules = [
@@ -87,6 +95,11 @@ class Contacts extends Component
     {
         $this->authorize('view contacts');
         $this->clientAccountId = app(ClientAccount::class)->id;
+
+        // If modal is opened via URL, initialize form for creating
+        if ($this->showModal && ! $this->isEditing) {
+            $this->resetForm();
+        }
     }
 
     public function updatingSearch()
@@ -179,7 +192,7 @@ class Contacts extends Component
     // Quick Create Methods for Types
     public function toggleCreateType()
     {
-        $this->isCreatingType = !$this->isCreatingType;
+        $this->isCreatingType = ! $this->isCreatingType;
         $this->newTypeName = '';
         if ($this->isCreatingType) {
             $this->contact_type_id = '';
@@ -189,7 +202,7 @@ class Contacts extends Component
     public function saveType()
     {
         $this->validate([
-            'newTypeName' => 'required|string|max:255|unique:contact_types,name,NULL,id,client_account_id,' . $this->clientAccountId
+            'newTypeName' => 'required|string|max:255|unique:contact_types,name,NULL,id,client_account_id,'.$this->clientAccountId,
         ]);
 
         $type = ContactType::create([
@@ -207,7 +220,7 @@ class Contacts extends Component
     // Quick Create Methods for Groups
     public function toggleCreateGroup()
     {
-        $this->isCreatingGroup = !$this->isCreatingGroup;
+        $this->isCreatingGroup = ! $this->isCreatingGroup;
         $this->newGroupName = '';
         if ($this->isCreatingGroup) {
             $this->contact_group_id = '';
@@ -217,7 +230,7 @@ class Contacts extends Component
     public function saveGroup()
     {
         $this->validate([
-            'newGroupName' => 'required|string|max:255|unique:contact_groups,name,NULL,id,client_account_id,' . $this->clientAccountId
+            'newGroupName' => 'required|string|max:255|unique:contact_groups,name,NULL,id,client_account_id,'.$this->clientAccountId,
         ]);
 
         $group = ContactGroup::create([
