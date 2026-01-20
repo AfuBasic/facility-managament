@@ -24,6 +24,13 @@ use App\Livewire\Client\WorkOrderCreate;
 use App\Livewire\Client\WorkOrderDetail;
 use App\Livewire\Client\WorkOrderEdit;
 use App\Livewire\Client\WorkOrderList;
+use App\Livewire\Client\Reports\ReportsIndex;
+use App\Livewire\Client\Reports\WorkOrders\StatusDistributionReport;
+use App\Livewire\Client\Reports\WorkOrders\SlaComplianceReport;
+use App\Livewire\Client\Reports\WorkOrders\TechnicianPerformanceReport;
+use App\Livewire\Client\Reports\Facilities\MaintenanceHistoryReport;
+use App\Livewire\Client\Reports\Facilities\AssetConditionReport;
+use App\Livewire\Client\Reports\Financial\CostSummaryReport;
 use App\Livewire\ForgotPassword;
 use App\Livewire\Login;
 use App\Livewire\ResetPassword;
@@ -81,6 +88,23 @@ Route::middleware(['auth', IsVerified::class])->group(function () {
             Route::get('/contacts/groups', ContactGroups::class)->name('contacts.groups');
             Route::get('/roles', Roles::class)->name('roles');
             Route::get('/settings', Settings::class)->name('settings');
+
+            // Reports
+            Route::prefix('reports')->name('reports.')->group(function () {
+                Route::get('/', ReportsIndex::class)->name('index');
+
+                // Work Order Reports
+                Route::get('/work-orders/status', StatusDistributionReport::class)->name('work-orders.status');
+                Route::get('/work-orders/sla', SlaComplianceReport::class)->name('work-orders.sla');
+                Route::get('/work-orders/technicians', TechnicianPerformanceReport::class)->name('work-orders.technicians');
+
+                // Facility Reports
+                Route::get('/facilities/maintenance', MaintenanceHistoryReport::class)->name('facilities.maintenance');
+                Route::get('/facilities/assets', AssetConditionReport::class)->name('facilities.assets');
+
+                // Financial Reports
+                Route::get('/financial/costs', CostSummaryReport::class)->name('financial.costs');
+            });
         });
 });
 

@@ -87,6 +87,10 @@ class PermissionSeeder extends Seeder
             'create events',
             'edit events',
             'delete events',
+
+            // Reports
+            'view reports',
+            'export reports',
         ];
 
         foreach ($permissions as $permission) {

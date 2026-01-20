@@ -4,11 +4,13 @@ namespace App\Livewire\Client;
 
 use App\Models\Asset;
 use App\Models\ClientAccount;
+use App\Models\Conversation;
 use App\Models\Event;
 use App\Models\Facility;
 use App\Models\WorkOrder;
 use App\Models\WorkOrderHistory;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -34,6 +36,10 @@ class Dashboard extends Component
 
     public $recentWorkOrders = [];
 
+    public $recentConversations = [];
+
+    public $unreadMessagesCount = 0;
+
     protected $clientId;
 
     public function mount()
@@ -46,6 +52,7 @@ class Dashboard extends Component
         $this->fetchUpcomingEvents();
         $this->fetchSlaMetrics();
         $this->fetchRecentWorkOrders();
+        $this->fetchRecentConversations();
     }
 
     protected function getClientId()
@@ -184,6 +191,34 @@ class Dashboard extends Component
             ->latest()
             ->take(5)
             ->get();
+    }
+
+    public function fetchRecentConversations()
+    {
+        $clientId = $this->clientId ?? $this->getClientId();
+        $userId = Auth::id();
+
+        $this->recentConversations = Conversation::where('client_account_id', $clientId)
+            ->forUser($userId)
+            ->with(['userOne', 'userTwo', 'latestMessage'])
+            ->latest('updated_at')
+            ->take(5)
+            ->get()
+            ->map(function ($conversation) use ($userId) {
+                $otherUser = $conversation->getOtherUser($userId);
+                return [
+                    'id' => $conversation->id,
+                    'hashid' => $conversation->hashid,
+                    'other_user' => $otherUser,
+                    'latest_message' => $conversation->latestMessage,
+                    'unread_count' => $conversation->unreadCountFor($userId),
+                ];
+            });
+
+        $this->unreadMessagesCount = Conversation::where('client_account_id', $clientId)
+            ->forUser($userId)
+            ->get()
+            ->sum(fn ($c) => $c->unreadCountFor($userId));
     }
 
     public function toJSON()

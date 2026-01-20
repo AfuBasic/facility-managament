@@ -8,6 +8,12 @@
     <link rel="icon" type="image/png" href="{{ asset('images/icons/icon_256.png') }}">
     <title>{{ $title ?? 'Optima FM' }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    
+    <!-- Flatpickr Date Picker -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/light.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    
     @livewireStyles
 </head>
 <body class="h-full font-sans antialiased text-slate-600" x-data="{ sidebarOpen: false }">

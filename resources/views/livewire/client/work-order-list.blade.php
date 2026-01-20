@@ -4,10 +4,22 @@
         description="Manage facility maintenance requests and track their progress."
     >
         <x-slot:actions>
-            <button wire:click="openCreateModal" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors border border-transparent text-white bg-teal-600 hover:bg-teal-700 focus:ring-teal-500">
-                <x-heroicon-o-plus class="h-5 w-5 mr-2" />
-                New Work Order
-            </button>
+            <div class="flex items-center gap-2">
+                {{-- Export Buttons --}}
+                <button wire:click="exportExcel" wire:loading.attr="disabled" class="inline-flex items-center justify-center px-3 py-2 text-sm font-medium rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors border border-slate-300 text-slate-700 bg-white hover:bg-slate-50 focus:ring-teal-500">
+                    <x-heroicon-o-document-arrow-down class="h-4 w-4 mr-1.5" />
+                    Excel
+                </button>
+                <button wire:click="exportPdf" wire:loading.attr="disabled" class="inline-flex items-center justify-center px-3 py-2 text-sm font-medium rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors border border-slate-300 text-slate-700 bg-white hover:bg-slate-50 focus:ring-teal-500">
+                    <x-heroicon-o-document-text class="h-4 w-4 mr-1.5" />
+                    PDF
+                </button>
+                {{-- New Work Order Button --}}
+                <button wire:click="openCreateModal" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors border border-transparent text-white bg-teal-600 hover:bg-teal-700 focus:ring-teal-500">
+                    <x-heroicon-o-plus class="h-5 w-5 mr-2" />
+                    New Work Order
+                </button>
+            </div>
         </x-slot:actions>
     </x-ui.page-header>
 

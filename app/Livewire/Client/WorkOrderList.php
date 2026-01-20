@@ -2,15 +2,18 @@
 
 namespace App\Livewire\Client;
 
+use App\Exports\WorkOrderListExport;
 use App\Models\ClientAccount;
 use App\Models\Facility;
 use App\Models\Space;
 use App\Models\WorkOrder;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Maatwebsite\Excel\Facades\Excel;
 
 #[Layout('components.layouts.client-app')]
 class WorkOrderList extends Component
@@ -147,5 +150,54 @@ class WorkOrderList extends Component
         $this->showCreateModal = false;
         $this->resetCreateForm();
         session()->flash('success', 'Work order created successfully.');
+    }
+
+    public function exportExcel()
+    {
+        return Excel::download(
+            new WorkOrderListExport($this->status, $this->priority, $this->search),
+            'work-orders-' . now()->format('Y-m-d') . '.xlsx'
+        );
+    }
+
+    public function exportPdf()
+    {
+        $clientAccount = app(ClientAccount::class);
+        $clientId = $clientAccount->id ?? session('current_client_account_id');
+        $user = Auth::user();
+
+        $query = WorkOrder::where('client_account_id', $clientId)
+            ->with(['facility', 'reportedBy', 'assignedTo']);
+
+        if (! $user->can('view workorders')) {
+            $query->where(function ($q) use ($user) {
+                $q->where('reported_by', $user->id)
+                    ->orWhere('assigned_to', $user->id);
+            });
+        }
+
+        $workOrders = $query
+            ->when($this->status, fn ($q) => $q->where('status', $this->status))
+            ->when($this->priority, fn ($q) => $q->where('priority', $this->priority))
+            ->when($this->search, function ($q) {
+                $q->where(function ($query) {
+                    $query->where('title', 'like', "%{$this->search}%")
+                        ->orWhere('description', 'like', "%{$this->search}%");
+                });
+            })
+            ->latest('created_at')
+            ->limit(500)
+            ->get();
+
+        $pdf = Pdf::loadView('exports.pdf.work-order-list', [
+            'workOrders' => $workOrders,
+            'generatedAt' => now(),
+            'clientName' => $clientAccount->name ?? 'Client',
+        ]);
+
+        return response()->streamDownload(
+            fn() => print($pdf->output()),
+            'work-orders-' . now()->format('Y-m-d') . '.pdf'
+        );
     }
 }
