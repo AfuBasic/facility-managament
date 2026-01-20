@@ -15,6 +15,7 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -24,10 +25,13 @@ class EventsIndex extends Component
 {
     use WithNotifications, WithPagination;
 
+    #[Url]
     public string $search = '';
 
+    #[Url]
     public string $filter = 'upcoming'; // upcoming, past, all
 
+    #[Url(as: 'create', history: true)]
     public bool $showModal = false;
 
     public bool $isEditing = false;
@@ -89,6 +93,11 @@ class EventsIndex extends Component
         $this->clientAccount = app(ClientAccount::class);
         $this->currentMonth = now()->month;
         $this->currentYear = now()->year;
+
+        // If modal is opened via URL, initialize form for creating
+        if ($this->showModal && ! $this->isEditing) {
+            $this->resetForm();
+        }
     }
 
     public function switchView(string $view): void
