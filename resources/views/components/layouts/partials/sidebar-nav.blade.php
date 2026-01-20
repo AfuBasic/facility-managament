@@ -120,6 +120,19 @@
                     </a>
                 </li>
                 @endcan
+                  @can('view reports')
+            <li>
+                <div class="text-xs font-semibold leading-6 text-slate-500 uppercase tracking-widest mb-4 px-2">Analytics</div>
+                <ul role="list" class="-mx-2 space-y-2">
+                    <li>
+                        <a href="{{ route('app.reports.index') }}" wire:navigate class="group flex gap-x-3 rounded-xl p-2.5 text-sm leading-6 font-semibold transition-all duration-300 {{ request()->routeIs('app.reports.*') ? 'bg-gradient-to-r from-teal-500/10 to-transparent text-teal-400 border-l-4 border-teal-500 shadow-[0_0_20px_rgba(45,212,191,0.1)]' : 'text-slate-400 hover:text-white hover:bg-slate-800/50 border-l-4 border-transparent' }}">
+                            <x-heroicon-o-chart-bar-square class="h-6 w-6 shrink-0 {{ request()->routeIs('app.reports.*') ? 'text-teal-400' : 'text-slate-500 group-hover:text-teal-400 transition-colors' }}" />
+                            Reports
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            @endcan
             </ul>
         </li>
         @endcanany
