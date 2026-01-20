@@ -1,6 +1,6 @@
 @props(['activities'])
 
-<div class="bg-white rounded-2xl border border-slate-100 shadow-sm flex flex-col h-full overflow-hidden">
+<div class="bg-white rounded-2xl border border-slate-100 shadow-sm flex flex-col max-h-[470px] overflow-hidden">
     <div class="p-6 border-b border-slate-50">
         <h3 class="font-semibold text-slate-900">Recent Activity</h3>
     </div>

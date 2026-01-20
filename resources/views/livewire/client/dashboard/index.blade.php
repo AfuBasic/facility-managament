@@ -25,7 +25,7 @@
                 <x-heroicon-o-plus class="h-4 w-4" />
                 New Work Order
             </a>
-            <a href="{{ route('app.events.index') }}" wire:navigate class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-sm font-medium text-slate-700 hover:border-teal-300 hover:text-teal-700 hover:shadow-sm transition-all">
+            <a href="{{ route('app.events.index', ['create' => 'true']) }}" wire:navigate class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-sm font-medium text-slate-700 hover:border-teal-300 hover:text-teal-700 hover:shadow-sm transition-all">
                 <x-heroicon-o-calendar class="h-4 w-4" />
                 Schedule Event
             </a>

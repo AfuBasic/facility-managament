@@ -303,7 +303,6 @@
     </div>
 
     {{-- Create/Edit Modal --}}
-    {{-- Create/Edit Modal --}}
     <x-ui.modal show="showModal" maxWidth="2xl" title="{{ $isEditing ? 'Edit Event' : 'Create New Event' }}">
         <form wire:submit="save" class="space-y-5" x-data="{ eventType: $wire.entangle('type') }">
             {{-- Title --}}

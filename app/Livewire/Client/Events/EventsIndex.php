@@ -107,14 +107,14 @@ class EventsIndex extends Component
 
     public function nextMonth(): void
     {
-        $date = \Carbon\Carbon::createFromDate($this->currentYear, $this->currentMonth, 1)->addMonth();
+        $date = Carbon::createFromDate($this->currentYear, $this->currentMonth, 1)->addMonth();
         $this->currentMonth = $date->month;
         $this->currentYear = $date->year;
     }
 
     public function prevMonth(): void
     {
-        $date = \Carbon\Carbon::createFromDate($this->currentYear, $this->currentMonth, 1)->subMonth();
+        $date = Carbon::createFromDate($this->currentYear, $this->currentMonth, 1)->subMonth();
         $this->currentMonth = $date->month;
         $this->currentYear = $date->year;
     }
@@ -209,13 +209,13 @@ class EventsIndex extends Component
         $this->showModal = true;
     }
 
-    public function save(): void
+    public function save()
     {
         $this->validate();
 
-        $startsAt = \Carbon\Carbon::parse("{$this->eventDate} {$this->eventTime}");
+        $startsAt = Carbon::parse("{$this->eventDate} {$this->eventTime}");
         $endsAt = $this->endTime
-            ? \Carbon\Carbon::parse("{$this->eventDate} {$this->endTime}")
+            ? Carbon::parse("{$this->eventDate} {$this->endTime}")
             : $startsAt->copy()->addHour(); // Default to 1 hour if no end time
 
         // Check for overlaps
@@ -264,6 +264,7 @@ class EventsIndex extends Component
             }
 
             $this->success('Event created and invitations sent!');
+            return redirect(route('app.events.index'));
         }
 
         $this->showModal = false;
