@@ -1,20 +1,20 @@
 <div x-data="{ isAnimating: false }">
     {{-- AI Assistant Floating Widget --}}
     
-    {{-- Floating Button with pulse animation --}}
+    {{-- Floating Button with subtle pulse animation --}}
     @if(!$isOpen)
         <div class="fixed bottom-6 right-6 z-50">
             <div class="relative">
-                {{-- Pulse ring --}}
-                <div class="absolute inset-0 rounded-full bg-blue-500 opacity-75 animate-ping"></div>
+                {{-- Subtle pulse ring - slower and less intense --}}
+                <div class="absolute inset-0 rounded-full bg-blue-400 opacity-40 animate-pulse"></div>
                 
                 <flux:button 
                     wire:click="toggleChat" 
                     variant="primary" 
-                    class="relative rounded-full shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 px-6 py-3"
+                    class="relative rounded-full shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 px-3 py-3 sm:px-6"
                     icon="sparkles"
                 >
-                    <span class="font-semibold">AI Assistant</span>
+                    <span class="font-semibold hidden sm:inline">AI Assistant</span>
                 </flux:button>
             </div>
         </div>

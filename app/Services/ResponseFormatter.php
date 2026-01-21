@@ -94,6 +94,10 @@ class ResponseFormatter
                 'assets' => 'asset',
                 'work orders' => 'work order',
                 'stores' => 'store',
+                'events' => 'event',
+                'contacts' => 'contact',
+                'spaces' => 'space',
+                'users' => 'user',
                 'results' => 'result',
             ];
 
@@ -128,6 +132,10 @@ class ResponseFormatter
             'Asset' => '/app/facilities', // Assets are viewed through facilities
             'Facility' => '/app/facilities',
             'Store' => '/app/facilities', // Stores are viewed through facilities
+            'Event' => '/app/events',
+            'Contact' => '/app/contacts',
+            'Space' => '/app/facilities', // Spaces are viewed through facilities
+            'User' => '/app/users',
         ];
 
         if (isset($routeMap[$model])) {
