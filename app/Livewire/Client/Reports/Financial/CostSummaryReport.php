@@ -21,6 +21,7 @@ class CostSummaryReport extends Component
     use HasDateRangeFilter;
 
     public ClientAccount $clientAccount;
+
     public ?int $facilityId = null;
 
     public function mount(): void
@@ -47,12 +48,12 @@ class CostSummaryReport extends Component
 
         $baseQuery = WorkOrder::where('client_account_id', $this->getClientId())
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->when($this->facilityId, fn($q) => $q->where('facility_id', $this->facilityId));
+            ->when($this->facilityId, fn ($q) => $q->where('facility_id', $this->facilityId));
 
         // Cost by Facility
         $costByFacility = WorkOrder::where('work_orders.client_account_id', $this->getClientId())
             ->whereBetween('work_orders.created_at', [$startDate, $endDate])
-            ->when($this->facilityId, fn($q) => $q->where('facility_id', $this->facilityId))
+            ->when($this->facilityId, fn ($q) => $q->where('facility_id', $this->facilityId))
             ->leftJoin('facilities', 'work_orders.facility_id', '=', 'facilities.id')
             ->select(
                 'facilities.name as facility_name',
@@ -63,7 +64,7 @@ class CostSummaryReport extends Component
             ->groupBy('facilities.id', 'facilities.name')
             ->orderBy('total_cost', 'desc')
             ->get()
-            ->map(fn($f) => [
+            ->map(fn ($f) => [
                 'facility' => $f->facility_name ?: 'Unassigned',
                 'order_count' => $f->order_count,
                 'total_cost' => number_format($f->total_cost, 2),
@@ -81,7 +82,7 @@ class CostSummaryReport extends Component
             ->groupBy('priority')
             ->orderBy('total_cost', 'desc')
             ->get()
-            ->map(fn($p) => [
+            ->map(fn ($p) => [
                 'priority' => ucfirst($p->priority),
                 'count' => $p->count,
                 'total_cost' => number_format($p->total_cost, 2),
@@ -98,8 +99,8 @@ class CostSummaryReport extends Component
             ->groupBy('month')
             ->orderBy('month')
             ->get()
-            ->map(fn($item) => [
-                'label' => \Carbon\Carbon::parse($item->month . '-01')->format('M Y'),
+            ->map(fn ($item) => [
+                'label' => \Carbon\Carbon::parse($item->month.'-01')->format('M Y'),
                 'count' => $item->count,
                 'cost' => $item->total_cost,
             ])
@@ -113,7 +114,7 @@ class CostSummaryReport extends Component
             ->orderBy('total_cost', 'desc')
             ->limit(10)
             ->get()
-            ->map(fn($wo) => [
+            ->map(fn ($wo) => [
                 'id' => $wo->id,
                 'serial' => $wo->workorder_serial,
                 'title' => $wo->title,
@@ -157,11 +158,12 @@ class CostSummaryReport extends Component
             'dateRange' => $this->getDateRangeLabel(),
             'generatedAt' => now(),
             'clientName' => $this->clientAccount->name,
+            'currency' => $this->clientAccount->getCurrencySymbol(),
         ]);
 
         return response()->streamDownload(
-            fn() => print($pdf->output()),
-            'cost-summary-report-' . now()->format('Y-m-d') . '.pdf'
+            fn () => print ($pdf->output()),
+            'cost-summary-report-'.now()->format('Y-m-d').'.pdf'
         );
     }
 
@@ -171,7 +173,7 @@ class CostSummaryReport extends Component
 
         return Excel::download(
             new CostSummaryExport($data, $this->getDateRangeLabel()),
-            'cost-summary-report-' . now()->format('Y-m-d') . '.xlsx'
+            'cost-summary-report-'.now()->format('Y-m-d').'.xlsx'
         );
     }
 

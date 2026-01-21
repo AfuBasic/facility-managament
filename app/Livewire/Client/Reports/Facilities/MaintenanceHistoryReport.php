@@ -21,6 +21,7 @@ class MaintenanceHistoryReport extends Component
     use HasDateRangeFilter;
 
     public ClientAccount $clientAccount;
+
     public ?int $facilityId = null;
 
     public function mount(): void
@@ -55,7 +56,7 @@ class MaintenanceHistoryReport extends Component
         // Per-Facility Summary
         $facilityData = WorkOrder::where('work_orders.client_account_id', $this->getClientId())
             ->whereBetween('work_orders.created_at', [$startDate, $endDate])
-            ->when($this->facilityId, fn($q) => $q->where('work_orders.facility_id', $this->facilityId))
+            ->when($this->facilityId, fn ($q) => $q->where('work_orders.facility_id', $this->facilityId))
             ->join('facilities', 'work_orders.facility_id', '=', 'facilities.id')
             ->select(
                 'facilities.id',
@@ -69,7 +70,7 @@ class MaintenanceHistoryReport extends Component
             ->groupBy('facilities.id', 'facilities.name')
             ->orderBy('total_orders', 'desc')
             ->get()
-            ->map(fn($f) => [
+            ->map(fn ($f) => [
                 'id' => $f->id,
                 'name' => $f->name,
                 'total_orders' => $f->total_orders,
@@ -83,7 +84,7 @@ class MaintenanceHistoryReport extends Component
         // Monthly Trend
         $trendData = WorkOrder::where('client_account_id', $this->getClientId())
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->when($this->facilityId, fn($q) => $q->where('facility_id', $this->facilityId))
+            ->when($this->facilityId, fn ($q) => $q->where('facility_id', $this->facilityId))
             ->select(
                 DB::raw('DATE_FORMAT(created_at, "%Y-%m") as month'),
                 DB::raw('COUNT(*) as count'),
@@ -92,8 +93,8 @@ class MaintenanceHistoryReport extends Component
             ->groupBy('month')
             ->orderBy('month')
             ->get()
-            ->map(fn($item) => [
-                'label' => \Carbon\Carbon::parse($item->month . '-01')->format('M Y'),
+            ->map(fn ($item) => [
+                'label' => \Carbon\Carbon::parse($item->month.'-01')->format('M Y'),
                 'count' => $item->count,
                 'cost' => $item->cost,
             ])
@@ -130,11 +131,12 @@ class MaintenanceHistoryReport extends Component
             'dateRange' => $this->getDateRangeLabel(),
             'generatedAt' => now(),
             'clientName' => $this->clientAccount->name,
+            'currency' => $this->clientAccount->getCurrencySymbol(),
         ]);
 
         return response()->streamDownload(
-            fn() => print($pdf->output()),
-            'maintenance-history-report-' . now()->format('Y-m-d') . '.pdf'
+            fn () => print ($pdf->output()),
+            'maintenance-history-report-'.now()->format('Y-m-d').'.pdf'
         );
     }
 
@@ -144,7 +146,7 @@ class MaintenanceHistoryReport extends Component
 
         return Excel::download(
             new MaintenanceHistoryExport($data, $this->getDateRangeLabel()),
-            'maintenance-history-report-' . now()->format('Y-m-d') . '.xlsx'
+            'maintenance-history-report-'.now()->format('Y-m-d').'.xlsx'
         );
     }
 

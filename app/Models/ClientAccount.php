@@ -13,9 +13,9 @@ class ClientAccount extends Model
     protected $fillable = [
         'name',
         'notification_email',
-        'company_phone',
+        'phone',
         'address',
-        'logo',
+        'currency',
     ];
 
     public function memberships(): HasMany
@@ -39,5 +39,23 @@ class ClientAccount extends Model
     public function getNotificationEmailAttribute(?string $value): ?string
     {
         return $value ?: null;
+    }
+
+    /**
+     * Get the currency symbol for this client account.
+     */
+    public function getCurrencySymbol(): string
+    {
+        return $this->currency ?? '$';
+    }
+
+    /**
+     * Format a monetary value with the client's currency symbol.
+     */
+    public function formatCurrency(float|int|string|null $amount, int $decimals = 2): string
+    {
+        $amount = (float) ($amount ?? 0);
+
+        return $this->getCurrencySymbol().number_format($amount, $decimals);
     }
 }

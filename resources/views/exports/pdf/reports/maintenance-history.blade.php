@@ -11,7 +11,7 @@
                 <div class="metric-label">Completed</div>
             </div>
             <div class="metric-box">
-                <div class="metric-value">₦{{ $data['summary']['total_cost'] }}</div>
+                <div class="metric-value">{{ $currency }}{{ $data['summary']['total_cost'] }}</div>
                 <div class="metric-label">Total Cost</div>
             </div>
             <div class="metric-box">
@@ -41,7 +41,7 @@
                 <td class="text-right font-bold">{{ number_format($facility['total_orders']) }}</td>
                 <td class="text-right text-success">{{ number_format($facility['completed']) }}</td>
                 <td class="text-right text-warning">{{ number_format($facility['open']) }}</td>
-                <td class="text-right">₦{{ $facility['total_cost'] }}</td>
+                <td class="text-right">{{ $currency }}{{ $facility['total_cost'] }}</td>
                 <td class="text-right">{{ $facility['avg_completion_hours'] }}h</td>
             </tr>
             @endforeach

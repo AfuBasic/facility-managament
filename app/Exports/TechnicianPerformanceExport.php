@@ -12,7 +12,8 @@ class TechnicianPerformanceExport implements FromArray, WithHeadings, WithStyles
 {
     public function __construct(
         protected array $data,
-        protected string $dateRange
+        protected string $dateRange,
+        protected string $currency = '$'
     ) {}
 
     public function array(): array
@@ -29,7 +30,7 @@ class TechnicianPerformanceExport implements FromArray, WithHeadings, WithStyles
                 $tech['completion_rate'].'%',
                 $tech['sla_rate'].'%',
                 $tech['avg_completion_hours'] ? $tech['avg_completion_hours'].'h' : 'N/A',
-                '$'.number_format($tech['total_cost'], 2),
+                $this->currency.number_format($tech['total_cost'], 2),
             ];
         }
 

@@ -1,4 +1,4 @@
-<div class="space-y-6" x-data="costReportCharts()">
+<div class="space-y-6" x-data="costReportCharts('{{ $clientAccount->getCurrencySymbol() }}')">
     <!-- Back Navigation -->
     <a href="{{ route('app.reports.index') }}" wire:navigate class="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-teal-600 transition-colors">
         <x-heroicon-o-arrow-left class="h-4 w-4" />
@@ -40,7 +40,7 @@
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <x-dashboard.stat-card
             label="Total Cost"
-            :value="'₦' . $data['summary']['total_cost']"
+            :value="$clientAccount->getCurrencySymbol() . $data['summary']['total_cost']"
             icon="banknotes"
             color="emerald"
         />
@@ -52,13 +52,13 @@
         />
         <x-dashboard.stat-card
             label="Avg Cost/Order"
-            :value="'₦' . $data['summary']['avg_cost']"
+            :value="$clientAccount->getCurrencySymbol() . $data['summary']['avg_cost']"
             icon="calculator"
             color="teal"
         />
         <x-dashboard.stat-card
             label="Highest Cost"
-            :value="'₦' . $data['summary']['max_cost']"
+            :value="$clientAccount->getCurrencySymbol() . $data['summary']['max_cost']"
             icon="arrow-trending-up"
             color="amber"
         />
@@ -110,10 +110,10 @@
                                 {{ number_format($facility['order_count']) }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-semibold text-slate-900">
-                                ₦{{ $facility['total_cost'] }}
+                                {{ $clientAccount->getCurrencySymbol() }}{{ $facility['total_cost'] }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-slate-600">
-                                ₦{{ $facility['avg_cost'] }}
+                                {{ $clientAccount->getCurrencySymbol() }}{{ $facility['avg_cost'] }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center gap-2">
@@ -185,7 +185,7 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-semibold text-slate-900">
-                                ₦{{ $order['cost'] }}
+                                {{ $clientAccount->getCurrencySymbol() }}{{ $order['cost'] }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
                                 {{ $order['created_at'] }}
@@ -205,8 +205,9 @@
 </div>
 
 <script>
-function costReportCharts() {
+function costReportCharts(currencySymbol) {
     return {
+        currency: currencySymbol,
         init() {
             this.renderTrendChart();
             this.renderPriorityChart();
@@ -215,10 +216,11 @@ function costReportCharts() {
         renderTrendChart() {
             const trendData = @json($data['monthlyTrend']);
             if (trendData.length === 0) return;
+            const currency = this.currency;
 
             const options = {
                 series: [{
-                    name: 'Cost (₦)',
+                    name: 'Cost (' + currency + ')',
                     type: 'area',
                     data: trendData.map(t => t.cost)
                 }, {
@@ -243,7 +245,7 @@ function costReportCharts() {
                     labels: { style: { colors: '#64748b', fontSize: '11px' } }
                 },
                 yaxis: [
-                    { title: { text: 'Cost (₦)' }, labels: { style: { colors: '#64748b' }, formatter: (val) => '₦' + val.toLocaleString() } },
+                    { title: { text: 'Cost (' + currency + ')' }, labels: { style: { colors: '#64748b' }, formatter: (val) => currency + val.toLocaleString() } },
                     { opposite: true, title: { text: 'Orders' }, labels: { style: { colors: '#64748b' } } }
                 ],
                 grid: { borderColor: '#f1f5f9', strokeDashArray: 4 },
@@ -258,6 +260,7 @@ function costReportCharts() {
         renderPriorityChart() {
             const priorityData = @json($data['costByPriority']);
             if (priorityData.length === 0) return;
+            const currency = this.currency;
 
             const options = {
                 series: [{
@@ -276,7 +279,7 @@ function costReportCharts() {
                 },
                 dataLabels: {
                     enabled: true,
-                    formatter: (val) => '₦' + val.toLocaleString(),
+                    formatter: (val) => currency + val.toLocaleString(),
                     style: { fontSize: '11px' },
                     offsetY: -20
                 },
@@ -285,7 +288,7 @@ function costReportCharts() {
                     labels: { style: { colors: '#64748b', fontSize: '12px' } }
                 },
                 yaxis: {
-                    labels: { style: { colors: '#64748b' }, formatter: (val) => '₦' + val.toLocaleString() }
+                    labels: { style: { colors: '#64748b' }, formatter: (val) => currency + val.toLocaleString() }
                 },
                 grid: { borderColor: '#f1f5f9', strokeDashArray: 4 },
                 legend: { show: false }

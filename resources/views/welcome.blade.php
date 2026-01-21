@@ -182,8 +182,8 @@
                         Solutions
                         <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-teal-400 transition-all group-hover:w-full"></span>
                     </a>
-                    <a href="#testimonials" class="text-sm font-medium text-slate-300 hover:text-white transition-colors relative group">
-                        Testimonials
+                    <a href="#contact" class="text-sm font-medium text-slate-300 hover:text-white transition-colors relative group">
+                        Contact
                         <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-teal-400 transition-all group-hover:w-full"></span>
                     </a>
                 </div>
@@ -226,7 +226,7 @@
             <div class="px-4 py-6 space-y-4">
                 <a href="#features" @click="mobileMenuOpen = false" class="block text-base font-medium text-slate-300 hover:text-white transition-colors py-2">Features</a>
                 <a href="#solutions" @click="mobileMenuOpen = false" class="block text-base font-medium text-slate-300 hover:text-white transition-colors py-2">Solutions</a>
-                <a href="#testimonials" @click="mobileMenuOpen = false" class="block text-base font-medium text-slate-300 hover:text-white transition-colors py-2">Testimonials</a>
+                <a href="#contact" @click="mobileMenuOpen = false" class="block text-base font-medium text-slate-300 hover:text-white transition-colors py-2">Contact</a>
                 <div class="pt-4 border-t border-slate-800 space-y-3">
                     @auth
                         <a href="{{ route('user.home') }}" class="block w-full text-center px-5 py-3 text-base font-semibold text-white bg-teal-500 rounded-xl">Dashboard</a>
@@ -673,7 +673,7 @@
     </section>
 
     <!-- Why Free Section -->
-    <section id="testimonials" class="py-24 bg-slate-900 text-white relative overflow-hidden">
+    <section class="py-24 bg-slate-900 text-white relative overflow-hidden">
         <div class="absolute top-0 right-0 -mr-32 -mt-32 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl"></div>
         <div class="absolute bottom-0 left-0 -ml-32 -mb-32 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl"></div>
 
@@ -717,27 +717,82 @@
                     </ul>
                 </div>
 
-                <!-- Testimonial Card -->
-                <div class="relative">
-                    <div class="absolute inset-0 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-3xl rotate-2 opacity-20 scale-105"></div>
-                    <div class="relative bg-slate-800/80 backdrop-blur-sm p-8 rounded-3xl border border-slate-700">
-                        <svg class="w-10 h-10 text-teal-500/30 mb-4" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/>
+                <!-- Free Illustration -->
+                <div class="relative flex items-center justify-center">
+                    <!-- Animated background glow -->
+                    <div class="absolute w-80 h-80 bg-gradient-to-r from-teal-500/20 to-emerald-500/20 rounded-full blur-3xl animate-pulse"></div>
+
+                    <!-- SVG Illustration -->
+                    <div class="relative">
+                        <svg class="w-72 h-72 md:w-96 md:h-96" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Background circle -->
+                            <circle cx="200" cy="200" r="180" fill="url(#bgGradient)" opacity="0.1"/>
+
+                            <!-- Gift box base -->
+                            <rect x="100" y="180" width="200" height="140" rx="12" fill="url(#boxGradient)" />
+                            <rect x="100" y="180" width="200" height="140" rx="12" stroke="#0d9488" stroke-width="3" opacity="0.3"/>
+
+                            <!-- Gift box lid -->
+                            <rect x="85" y="150" width="230" height="40" rx="8" fill="url(#lidGradient)" />
+                            <rect x="85" y="150" width="230" height="40" rx="8" stroke="#0d9488" stroke-width="3" opacity="0.3"/>
+
+                            <!-- Ribbon vertical -->
+                            <rect x="185" y="150" width="30" height="170" fill="#f0fdfa" opacity="0.9"/>
+                            <rect x="185" y="150" width="30" height="170" stroke="#5eead4" stroke-width="2"/>
+
+                            <!-- Ribbon horizontal -->
+                            <rect x="85" y="160" width="230" height="20" fill="#f0fdfa" opacity="0.9"/>
+                            <rect x="85" y="160" width="230" height="20" stroke="#5eead4" stroke-width="2"/>
+
+                            <!-- Bow left loop -->
+                            <ellipse cx="165" cy="130" rx="35" ry="25" fill="#f0fdfa" stroke="#5eead4" stroke-width="2"/>
+
+                            <!-- Bow right loop -->
+                            <ellipse cx="235" cy="130" rx="35" ry="25" fill="#f0fdfa" stroke="#5eead4" stroke-width="2"/>
+
+                            <!-- Bow center -->
+                            <circle cx="200" cy="140" r="15" fill="url(#bowGradient)" stroke="#5eead4" stroke-width="2"/>
+
+                            <!-- Sparkles -->
+                            <g class="animate-pulse">
+                                <path d="M80 100 L85 110 L80 120 L75 110 Z" fill="#5eead4"/>
+                                <path d="M320 90 L325 100 L320 110 L315 100 Z" fill="#5eead4"/>
+                                <path d="M340 200 L345 210 L340 220 L335 210 Z" fill="#2dd4bf"/>
+                                <path d="M60 220 L65 230 L60 240 L55 230 Z" fill="#2dd4bf"/>
+                                <path d="M100 80 L103 87 L100 94 L97 87 Z" fill="#99f6e4"/>
+                                <path d="M300 280 L303 287 L300 294 L297 287 Z" fill="#99f6e4"/>
+                            </g>
+
+                            <!-- Floating circles -->
+                            <circle cx="70" cy="160" r="6" fill="#14b8a6" opacity="0.6"/>
+                            <circle cx="330" cy="140" r="8" fill="#10b981" opacity="0.6"/>
+                            <circle cx="350" cy="260" r="5" fill="#5eead4" opacity="0.6"/>
+                            <circle cx="50" cy="280" r="7" fill="#2dd4bf" opacity="0.6"/>
+
+                            <!-- Gradients -->
+                            <defs>
+                                <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#14b8a6"/>
+                                    <stop offset="100%" stop-color="#10b981"/>
+                                </linearGradient>
+                                <linearGradient id="boxGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#0f766e"/>
+                                    <stop offset="100%" stop-color="#047857"/>
+                                </linearGradient>
+                                <linearGradient id="lidGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#14b8a6"/>
+                                    <stop offset="100%" stop-color="#10b981"/>
+                                </linearGradient>
+                                <linearGradient id="bowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#2dd4bf"/>
+                                    <stop offset="100%" stop-color="#34d399"/>
+                                </linearGradient>
+                            </defs>
                         </svg>
-                        <p class="text-xl text-slate-200 mb-6 leading-relaxed">
-                            "Optima FM transformed how we handle maintenance. It's incredibly intuitive and, best of all, it didn't cost us a dime to get started. Our team was onboarded in a day."
-                        </p>
-                        <div class="flex items-center gap-4">
-                            <div class="h-12 w-12 rounded-full bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center font-bold text-white text-lg">JD</div>
-                            <div>
-                                <h4 class="font-bold text-white">John Doe</h4>
-                                <p class="text-sm text-slate-400">Facilities Manager, Acme Corp</p>
-                            </div>
-                        </div>
-                        <div class="flex text-amber-400 mt-4 gap-0.5">
-                            @for($i = 0; $i < 5; $i++)
-                            <svg class="w-5 h-5 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                            @endfor
+
+                        <!-- Floating badge -->
+                        <div class="absolute -top-4 -right-4 px-4 py-2 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full shadow-lg transform rotate-12 animate-bounce">
+                            <span class="text-white font-bold text-sm">100% Free!</span>
                         </div>
                     </div>
                 </div>
@@ -855,6 +910,69 @@
         </div>
     </section>
 
+    <!-- Feature Request / Contact Section -->
+    <section id="contact" class="py-20 bg-white relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent"></div>
+        <div class="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent"></div>
+
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="relative">
+                <!-- Decorative elements -->
+                <div class="absolute -top-10 -left-10 w-32 h-32 bg-gradient-to-br from-teal-100 to-emerald-100 rounded-full blur-3xl opacity-60"></div>
+                <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full blur-3xl opacity-60"></div>
+
+                <!-- Card -->
+                <div class="relative bg-gradient-to-br from-slate-50 to-white rounded-3xl border border-slate-200/80 shadow-xl shadow-slate-200/50 p-8 md:p-12 text-center">
+                    <!-- Icon -->
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/30 mb-6">
+                        <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        </svg>
+                    </div>
+
+                    <h3 class="text-2xl md:text-3xl font-extrabold text-slate-900 mb-4">
+                        Missing a Feature?
+                    </h3>
+
+                    <p class="text-lg text-slate-500 mb-8 max-w-xl mx-auto leading-relaxed">
+                        We're constantly improving Optima FM based on your feedback. If there's something you'd love to see, we'd love to hear about it!
+                    </p>
+
+                    <!-- Email CTA -->
+                    <div class="inline-flex flex-col sm:flex-row items-center gap-4 p-2 bg-slate-100 rounded-2xl">
+                        <div class="flex items-center gap-3 px-4 py-3 bg-white rounded-xl shadow-sm border border-slate-200">
+                            <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-teal-500 to-emerald-500 text-white">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <span class="text-slate-700 font-medium select-all">features@optimafm.com</span>
+                        </div>
+
+                        <a href="mailto:features@optimafm.com?subject=Feature%20Request%20for%20Optima%20FM" class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold rounded-xl shadow-lg shadow-indigo-500/25 transition-all hover:scale-105 hover:shadow-xl">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                            </svg>
+                            Send Feature Request
+                        </a>
+                    </div>
+
+                    <!-- Additional note -->
+                    <p class="mt-6 text-sm text-slate-400">
+                        We read every suggestion and prioritize features based on community demand.
+                    </p>
+
+                    <!-- Decorative dots -->
+                    <div class="absolute top-6 right-6 flex gap-1.5 opacity-30">
+                        <span class="w-2 h-2 rounded-full bg-teal-500"></span>
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Final CTA -->
     <section class="py-24 bg-gradient-to-br from-teal-600 via-teal-500 to-emerald-500 relative overflow-hidden">
         <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSIyIi8+PC9nPjwvZz48L3N2Zz4=')] opacity-30"></div>
@@ -863,7 +981,7 @@
             <h2 class="text-3xl md:text-5xl font-extrabold text-white mb-6">Ready to streamline your facilities?</h2>
             <p class="text-teal-100 text-lg md:text-xl mb-10 max-w-2xl mx-auto">Join facility managers who have switched to a smarter, simpler way to work. Get started in under 5 minutes.</p>
             <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <a href="{{ route('signup') }}" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-10 py-4 text-lg font-bold text-teal-600 bg-white rounded-full hover:bg-teal-50 shadow-xl shadow-teal-700/20 transition-all hover:scale-105">
+                <a href="{{ route('signup') }}" wire:navigate class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-10 py-4 text-lg font-bold text-teal-600 bg-white rounded-full hover:bg-teal-50 shadow-xl shadow-teal-700/20 transition-all hover:scale-105">
                     Create Your Free Account
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />

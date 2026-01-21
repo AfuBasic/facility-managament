@@ -504,7 +504,7 @@
                     @if($workOrder->total_cost)
                     <div>
                         <span class="text-slate-500">Total Cost:</span>
-                        <span class="text-slate-900">${{ number_format($workOrder->total_cost, 2) }}</span>
+                        <span class="text-slate-900">{{ $clientAccount->formatCurrency($workOrder->total_cost) }}</span>
                     </div>
                     @endif
                 </div>
@@ -632,7 +632,7 @@
                     @error('time_spent') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Total Cost ($)</label>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Total Cost ({{ $clientAccount->getCurrencySymbol() }})</label>
                     <input type="number" wire:model="total_cost" min="0" step="0.01"
                         class="p-2 border w-full rounded-lg border-slate-200 focus:border-teal-500 focus:ring-teal-500"
                         placeholder="0.00">

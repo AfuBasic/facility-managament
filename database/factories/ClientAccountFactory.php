@@ -18,6 +18,7 @@ class ClientAccountFactory extends Factory
     {
         return [
             'name' => fake()->company(),
+            'currency' => '$',
         ];
     }
 }

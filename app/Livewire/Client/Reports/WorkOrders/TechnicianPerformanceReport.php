@@ -143,7 +143,7 @@ class TechnicianPerformanceReport extends Component
         $data = $this->getReportData();
 
         return Excel::download(
-            new TechnicianPerformanceExport($data, $this->getDateRangeLabel()),
+            new TechnicianPerformanceExport($data, $this->getDateRangeLabel(), $this->clientAccount->getCurrencySymbol()),
             'technician-performance-report-'.now()->format('Y-m-d').'.xlsx'
         );
     }

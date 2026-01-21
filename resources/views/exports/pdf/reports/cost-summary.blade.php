@@ -3,7 +3,7 @@
     <div class="summary-grid">
         <div class="summary-row">
             <div class="metric-box">
-                <div class="metric-value">₦{{ $data['summary']['total_cost'] }}</div>
+                <div class="metric-value">{{ $currency }}{{ $data['summary']['total_cost'] }}</div>
                 <div class="metric-label">Total Cost</div>
             </div>
             <div class="metric-box">
@@ -11,11 +11,11 @@
                 <div class="metric-label">Work Orders</div>
             </div>
             <div class="metric-box">
-                <div class="metric-value">₦{{ $data['summary']['avg_cost'] }}</div>
+                <div class="metric-value">{{ $currency }}{{ $data['summary']['avg_cost'] }}</div>
                 <div class="metric-label">Avg Cost/Order</div>
             </div>
             <div class="metric-box">
-                <div class="metric-value">₦{{ $data['summary']['max_cost'] }}</div>
+                <div class="metric-value">{{ $currency }}{{ $data['summary']['max_cost'] }}</div>
                 <div class="metric-label">Highest Cost</div>
             </div>
         </div>
@@ -37,8 +37,8 @@
             <tr>
                 <td>{{ $facility['facility'] }}</td>
                 <td class="text-right">{{ number_format($facility['order_count']) }}</td>
-                <td class="text-right font-bold">₦{{ $facility['total_cost'] }}</td>
-                <td class="text-right">₦{{ $facility['avg_cost'] }}</td>
+                <td class="text-right font-bold">{{ $currency }}{{ $facility['total_cost'] }}</td>
+                <td class="text-right">{{ $currency }}{{ $facility['avg_cost'] }}</td>
             </tr>
             @endforeach
         </tbody>
@@ -69,7 +69,7 @@
                     @endif
                 </td>
                 <td class="text-right">{{ number_format($priority['count']) }}</td>
-                <td class="text-right font-bold">₦{{ $priority['total_cost'] }}</td>
+                <td class="text-right font-bold">{{ $currency }}{{ $priority['total_cost'] }}</td>
             </tr>
             @endforeach
         </tbody>
@@ -94,7 +94,7 @@
                 <td>{{ Str::limit($order['title'], 25) }}</td>
                 <td>{{ $order['facility'] }}</td>
                 <td>{{ $order['status'] }}</td>
-                <td class="text-right font-bold">₦{{ $order['cost'] }}</td>
+                <td class="text-right font-bold">{{ $currency }}{{ $order['cost'] }}</td>
             </tr>
             @endforeach
         </tbody>
