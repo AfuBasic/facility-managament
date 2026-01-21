@@ -5,6 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Optima FM - Powerful Facility Management. Completely Free.</title>
     <meta name="description" content="Streamline operations, track assets, and manage work orders without the enterprise price tag. The free facility management platform for everyone.">
+    <link rel="canonical" href="https://optimafm.org">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://optimafm.org/">
+    <meta property="og:title" content="Optima FM - Powerful Facility Management. Completely Free.">
+    <meta property="og:description" content="Streamline operations, track assets, and manage work orders without the enterprise price tag. The free facility management platform for everyone.">
+    <meta property="og:image" content="{{ asset('images/logo-white.png') }}">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://optimafm.org/">
+    <meta property="twitter:title" content="Optima FM - Powerful Facility Management. Completely Free.">
+    <meta property="twitter:description" content="Streamline operations, track assets, and manage work orders without the enterprise price tag. The free facility management platform for everyone.">
+    <meta property="twitter:image" content="{{ asset('images/logo-white.png') }}">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Optima FM",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Web",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "Powerful facility management software that is completely free. Track assets, manage work orders, and streamline operations.",
+      "image": "{{ asset('images/logo-white.png') }}",
+      "featureList": "Work Order Management, Asset Tracking, Preventive Maintenance, Multi-Tenancy"
+    }
+    </script>
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="64x64" href="{{ asset('images/icons/rsz_icon_64.png') }}">
@@ -328,7 +362,7 @@
                             <svg class="w-3 h-3 text-slate-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                             </svg>
-                            <span class="text-[10px] text-slate-500 font-medium">optimafm.com/dashboard</span>
+                            <span class="text-[10px] text-slate-500 font-medium">optimafm.org/dashboard</span>
                         </div>
                     </div>
 
@@ -946,10 +980,10 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                 </svg>
                             </div>
-                            <span class="text-slate-700 font-medium select-all">features@optimafm.com</span>
+                            <span class="text-slate-700 font-medium select-all">features@optimafm.org</span>
                         </div>
 
-                        <a href="mailto:features@optimafm.com?subject=Feature%20Request%20for%20Optima%20FM" class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold rounded-xl shadow-lg shadow-indigo-500/25 transition-all hover:scale-105 hover:shadow-xl">
+                        <a href="mailto:features@optimafm.org?subject=Feature%20Request%20for%20Optima%20FM" class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold rounded-xl shadow-lg shadow-indigo-500/25 transition-all hover:scale-105 hover:shadow-xl">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                             </svg>
