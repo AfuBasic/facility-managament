@@ -1,7 +1,16 @@
 <div x-data="{ showSettingsModal: false, selectedClientId: null }" @settings-close.window="showSettingsModal = false">
-    <div class="mb-8">
-        <h1 class="text-3xl font-bold text-slate-900 tracking-tight">Your Clients</h1>
-        <p class="text-slate-500 mt-2">Select a Client to manage or view details.</p>
+    <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-slate-900 tracking-tight">Your Organizations</h1>
+            <p class="text-slate-500 mt-2">Select an organization to manage or create a new one.</p>
+        </div>
+        <button 
+            wire:click="openCreateModal" 
+            class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-semibold rounded-xl shadow-md hover:from-teal-600 hover:to-emerald-600 hover:shadow-lg transition-all"
+        >
+            <x-heroicon-o-plus class="w-5 h-5" />
+            New Organization
+        </button>
     </div>
 
     @if($memberships->count() > 0)
@@ -78,5 +87,106 @@
                 @endforeach
             </div>
         </template>
+    </x-ui.modal>
+
+    <!-- Create Organization Modal -->
+    <x-ui.modal wire:model="showCreateModal" title="Create New Organization" maxWidth="md">
+        <form wire:submit="createOrganization">
+            <div class="space-y-5">
+                <!-- Organization Name -->
+                <div>
+                    <label for="orgName" class="block text-sm font-medium text-slate-700 mb-1.5">
+                        Organization Name <span class="text-red-500">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        wire:model="orgName" 
+                        id="orgName"
+                        class="w-full px-4 py-2.5 rounded-xl border border-slate-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 transition-colors"
+                        placeholder="Enter organization name"
+                    >
+                    @error('orgName')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Notification Email -->
+                <div>
+                    <label for="orgEmail" class="block text-sm font-medium text-slate-700 mb-1.5">
+                        Notification Email
+                    </label>
+                    <input 
+                        type="email" 
+                        wire:model="orgEmail" 
+                        id="orgEmail"
+                        class="w-full px-4 py-2.5 rounded-xl border border-slate-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 transition-colors"
+                        placeholder="notifications@company.com"
+                    >
+                    @error('orgEmail')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Phone -->
+                <div>
+                    <label for="orgPhone" class="block text-sm font-medium text-slate-700 mb-1.5">
+                        Company Phone
+                    </label>
+                    <input 
+                        type="text" 
+                        wire:model="orgPhone" 
+                        id="orgPhone"
+                        class="w-full px-4 py-2.5 rounded-xl border border-slate-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 transition-colors"
+                        placeholder="+234 800 000 0000"
+                    >
+                    @error('orgPhone')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Address -->
+                <div>
+                    <label for="orgAddress" class="block text-sm font-medium text-slate-700 mb-1.5">
+                        Address
+                    </label>
+                    <textarea 
+                        wire:model="orgAddress" 
+                        id="orgAddress"
+                        rows="2"
+                        class="w-full px-4 py-2.5 rounded-xl border border-slate-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 transition-colors resize-none"
+                        placeholder="Enter company address"
+                    ></textarea>
+                    @error('orgAddress')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+            </div>
+
+            <!-- Info Notice -->
+            <div class="mt-5 p-3 bg-teal-50 rounded-lg border border-teal-100">
+                <p class="text-sm text-teal-800 flex items-start gap-2">
+                    <x-heroicon-o-information-circle class="w-5 h-5 flex-shrink-0 mt-0.5" />
+                    <span>You will become the admin of this organization and can invite other members.</span>
+                </p>
+            </div>
+
+            <!-- Actions -->
+            <div class="mt-6 flex justify-end gap-3">
+                <button 
+                    type="button" 
+                    wire:click="$set('showCreateModal', false)"
+                    class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
+                >
+                    Cancel
+                </button>
+                <button 
+                    type="submit"
+                    class="px-5 py-2 text-sm font-medium text-white bg-gradient-to-r from-teal-500 to-emerald-500 rounded-lg hover:from-teal-600 hover:to-emerald-600 shadow-sm transition-all"
+                >
+                    <span wire:loading.remove wire:target="createOrganization">Create Organization</span>
+                    <span wire:loading wire:target="createOrganization">Creating...</span>
+                </button>
+            </div>
+        </form>
     </x-ui.modal>
 </div>

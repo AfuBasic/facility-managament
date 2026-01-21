@@ -12,7 +12,7 @@
             </ul>
         </li>
 
-        @canany(['view facilities', 'view work orders'])
+        @if(auth()->user()->can('view facilities') || auth()->user()->can('viewAny', \App\Models\WorkOrder::class))
         <li>
             <div class="text-xs font-semibold leading-6 text-slate-500 uppercase tracking-widest mb-4 px-2">Management</div>
             <ul role="list" class="-mx-2 space-y-2">

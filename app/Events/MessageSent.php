@@ -19,6 +19,8 @@ class MessageSent implements ShouldBroadcastNow
 
     public int $recipientId;
 
+    public int $clientAccountId;
+
     public string $senderName;
 
     public string $body;
@@ -33,6 +35,7 @@ class MessageSent implements ShouldBroadcastNow
         $this->conversationId = $message->conversation_id;
         $this->senderId = $message->sender_id;
         $this->recipientId = $recipientId;
+        $this->clientAccountId = $message->conversation->client_account_id;
         $this->senderName = $message->sender->name;
         $this->body = $message->body;
         $this->messageId = (string) $message->id;
@@ -41,6 +44,9 @@ class MessageSent implements ShouldBroadcastNow
 
     /**
      * Get the channels the event should broadcast on.
+     *
+     * We broadcast to a client-scoped user channel to ensure users only
+     * receive notifications for the specific client account context.
      */
     public function broadcastOn(): array
     {
@@ -48,8 +54,9 @@ class MessageSent implements ShouldBroadcastNow
             // Broadcast to the conversation channel (for real-time chat)
             new PrivateChannel('conversation.'.$this->conversationId),
 
-            // Also broadcast to recipient's personal channel (for badge updates)
-            new PrivateChannel('user.'.$this->recipientId),
+            // Broadcast to recipient's client-scoped channel (for badge updates)
+            // This ensures users only get notifications for their current client context
+            new PrivateChannel('client.'.$this->clientAccountId.'.user.'.$this->recipientId),
         ];
     }
 
@@ -65,6 +72,7 @@ class MessageSent implements ShouldBroadcastNow
             'sender_name' => $this->senderName,
             'body' => $this->body,
             'created_at' => $this->createdAt,
+            'client_account_id' => $this->clientAccountId,
         ];
     }
 

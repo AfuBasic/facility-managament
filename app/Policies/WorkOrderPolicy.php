@@ -12,13 +12,24 @@ class WorkOrderPolicy
      */
     public function viewAny(User $user): bool
     {
+        // Get the current client account ID
+        $clientId = session('current_client_account_id');
+
+        if (! $clientId) {
+            return false;
+        }
+
         // User can view work orders if they:
-        // 1. Have the permission
-        // 2. Have created any work orders
-        // 3. Have been assigned any work orders
+        // 1. Have the permission (within this client's context)
+        // 2. Have created any work orders for this client
+        // 3. Have been assigned any work orders for this client
         return $user->can('view workorders')
-            || WorkOrder::where('reported_by', $user->id)->exists()
-            || WorkOrder::where('assigned_to', $user->id)->exists();
+            || WorkOrder::where('client_account_id', $clientId)
+                ->where('reported_by', $user->id)
+                ->exists()
+            || WorkOrder::where('client_account_id', $clientId)
+                ->where('assigned_to', $user->id)
+                ->exists();
     }
 
     /**
