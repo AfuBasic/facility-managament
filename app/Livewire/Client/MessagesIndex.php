@@ -74,27 +74,22 @@ class MessagesIndex extends Component
     }
 
     /**
-     * Register WebSocket event listeners.
+     * Register event listeners.
      *
-     * This tells Livewire to listen for 'message.sent' events on the user's
-     * private channel. When a message is broadcast via Reverb, this component
-     * will automatically call handleIncomingMessage().
-     *
-     * Format: "echo-private:{channel},.{event}" => 'methodName'
+     * We listen for the global 'message-received' event dispatched from JavaScript.
+     * This is more reliable than Livewire's Echo integration with SPA navigation.
      */
     public function getListeners(): array
     {
-        $userId = Auth::id();
-
         return [
-            "echo-private:user.{$userId},.message.sent" => 'handleIncomingMessage',
+            'message-received' => 'handleIncomingMessage',
         ];
     }
 
     /**
-     * Handle an incoming message from WebSocket.
+     * Handle an incoming message from WebSocket (via global JS handler).
      *
-     * Called automatically when a 'message.sent' event is received on the user's channel.
+     * Called when the 'message-received' event is dispatched from JavaScript.
      * - If the message is from us, ignore it (we already have it locally)
      * - If it's for the active conversation, mark it as read and refresh the chat
      * - If it's for a different conversation, just refresh the sidebar (to update unread count)
@@ -104,14 +99,16 @@ class MessagesIndex extends Component
     public function handleIncomingMessage(array $event): void
     {
         // Ignore messages we sent (they're already shown locally)
-        if ($event['sender_id'] === Auth::id()) {
+        if (($event['sender_id'] ?? null) === Auth::id()) {
             return;
         }
 
         // Check if this message belongs to the conversation we're currently viewing
-        if ($this->activeConversationId === $event['conversation_id']) {
+        if ($this->activeConversationId === ($event['conversation_id'] ?? null)) {
             // Mark as read immediately since user is looking at this conversation
-            Message::where('id', $event['id'])->update(['read_at' => now()]);
+            if (isset($event['id'])) {
+                Message::where('id', $event['id'])->update(['read_at' => now()]);
+            }
 
             // Clear cached computed properties to force re-fetch
             unset($this->activeMessages, $this->conversations);
@@ -342,7 +339,7 @@ class MessagesIndex extends Component
 
         // Broadcast the message via Reverb WebSocket
         // This will be received by the recipient's MessageIcon and MessagesIndex components
-        broadcast(new MessageSent($message->load('sender'), $recipientId));
+        broadcast(new MessageSent($message->load(['sender', 'conversation']), $recipientId));
 
         // Clear input and refresh the view
         $this->newMessage = '';

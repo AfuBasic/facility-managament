@@ -3,8 +3,12 @@
 namespace App\Services;
 
 use App\Models\Asset;
+use App\Models\Contact;
+use App\Models\Event;
 use App\Models\Facility;
+use App\Models\Space;
 use App\Models\Store;
+use App\Models\User;
 use App\Models\WorkOrder;
 use Illuminate\Support\Facades\Schema;
 
@@ -18,6 +22,10 @@ class DatabaseSchemaProvider
         WorkOrder::class,
         Facility::class,
         Store::class,
+        Event::class,
+        Contact::class,
+        Space::class,
+        User::class,
     ];
 
     /**

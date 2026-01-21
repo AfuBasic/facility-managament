@@ -4,8 +4,12 @@ namespace App\Services;
 
 use App\Models\Asset;
 use App\Models\ClientAccount;
+use App\Models\Contact;
+use App\Models\Event;
 use App\Models\Facility;
+use App\Models\Space;
 use App\Models\Store;
+use App\Models\User;
 use App\Models\WorkOrder;
 use Illuminate\Support\Facades\Log;
 
@@ -19,6 +23,10 @@ class QueryInterpreter
         'WorkOrder' => WorkOrder::class,
         'Facility' => Facility::class,
         'Store' => Store::class,
+        'Event' => Event::class,
+        'Contact' => Contact::class,
+        'Space' => Space::class,
+        'User' => User::class,
     ];
 
     /**

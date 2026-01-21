@@ -13,6 +13,11 @@ class MessageIcon extends Component
     public int $unreadCount = 0;
 
     /**
+     * The client account ID for channel scoping.
+     */
+    public ?int $clientId = null;
+
+    /**
      * The conversation currently being viewed by the user.
      * If set, we won't update badge for messages in this conversation.
      */
@@ -20,18 +25,26 @@ class MessageIcon extends Component
 
     public function mount(): void
     {
+        // Store client ID for use in getListeners
+        try {
+            $this->clientId = app(ClientAccount::class)->id;
+        } catch (\Exception $e) {
+            $this->clientId = session('current_client_account_id');
+        }
+
         $this->refreshUnreadCount();
     }
 
     /**
-     * Get the Echo listeners for real-time updates.
+     * Get the event listeners for this component.
+     *
+     * We use a global Livewire event dispatched from JavaScript
+     * to handle incoming messages more reliably across SPA navigation.
      */
     public function getListeners(): array
     {
-        $userId = Auth::id();
-
         return [
-            "echo-private:user.{$userId},.message.sent" => 'handleNewMessage',
+            'message-received' => 'handleNewMessage',
             'conversation-focused' => 'setFocusedConversation',
         ];
     }
@@ -46,12 +59,15 @@ class MessageIcon extends Component
     }
 
     /**
-     * Handle incoming message from WebSocket.
+     * Handle incoming message from WebSocket (via global JS handler).
+     *
+     * @param  array  $event  The message event data (wrapped in 'event' key from JS dispatch)
      */
+    #[On('message-received')]
     public function handleNewMessage(array $event): void
     {
         // If user is viewing this conversation, don't update the badge
-        if ($this->focusedConversationId === $event['conversation_id']) {
+        if ($this->focusedConversationId === ($event['conversation_id'] ?? null)) {
             return;
         }
 
@@ -59,9 +75,12 @@ class MessageIcon extends Component
         $this->unreadCount++;
 
         // Show toast notification for new message
+        $senderName = $event['sender_name'] ?? 'Someone';
+        $body = $event['body'] ?? 'sent you a message';
+
         $this->dispatch(
             'toast',
-            message: "{$event['sender_name']}: ".\Illuminate\Support\Str::limit($event['body'], 50),
+            message: "{$senderName}: ".\Illuminate\Support\Str::limit($body, 50),
             type: 'info',
             position: 'bottom'
         );
@@ -71,16 +90,14 @@ class MessageIcon extends Component
     {
         $userId = Auth::id();
 
-        // Check if we have a client context
-        try {
-            $clientId = app(ClientAccount::class)->id;
-        } catch (\Exception $e) {
+        // Use stored client ID
+        if (! $this->clientId) {
             $this->unreadCount = 0;
 
             return;
         }
 
-        $this->unreadCount = Conversation::where('client_account_id', $clientId)
+        $this->unreadCount = Conversation::where('client_account_id', $this->clientId)
             ->forUser($userId)
             ->get()
             ->sum(fn ($c) => $c->unreadCountFor($userId));

@@ -110,11 +110,20 @@ class Facilities extends Component
             $this->success('Facility updated successfully!');
         } else {
             $this->authorize('create facilities');
-            $createFacility->execute(
+            $facility = $createFacility->execute(
                 $this->name,
                 $this->address,
                 $this->clientAccount->id
             );
+
+            if(! Auth::user()->hasRole('admin')) {
+                $facility->users()->attach(Auth::id(), [
+                    'designation' => 'Manager',
+                    'client_account_id' => $this->clientAccount->id,
+                    'assigned_at' => now()
+                ]);
+            }
+            
             $this->success('Facility created successfully!');
         }
 

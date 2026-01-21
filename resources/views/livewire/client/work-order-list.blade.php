@@ -24,7 +24,7 @@
     </x-ui.page-header>
 
     {{-- Filters --}}
-    <div class="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div class="mb-6 grid grid-cols-1 md:grid-cols-5 gap-4">
         {{-- Search --}}
         <div class="md:col-span-2">
             <div class="relative">
@@ -74,6 +74,22 @@
                 placeholder="All Priorities"
             />
         </div>
+
+        {{-- SLA Breach Filter --}}
+        <div>
+            <x-forms.searchable-select
+                wire:model.live="slaBreached"
+                :options="[
+                    '' => 'All SLA Status',
+                    'overdue' => 'Past Deadline',
+                    'any' => 'Any Breach',
+                    'response' => 'Response Breached',
+                    'resolution' => 'Resolution Breached'
+                ]"
+                :selected="$slaBreached"
+                placeholder="All SLA Status"
+            />
+        </div>
     </div>
 
     {{-- Work Orders Table --}}
@@ -87,6 +103,7 @@
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Facility</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Priority</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">SLA</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Assigned To</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Created</th>
                         <th scope="col" class="relative px-6 py-3">
@@ -136,6 +153,47 @@
                                     {{ ucfirst($workOrder->priority) }}
                                 </x-ui.badge>
                             </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @php
+                                    $activeStatuses = ['reported', 'approved', 'assigned', 'in_progress', 'on_hold'];
+                                    $isActive = in_array($workOrder->status, $activeStatuses);
+                                    $responseOverdue = $isActive && $workOrder->response_due_at && $workOrder->response_due_at < now();
+                                    $resolutionOverdue = $isActive && $workOrder->resolution_due_at && $workOrder->resolution_due_at < now();
+                                    $hasBreachFlag = $workOrder->sla_response_breached || $workOrder->sla_resolution_breached;
+                                    $hasIssue = $hasBreachFlag || $responseOverdue || $resolutionOverdue;
+                                @endphp
+                                @if($hasIssue)
+                                    <div class="flex flex-col gap-1">
+                                        @if($workOrder->sla_response_breached)
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+                                                <x-heroicon-s-exclamation-triangle class="h-3 w-3" />
+                                                Response
+                                            </span>
+                                        @elseif($responseOverdue)
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-orange-100 text-orange-800">
+                                                <x-heroicon-s-clock class="h-3 w-3" />
+                                                Response Due
+                                            </span>
+                                        @endif
+                                        @if($workOrder->sla_resolution_breached)
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+                                                <x-heroicon-s-exclamation-triangle class="h-3 w-3" />
+                                                Resolution
+                                            </span>
+                                        @elseif($resolutionOverdue)
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-orange-100 text-orange-800">
+                                                <x-heroicon-s-clock class="h-3 w-3" />
+                                                Resolution Due
+                                            </span>
+                                        @endif
+                                    </div>
+                                @else
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                                        <x-heroicon-s-check-circle class="h-3 w-3" />
+                                        OK
+                                    </span>
+                                @endif
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
                                 {{ $workOrder->assignedTo?->name ?? '—' }}
                             </td>
@@ -151,7 +209,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="px-6 py-10 text-center text-slate-500">
+                            <td colspan="9" class="px-6 py-10 text-center text-slate-500">
                                 No work orders found. 
                                 <button wire:click="openCreateModal" class="text-teal-600 hover:text-teal-700 font-medium">Create your first work order</button>
                             </td>

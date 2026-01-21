@@ -80,13 +80,13 @@ USER QUESTION:
 {$question}
 
 INSTRUCTIONS:
-1. Analyze the question and identify the relevant model (Asset, WorkOrder, Facility, or Store)
+1. Analyze the question and identify the relevant model (Asset, WorkOrder, Facility, Store, Event, Contact, Space, or User)
 2. Identify any relationships or filters needed
 3. Generate a JSON response with this EXACT structure:
 
 {
     "intent": "Brief description of what the user wants",
-    "model": "MUST be one of: Asset, WorkOrder, Facility, or Store",
+    "model": "MUST be one of: Asset, WorkOrder, Facility, Store, Event, Contact, Space, or User",
     "query_instructions": {
         "where": [{"field": "field_name", "operator": "=", "value": "value"}],
         "whereHas": [{"relation": "facility", "field": "name", "operator": "like", "value": "%Facility A%"}],
@@ -144,29 +144,105 @@ Response:
     "response_template": "Facility A has {count} stores"
 }
 
-Question: "Show me assets at Main Building"
+Question: "What events are coming up?"
 Response:
 {
-    "intent": "List assets at Main Building facility",
-    "model": "Asset",
+    "intent": "List upcoming events",
+    "model": "Event",
     "query_instructions": {
-        "where": [],
-        "whereHas": [{"relation": "facility", "field": "name", "operator": "like", "value": "%Main Building%"}],
-        "orderBy": {"field": "name", "direction": "asc"},
-        "limit": 20,
+        "where": [{"field": "starts_at", "operator": ">=", "value": "now"}],
+        "whereHas": [],
+        "orderBy": {"field": "starts_at", "direction": "asc"},
+        "limit": 10,
         "with": ["facility"]
     },
-    "response_template": "Found {count} assets at Main Building"
+    "response_template": "You have {count} upcoming events"
+}
+
+Question: "How many contacts do we have?"
+Response:
+{
+    "intent": "Count total contacts",
+    "model": "Contact",
+    "query_instructions": {
+        "where": [],
+        "whereHas": [],
+        "orderBy": {"field": "name", "direction": "asc"},
+        "limit": 100,
+        "with": []
+    },
+    "response_template": "You have {count} contacts"
+}
+
+Question: "Show me vendor contacts"
+Response:
+{
+    "intent": "List vendor contacts",
+    "model": "Contact",
+    "query_instructions": {
+        "where": [{"field": "type", "operator": "=", "value": "vendor"}],
+        "whereHas": [],
+        "orderBy": {"field": "name", "direction": "asc"},
+        "limit": 20,
+        "with": []
+    },
+    "response_template": "You have {count} vendor contacts"
+}
+
+Question: "How many spaces are in Building A?"
+Response:
+{
+    "intent": "Count spaces in Building A",
+    "model": "Space",
+    "query_instructions": {
+        "where": [],
+        "whereHas": [{"relation": "facility", "field": "name", "operator": "like", "value": "%Building A%"}],
+        "orderBy": {"field": "name", "direction": "asc"},
+        "limit": 100,
+        "with": ["facility"]
+    },
+    "response_template": "Building A has {count} spaces"
+}
+
+Question: "How many users do we have?"
+Response:
+{
+    "intent": "Count total users",
+    "model": "User",
+    "query_instructions": {
+        "where": [],
+        "whereHas": [],
+        "orderBy": {"field": "name", "direction": "asc"},
+        "limit": 100,
+        "with": []
+    },
+    "response_template": "You have {count} users"
+}
+
+Question: "Show me completed work orders"
+Response:
+{
+    "intent": "List completed work orders",
+    "model": "WorkOrder",
+    "query_instructions": {
+        "where": [{"field": "status", "operator": "=", "value": "completed"}],
+        "whereHas": [],
+        "orderBy": {"field": "completed_at", "direction": "desc"},
+        "limit": 10,
+        "with": ["facility", "assignedTo"]
+    },
+    "response_template": "You have {count} completed work orders"
 }
 
 CRITICAL RULES:
-- ALWAYS provide a "model" value (Asset, WorkOrder, Facility, or Store)
+- ALWAYS provide a "model" value (Asset, WorkOrder, Facility, Store, Event, Contact, Space, or User)
 - Use "whereHas" for filtering by related models (e.g., stores in a facility)
 - Use "where" for filtering the main model's own fields
 - Use "with" to eager load relationships for better performance
 - Use LIKE operator with % wildcards for partial name matches
 - Keep queries simple and safe (read-only)
 - Respond ONLY with valid JSON, no additional text
+- For date comparisons like "upcoming" or "past", use appropriate operators (>=, <, etc.)
 
 Generate the JSON response now:
 PROMPT;

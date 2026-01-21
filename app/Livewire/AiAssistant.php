@@ -34,7 +34,7 @@ class AiAssistant extends Component
             $this->conversation = [
                 [
                     'role' => 'assistant',
-                    'content' => 'Hi! I\'m your AI assistant. Ask me anything about your work orders, assets, facilities, or stores!',
+                    'content' => 'Hi! I\'m your AI assistant. Ask me anything about your work orders, assets, facilities, stores, events, contacts, spaces, or users!',
                     'timestamp' => now()->toIso8601String(),
                 ],
             ];

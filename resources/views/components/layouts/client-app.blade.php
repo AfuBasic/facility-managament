@@ -146,5 +146,29 @@
     <livewire:ai-assistant />
     
     @livewireScripts
+
+    {{-- Global message subscription handler --}}
+    @auth
+    <script data-navigate-once>
+        document.addEventListener('livewire:init', () => {
+            const userId = {{ Auth::id() }};
+            const clientId = {{ app()->bound(App\Models\ClientAccount::class) ? app(App\Models\ClientAccount::class)->id : 'null' }};
+
+            if (clientId && window.Echo) {
+                const channelName = `client.${clientId}.user.${userId}`;
+
+                // Leave any existing subscription first
+                window.Echo.leave(channelName);
+
+                // Subscribe to the private channel
+                window.Echo.private(channelName)
+                    .listen('.message.sent', (event) => {
+                        // Dispatch to any listening Livewire components
+                        Livewire.dispatch('message-received', { event: event });
+                    });
+            }
+        });
+    </script>
+    @endauth
 </body>
 </html>

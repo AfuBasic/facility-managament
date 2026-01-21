@@ -29,6 +29,9 @@ class WorkOrderList extends Component
     #[Url]
     public $search = '';
 
+    #[Url]
+    public $slaBreached = '';
+
     public function mount()
     {
         $this->authorize('viewAny', WorkOrder::class);
@@ -66,6 +69,25 @@ class WorkOrderList extends Component
                     $query->where('title', 'like', "%{$this->search}%")
                         ->orWhere('description', 'like', "%{$this->search}%");
                 });
+            })
+            ->when($this->slaBreached, function ($q) {
+                if ($this->slaBreached === 'response') {
+                    $q->where('sla_response_breached', true);
+                } elseif ($this->slaBreached === 'resolution') {
+                    $q->where('sla_resolution_breached', true);
+                } elseif ($this->slaBreached === 'any') {
+                    $q->where(function ($query) {
+                        $query->where('sla_response_breached', true)
+                            ->orWhere('sla_resolution_breached', true);
+                    });
+                } elseif ($this->slaBreached === 'overdue') {
+                    // Real-time check for overdue (matches dashboard "past SLA deadline")
+                    $q->whereIn('status', ['reported', 'approved', 'assigned', 'in_progress', 'on_hold'])
+                        ->where(function ($query) {
+                            $query->where('response_due_at', '<', now())
+                                ->orWhere('resolution_due_at', '<', now());
+                        });
+                }
             })
             ->latest('created_at')
             ->paginate(15);
@@ -156,7 +178,7 @@ class WorkOrderList extends Component
     {
         return Excel::download(
             new WorkOrderListExport($this->status, $this->priority, $this->search),
-            'work-orders-' . now()->format('Y-m-d') . '.xlsx'
+            'work-orders-'.now()->format('Y-m-d').'.xlsx'
         );
     }
 
@@ -196,8 +218,8 @@ class WorkOrderList extends Component
         ]);
 
         return response()->streamDownload(
-            fn() => print($pdf->output()),
-            'work-orders-' . now()->format('Y-m-d') . '.pdf'
+            fn () => print ($pdf->output()),
+            'work-orders-'.now()->format('Y-m-d').'.pdf'
         );
     }
 }
