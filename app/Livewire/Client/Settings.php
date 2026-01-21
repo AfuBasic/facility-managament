@@ -56,6 +56,7 @@ class Settings extends Component
 
         $this->success('Settings saved successfully!');
         $this->dispatch('saved');
+    
     }
 
     #[Computed]
