@@ -1,4 +1,4 @@
 User-agent: *
 Disallow:
 
-Sitemap: https://optimafm.com/sitemap.xml
+Sitemap: https://optimafm.org/sitemap.xml

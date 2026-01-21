@@ -15,7 +15,7 @@ class IcsCalendarService
      */
     public function generate(Event $event, ?Contact $attendee = null): string
     {
-        $uid = uniqid('optima-', true).'@optimafm.com';
+        $uid = uniqid('optima-', true).'@optimafm.org';
         $dtstamp = Carbon::now()->format('Ymd\THis\Z');
         $dtstart = $event->starts_at->format('Ymd\THis');
         $dtend = $event->ends_at

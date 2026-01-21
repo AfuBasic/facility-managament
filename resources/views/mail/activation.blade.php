@@ -80,7 +80,7 @@
         <td style="padding:24px 36px; background-color:#f9fafb;
                    font-family:Arial, Helvetica, sans-serif; text-align:center;">
           <p style="margin:0; font-size:12px; line-height:18px; color:#98a2b3;">
-            Need help? send an email to support@optimafm.com and we'll get back to you as soon as possible.
+            Need help? send an email to support@optimafm.org and we'll get back to you as soon as possible.
           </p>
           <p style="margin:6px 0 0 0; font-size:12px; line-height:18px; color:#98a2b3;">
             © {{ date('Y') }} Optima FM. All rights reserved.
