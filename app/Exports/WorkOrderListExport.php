@@ -14,11 +14,16 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class WorkOrderListExport implements FromQuery, WithHeadings, WithMapping, WithStyles, WithTitle
 {
+    protected string $currency = '$';
+
     public function __construct(
         protected string $status = '',
         protected string $priority = '',
         protected string $search = ''
-    ) {}
+    ) {
+        $clientAccount = app(ClientAccount::class);
+        $this->currency = $clientAccount->getCurrencySymbol();
+    }
 
     public function query()
     {
@@ -62,7 +67,7 @@ class WorkOrderListExport implements FromQuery, WithHeadings, WithMapping, WithS
             $workOrder->assignedTo?->name ?? 'Unassigned',
             $workOrder->created_at?->format('M d, Y'),
             $workOrder->completed_at?->format('M d, Y') ?? '-',
-            $workOrder->total_cost ? '₦'.number_format($workOrder->total_cost, 2) : '-',
+            $workOrder->total_cost ? $this->currency.number_format($workOrder->total_cost, 2) : '-',
         ];
     }
 

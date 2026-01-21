@@ -1,4 +1,4 @@
-<div class="space-y-6" x-data="maintenanceReportCharts()">
+<div class="space-y-6" x-data="maintenanceReportCharts('{{ $clientAccount->getCurrencySymbol() }}')">
     <!-- Back Navigation -->
     <a href="{{ route('app.reports.index') }}" wire:navigate class="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-teal-600 transition-colors">
         <x-heroicon-o-arrow-left class="h-4 w-4" />
@@ -52,7 +52,7 @@
         />
         <x-dashboard.stat-card
             label="Total Cost"
-            :value="'₦' . $data['summary']['total_cost']"
+            :value="$clientAccount->getCurrencySymbol() . $data['summary']['total_cost']"
             icon="banknotes"
             color="teal"
         />
@@ -116,7 +116,7 @@
                                 {{ number_format($facility['open']) }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-slate-900">
-                                ₦{{ $facility['total_cost'] }}
+                                {{ $clientAccount->getCurrencySymbol() }}{{ $facility['total_cost'] }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-slate-600">
                                 {{ $facility['avg_completion_hours'] }}h
@@ -136,8 +136,9 @@
 </div>
 
 <script>
-function maintenanceReportCharts() {
+function maintenanceReportCharts(currencySymbol) {
     return {
+        currency: currencySymbol,
         init() {
             this.renderTrendChart();
             this.renderCostChart();
@@ -146,6 +147,7 @@ function maintenanceReportCharts() {
         renderTrendChart() {
             const trendData = @json($data['trendData']);
             if (trendData.length === 0) return;
+            const currency = this.currency;
 
             const options = {
                 series: [{
@@ -153,7 +155,7 @@ function maintenanceReportCharts() {
                     type: 'column',
                     data: trendData.map(t => t.count)
                 }, {
-                    name: 'Cost (₦)',
+                    name: 'Cost (' + currency + ')',
                     type: 'line',
                     data: trendData.map(t => t.cost)
                 }],
@@ -172,7 +174,7 @@ function maintenanceReportCharts() {
                 },
                 yaxis: [
                     { title: { text: 'Work Orders' }, labels: { style: { colors: '#64748b' } } },
-                    { opposite: true, title: { text: 'Cost (₦)' }, labels: { style: { colors: '#64748b' }, formatter: (val) => '₦' + val.toLocaleString() } }
+                    { opposite: true, title: { text: 'Cost (' + currency + ')' }, labels: { style: { colors: '#64748b' }, formatter: (val) => currency + val.toLocaleString() } }
                 ],
                 grid: { borderColor: '#f1f5f9', strokeDashArray: 4 },
                 legend: { position: 'top' }
@@ -186,6 +188,7 @@ function maintenanceReportCharts() {
         renderCostChart() {
             const facilityData = @json($data['facilityData']);
             if (facilityData.length === 0) return;
+            const currency = this.currency;
 
             const top5 = facilityData.slice(0, 5);
 
@@ -206,12 +209,12 @@ function maintenanceReportCharts() {
                 },
                 dataLabels: {
                     enabled: true,
-                    formatter: (val) => '₦' + val.toLocaleString(),
+                    formatter: (val) => currency + val.toLocaleString(),
                     style: { fontSize: '11px' }
                 },
                 xaxis: {
                     categories: top5.map(f => f.name),
-                    labels: { style: { colors: '#64748b', fontSize: '11px' }, formatter: (val) => '₦' + val.toLocaleString() }
+                    labels: { style: { colors: '#64748b', fontSize: '11px' }, formatter: (val) => currency + val.toLocaleString() }
                 },
                 yaxis: { labels: { style: { colors: '#64748b', fontSize: '11px' } } },
                 grid: { borderColor: '#f1f5f9', strokeDashArray: 4 }
