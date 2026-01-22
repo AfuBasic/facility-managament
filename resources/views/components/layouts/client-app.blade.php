@@ -15,6 +15,7 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     
     @livewireStyles
+    <x-google-analytics />
 </head>
 <body class="h-full font-sans antialiased text-slate-600" x-data="{ sidebarOpen: false }">
 

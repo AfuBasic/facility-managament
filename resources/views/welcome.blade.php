@@ -175,6 +175,8 @@
 
     <!-- Alpine.js (loaded before body for immediate availability) -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <x-google-analytics />
 </head>
 <body class="font-sans antialiased text-slate-600 bg-white" x-data="{ mobileMenuOpen: false, scrolled: false }" @scroll.window="scrolled = (window.pageYOffset > 50)">
 

@@ -9,6 +9,7 @@
     <title>{{ $title ?? config('app.name') }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
+    <x-google-analytics />
 </head>
 <body class="bg-slate-50 font-sans text-slate-900 antialiased" x-data="{ sidebarOpen: false }">
     <x-toast />
