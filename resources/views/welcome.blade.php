@@ -974,23 +974,45 @@
                         We're constantly improving Optima FM based on your feedback. If there's something you'd love to see, we'd love to hear about it!
                     </p>
 
-                    <!-- Email CTA -->
-                    <div class="inline-flex flex-col sm:flex-row items-center gap-4 p-2 bg-slate-100 rounded-2xl">
-                        <div class="flex items-center gap-3 px-4 py-3 bg-white rounded-xl shadow-sm border border-slate-200">
-                            <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-teal-500 to-emerald-500 text-white">
-                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                </svg>
+                    <!-- Email CTAs -->
+                    <div class="flex flex-col gap-4 max-w-xl mx-auto w-full">
+                        <!-- Feature Request -->
+                        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 p-3 bg-slate-100 rounded-2xl">
+                            <div class="flex items-center gap-3 px-4 py-2 bg-white rounded-xl shadow-sm border border-slate-200">
+                                <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-teal-500 to-emerald-500 text-white">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                                    </svg>
+                                </div>
+                                <span class="text-slate-700 font-medium select-all text-sm">features@optimafm.org</span>
                             </div>
-                            <span class="text-slate-700 font-medium select-all">features@optimafm.org</span>
+
+                            <a href="mailto:features@optimafm.org?subject=Feature%20Request%20for%20Optima%20FM" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold rounded-xl shadow-lg shadow-indigo-500/25 transition-all hover:scale-105 hover:shadow-xl text-sm">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                                </svg>
+                                Send Feature Request
+                            </a>
                         </div>
 
-                        <a href="mailto:features@optimafm.org?subject=Feature%20Request%20for%20Optima%20FM" class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold rounded-xl shadow-lg shadow-indigo-500/25 transition-all hover:scale-105 hover:shadow-xl">
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                            </svg>
-                            Send Feature Request
-                        </a>
+                        <!-- General Support -->
+                        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 p-3 bg-slate-100 rounded-2xl">
+                            <div class="flex items-center gap-3 px-4 py-2 bg-white rounded-xl shadow-sm border border-slate-200">
+                                <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-500 text-white">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+                                    </svg>
+                                </div>
+                                <span class="text-slate-700 font-medium select-all text-sm">support@optimafm.org</span>
+                            </div>
+
+                            <a href="mailto:support@optimafm.org?subject=Support%20Request%20-%20Optima%20FM" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/25 transition-all hover:scale-105 hover:shadow-xl text-sm">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                                Contact Support
+                            </a>
+                        </div>
                     </div>
 
                     <!-- Additional note -->
@@ -1036,6 +1058,24 @@
                     <img src="{{ asset('images/logo-white.png') }}" alt="Optima FM" class="h-8 w-auto">
                 </div>
                 <p class="text-sm mb-6 max-w-sm">Empowering facility teams with modern, free tools.</p>
+
+                <!-- Contact Emails -->
+                <div class="flex flex-col sm:flex-row items-center gap-4 mb-6 text-sm">
+                    <a href="mailto:support@optimafm.org" class="flex items-center gap-2 text-slate-400 hover:text-teal-400 transition-colors">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        support@optimafm.org
+                    </a>
+                    <span class="hidden sm:inline text-slate-700">|</span>
+                    <a href="mailto:features@optimafm.org" class="flex items-center gap-2 text-slate-400 hover:text-teal-400 transition-colors">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        </svg>
+                        features@optimafm.org
+                    </a>
+                </div>
+
                 <div class="flex gap-3">
                     <a href="https://x.com/OptimaFM_NG" target="_blank" class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center hover:bg-teal-500 hover:text-white transition-all">
                         <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" /></svg>
