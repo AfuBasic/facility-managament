@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AcceptInvitationController;
 use App\Http\Controllers\ClientSessionController;
+use App\Http\Controllers\SocialLoginController;
 use App\Http\Middleware\IsVerified;
 use App\Http\Middleware\SetClientContext;
 use App\Livewire\Client\AssetDetail;
@@ -14,23 +15,21 @@ use App\Livewire\Client\Facilities;
 use App\Livewire\Client\FacilityDetail;
 use App\Livewire\Client\MessagesIndex;
 use App\Livewire\Client\Notifications;
+use App\Livewire\Client\Reports\Facilities\AssetConditionReport;
+use App\Livewire\Client\Reports\Facilities\MaintenanceHistoryReport;
+use App\Livewire\Client\Reports\Financial\CostSummaryReport;
+use App\Livewire\Client\Reports\ReportsIndex;
+use App\Livewire\Client\Reports\WorkOrders\SlaComplianceReport;
+use App\Livewire\Client\Reports\WorkOrders\StatusDistributionReport;
+use App\Livewire\Client\Reports\WorkOrders\TechnicianPerformanceReport;
 use App\Livewire\Client\Roles;
 use App\Livewire\Client\Settings;
 use App\Livewire\Client\SlaPolicy;
 use App\Livewire\Client\StoreDetail;
 use App\Livewire\Client\Users;
 use App\Livewire\Client\Vendors;
-use App\Livewire\Client\WorkOrderCreate;
 use App\Livewire\Client\WorkOrderDetail;
-use App\Livewire\Client\WorkOrderEdit;
 use App\Livewire\Client\WorkOrderList;
-use App\Livewire\Client\Reports\ReportsIndex;
-use App\Livewire\Client\Reports\WorkOrders\StatusDistributionReport;
-use App\Livewire\Client\Reports\WorkOrders\SlaComplianceReport;
-use App\Livewire\Client\Reports\WorkOrders\TechnicianPerformanceReport;
-use App\Livewire\Client\Reports\Facilities\MaintenanceHistoryReport;
-use App\Livewire\Client\Reports\Facilities\AssetConditionReport;
-use App\Livewire\Client\Reports\Financial\CostSummaryReport;
 use App\Livewire\ForgotPassword;
 use App\Livewire\Login;
 use App\Livewire\ResetPassword;
@@ -127,7 +126,9 @@ Route::group(['middleware' => ['guest']], function () {
     Route::get('/forgot-password', ForgotPassword::class)->name('password.request');
     Route::get('/reset-password/{token}', ResetPassword::class)->name('password.reset');
 
-    // Invitation Routes
+    // Social Login Routes
+    Route::get('/auth/{provider}', [SocialLoginController::class, 'redirect'])->name('social.redirect');
+    Route::get('/social-auth/{provider}', [SocialLoginController::class, 'callback'])->name('social.callback');
 });
 
 Route::get('/invitations/{membership}/accept', [AcceptInvitationController::class, 'show'])->name('invitations.accept');
