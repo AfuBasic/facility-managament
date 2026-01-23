@@ -1104,6 +1104,10 @@
             </div>
             <div class="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
                 <p class="text-sm"> {{ date('Y') }} Optima FM. All rights reserved.</p>
+                <div class="flex gap-6 text-sm">
+                    <a href="{{ route('privacy-policy') }}" class="hover:text-white transition-colors">Privacy Policy</a>
+                    <a href="{{ route('terms-of-use') }}" class="hover:text-white transition-colors">Terms of Use</a>
+                </div>
                 <p class="text-sm text-slate-500">Made with <span class="text-red-400">&hearts;</span> for facility teams everywhere</p>
             </div>
         </div>

@@ -48,6 +48,9 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
+Route::view('/privacy-policy', 'privacy-policy')->name('privacy-policy');
+Route::view('/terms-of-use', 'terms-of-use')->name('terms-of-use');
+
 Route::middleware(['auth', IsVerified::class])->group(function () {
     Route::get('/home', UserHome::class)->name('user.home');
     Route::get('/user/invitations', UserInvitations::class)->name('user.invitations');
