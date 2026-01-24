@@ -3,6 +3,7 @@
 use App\Livewire\Admin\Clients;
 use App\Livewire\Admin\Dashboard;
 use App\Livewire\Admin\Login;
+use App\Livewire\Admin\Notifications;
 use App\Livewire\Admin\Users;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -25,8 +26,9 @@ Route::middleware('auth:admin')->prefix('admin')->name('admin.')->group(function
     Route::get('/', Dashboard::class)->name('dashboard');
     Route::get('/users', Users::class)->name('users');
     Route::get('/clients', Clients::class)->name('clients');
+    Route::get('/notifications', Notifications::class)->name('notifications');
 
-    Route::post('/logout', function () {
+    Route::get('/logout', function () {
         Auth::guard('admin')->logout();
         request()->session()->invalidate();
         request()->session()->regenerateToken();
