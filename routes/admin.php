@@ -25,7 +25,6 @@ Route::middleware('auth:admin')->prefix('admin')->name('admin.')->group(function
     Route::get('/', Dashboard::class)->name('dashboard');
     Route::get('/users', Users::class)->name('users');
     Route::get('/clients', Clients::class)->name('clients');
-    Route::get('/notifications', \App\Livewire\Admin\Notifications::class)->name('notifications');
 
     Route::post('/logout', function () {
         Auth::guard('admin')->logout();
