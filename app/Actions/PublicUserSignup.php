@@ -3,11 +3,14 @@
 namespace App\Actions;
 
 use App\Events\ClientRegistered;
+use App\Models\Admin;
 use App\Models\ClientAccount;
 use App\Models\ClientMembership;
 use App\Models\User;
+use App\Notifications\AdminNewUserNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Notification;
 use Spatie\Permission\Models\Role;
 
 final class PublicUserSignup
@@ -53,6 +56,9 @@ final class PublicUserSignup
             $user->verification_sent_at = now();
             $user->save();
             event(new ClientRegistered($user));
+
+            // Notify all admins about the new user registration
+            Notification::send(Admin::all(), new AdminNewUserNotification($user, 'email'));
 
             return $user;
         });

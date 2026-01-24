@@ -82,7 +82,7 @@
                                 <div class="w-full border-t border-white/20"></div>
                             </div>
                             <div class="relative flex justify-center text-sm">
-                                <span class="px-4 bg-transparent text-teal-200/60">or</span>
+                                <span class="px-4 text-teal-200/60 bg-slate-800/90 rounded">or</span>
                             </div>
                         </div>
 

@@ -23,6 +23,17 @@ class Login extends Component
         ]);
 
         if (Auth::attempt(['email' => $this->email, 'password' => $this->password], $this->remember)) {
+            if (Auth::user()->suspended_at) {
+                Auth::logout();
+                session()->invalidate();
+                session()->regenerateToken();
+
+                $this->addError('email', 'Your account has been suspended. Please contact support.');
+                $this->dispatch('toast', message: 'Your account has been suspended.', type: 'error');
+
+                return;
+            }
+
             session()->regenerate();
 
             return redirect()->intended(route('user.home'));
