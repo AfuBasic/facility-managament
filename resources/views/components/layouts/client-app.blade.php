@@ -18,6 +18,12 @@
     <x-google-analytics />
 </head>
 <body class="h-full font-sans antialiased text-slate-600" x-data="{ sidebarOpen: false }">
+    @if(session('impersonating'))
+        <div class="bg-amber-500 text-amber-900 px-4 py-2 text-center text-sm font-medium sticky top-0 z-[60]">
+            <span>Impersonation Mode (Read-Only): Viewing as {{ auth()->user()->name }} ({{ auth()->user()->email }})</span>
+            <a href="{{ route('admin.stop-impersonating') }}" class="ml-2 underline hover:no-underline font-semibold">End Session</a>
+        </div>
+    @endif
 
     <!-- Mobile sidebar -->
     <div x-show="sidebarOpen" class="relative z-50 lg:hidden" role="dialog" aria-modal="true">

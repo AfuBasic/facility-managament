@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Admin;
 use App\Models\SocialAccount;
 use App\Models\User;
+use App\Notifications\AdminNewUserNotification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 use Laravel\Socialite\Facades\Socialite;
 
 class SocialLoginController extends Controller
@@ -43,6 +45,10 @@ class SocialLoginController extends Controller
                 'avatar' => $socialUser->getAvatar(),
             ]);
 
+            if ($socialAccount->user->suspended_at) {
+                return redirect()->route('login')->with('error', 'Your account has been suspended. Please contact support.');
+            }
+
             Auth::login($socialAccount->user);
 
             return redirect()->intended(route('user.home'));
@@ -51,6 +57,10 @@ class SocialLoginController extends Controller
         $user = User::where('email', $socialUser->getEmail())->first();
 
         if ($user) {
+            if ($user->suspended_at) {
+                return redirect()->route('login')->with('error', 'Your account has been suspended. Please contact support.');
+            }
+
             $user->socialAccounts()->create([
                 'provider' => $provider,
                 'provider_id' => $socialUser->getId(),
@@ -79,6 +89,9 @@ class SocialLoginController extends Controller
             'provider_refresh_token' => $socialUser->refreshToken,
             'avatar' => $socialUser->getAvatar(),
         ]);
+
+        // Notify all admins about the new user registration via social login
+        Notification::send(Admin::all(), new AdminNewUserNotification($user, $provider));
 
         Auth::login($user);
 
