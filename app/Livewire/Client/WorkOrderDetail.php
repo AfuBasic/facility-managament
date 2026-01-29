@@ -104,12 +104,17 @@ class WorkOrderDetail extends Component
 
     public function getUsersProperty()
     {
-        return User::orderBy('name')->pluck('name', 'id');
+        return User::whereHas('clientMemberships', function($q) {
+            return $q->where('client_account_id', $this->clientAccount->id);
+        })->orderBy('name')->pluck('name', 'id');
     }
 
     public function getReassignableUsersProperty()
     {
         return User::where('id', '!=', $this->workOrder->assigned_to)
+            ->whereHas('clientMemberships', function ($query) {
+                $query->where('client_account_id', $this->clientAccount->id);
+            })
             ->orderBy('name')
             ->pluck('name', 'id');
     }
