@@ -30,6 +30,13 @@ class SetClientContext
             return redirect()->route('user.home')->with('error', 'Please select a client to continue.');
         }
 
+        // Check if client has changed
+        $previousClientId = session('current_client_account_id');
+        if ($previousClientId !== null && $previousClientId !== $client->id) {
+            // Clear AI assistant conversation when switching clients
+            session()->forget('ai_conversation');
+        }
+
         // Bind the current client to the container
         app()->instance(ClientAccount::class, $client);
         

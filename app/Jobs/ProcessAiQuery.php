@@ -17,13 +17,14 @@ class ProcessAiQuery implements ShouldQueue
     public function __construct(
         public string $question,
         public string $userId,
-        public string $componentId
+        public string $componentId,
+        public ?int $clientAccountId = null
     ) {}
 
     public function handle(AiAssistantService $aiService): void
     {
-        // Get AI response
-        $response = $aiService->ask($this->question);
+        // Get AI response with client scoping
+        $response = $aiService->ask($this->question, $this->clientAccountId);
 
         // Broadcast event with response
         broadcast(new AiResponseReady(

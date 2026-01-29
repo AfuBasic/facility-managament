@@ -16,7 +16,7 @@ class ResponseFormatter
     /**
      * Format the AI response into a user-friendly message
      */
-    public function format(string $aiResponse, string $originalQuestion): array
+    public function format(string $aiResponse, string $originalQuestion, ?int $clientAccountId = null): array
     {
         try {
             // Claude wraps JSON in markdown code blocks, so strip them
@@ -43,8 +43,8 @@ class ResponseFormatter
                 ];
             }
 
-            // Execute the query
-            $queryResult = $this->queryInterpreter->execute($parsed);
+            // Execute the query with client scoping
+            $queryResult = $this->queryInterpreter->execute($parsed, $clientAccountId);
 
             if (! $queryResult['success']) {
                 return [

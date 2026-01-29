@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Asset;
-use App\Models\ClientAccount;
 use App\Models\Contact;
 use App\Models\Event;
 use App\Models\Facility;
@@ -32,7 +31,7 @@ class QueryInterpreter
     /**
      * Execute a query based on AI instructions
      */
-    public function execute(array $queryInstructions): array
+    public function execute(array $queryInstructions, ?int $clientAccountId = null): array
     {
         try {
             $modelName = $queryInstructions['model'] ?? null;
@@ -45,18 +44,8 @@ class QueryInterpreter
             $query = $modelClass::query();
 
             // IMPORTANT: Always filter by current client for data isolation
-            $currentClient = app(ClientAccount::class);
-
-            // If the bound instance has no ID, fallback to session
-            if ($currentClient && ! $currentClient->id) {
-                $clientId = session('current_client_account_id');
-                if ($clientId) {
-                    $currentClient = ClientAccount::find($clientId);
-                }
-            }
-
-            if ($currentClient && $currentClient->id) {
-                $query->where('client_account_id', $currentClient->id);
+            if ($clientAccountId) {
+                $query->where('client_account_id', $clientAccountId);
             }
 
             // Apply where clauses

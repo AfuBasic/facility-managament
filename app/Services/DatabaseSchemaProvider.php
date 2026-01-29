@@ -10,6 +10,7 @@ use App\Models\Space;
 use App\Models\Store;
 use App\Models\User;
 use App\Models\WorkOrder;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
 
 class DatabaseSchemaProvider
@@ -29,36 +30,37 @@ class DatabaseSchemaProvider
     ];
 
     /**
-     * Get the database schema context for AI
+     * Get the database schema context for AI (cached)
      */
     public function getSchemaContext(): string
     {
-        $context = "AVAILABLE MODELS AND THEIR FIELDS:\n\n";
+        return Cache::remember('ai_schema_context', 3600, function () {
+            return $this->buildSchemaContext();
+        });
+    }
+
+    /**
+     * Build the actual schema context
+     */
+    protected function buildSchemaContext(): string
+    {
+        $context = "MODELS:\\n";
 
         foreach ($this->models as $modelClass) {
             $model = new $modelClass;
             $table = $model->getTable();
             $modelName = class_basename($modelClass);
 
-            $context .= "Model: {$modelName}\n";
-            $context .= "Table: {$table}\n";
-
             // Get table columns
             $columns = Schema::getColumns($table);
-            $context .= 'Fields: ';
             $columnNames = array_map(fn ($col) => $col['name'], $columns);
-            $context .= implode(', ', $columnNames)."\n";
 
-            // Get relationships (from fillable and common patterns)
+            // Get relationships
             $relationships = $this->getModelRelationships($model);
-            if (! empty($relationships)) {
-                $context .= 'Relationships: '.implode(', ', $relationships)."\n";
-            }
+            $relStr = !empty($relationships) ? ' | Relations: ' . implode(', ', $relationships) : '';
 
-            $context .= "\n";
+            $context .= "{$modelName}: " . implode(', ', $columnNames) . $relStr . "\\n";
         }
-
-        $context .= $this->getCommonQueries();
 
         return $context;
     }

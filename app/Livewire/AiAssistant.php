@@ -15,7 +15,7 @@ class AiAssistant extends Component
 
     public string $message = '';
 
-    #[Session]
+    #[Session(key: 'ai_conversation')]
     public array $conversation = [];
 
     public bool $isProcessing = false;
@@ -66,11 +66,15 @@ class AiAssistant extends Component
         // Set processing state to show typing indicator
         $this->isProcessing = true;
 
+        // Get the current client account ID from session
+        $clientAccountId = session('current_client_account_id');
+
         // Dispatch job to process AI query asynchronously
         ProcessAiQuery::dispatch(
             question: $userMessage,
             userId: (string) Auth::id(),
-            componentId: $this->getId()
+            componentId: $this->getId(),
+            clientAccountId: $clientAccountId
         );
     }
 
