@@ -36,7 +36,7 @@ class MessageSent implements ShouldBroadcastNow
         $this->senderId = $message->sender_id;
         $this->recipientId = $recipientId;
         $this->clientAccountId = $message->conversation->client_account_id;
-        $this->senderName = $message->sender->name;
+        $this->senderName = $message->sender->name ?? $message->sender->email;
         $this->body = $message->body;
         $this->messageId = (string) $message->id;
         $this->createdAt = $message->created_at->toIso8601String();

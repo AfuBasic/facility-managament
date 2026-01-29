@@ -48,7 +48,7 @@ class IcsCalendarService
 
         // Add organizer if we have creator info
         if ($event->creator) {
-            $organizerName = $this->escapeIcsText($event->creator->name);
+            $organizerName = $this->escapeIcsText($event->creator->name ?? $event->creator->email);
             $organizerEmail = $event->creator->email;
             $ics .= "ORGANIZER;CN={$organizerName}:mailto:{$organizerEmail}\r\n";
         }
